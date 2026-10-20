@@ -2,7 +2,7 @@
 
 Página web de Ride U. El stack es React (Vite) en el frontend, Node.js con Express en el backend y PostgreSQL como base de datos.
 
-El registro crea la cuenta en «Sin verificar» y envía el enlace de verificación. Con `MAIL_MODE=console` el enlace se imprime en la terminal del backend. Todavía no hay pantallas.
+El registro está en `/registro` y la verificación del enlace en `/registro/verificacion`. Con `MAIL_MODE=console` el enlace se imprime en la terminal del backend.
 
 ## Requisitos
 

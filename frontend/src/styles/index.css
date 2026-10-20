@@ -1,21 +1,330 @@
 :root {
-  font-family: "Segoe UI", system-ui, sans-serif;
-  color: #1a1a1a;
-  background: #f7f5f2;
+  color: #1f2a44;
+  background: #fff;
+  font-family: "Segoe UI", "Avenir Next", system-ui, sans-serif;
+  line-height: 1.45;
+  --azul: #0060f9;
+  --azul-oscuro: #0b3fa8;
+  --cielo: #e6f0ff;
+  --borde: #dadfe6;
+  --texto-suave: #6d7585;
+  --error: #b42318;
+  --exito: #067647;
+  --exito-fondo: #ecfdf3;
+  --error-fondo: #fef3f2;
 }
 
-body {
-  margin: 0;
-}
+* { box-sizing: border-box; }
 
-.app {
+body { margin: 0; }
+
+button, input, a { font: inherit; }
+
+.pantalla {
   min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+.barra, .pie {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.1rem 2.5rem;
+}
+
+.pie {
+  background: #f4f8ff;
+  color: #8b93a3;
+  font-size: 0.92rem;
+}
+
+.pie p { margin: 0; }
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.marca strong {
+  display: block;
+  font-size: 1.35rem;
+  letter-spacing: -0.03em;
+}
+
+.marca small {
+  display: block;
+  color: var(--texto-suave);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.marca-icono, .beneficios span, .campus {
   display: grid;
   place-items: center;
 }
 
-h1 {
+.marca-icono {
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 0.8rem;
+  background: var(--azul);
+  color: white;
+}
+
+.marca-icono svg, .exclusivo svg, .kicker svg, .control svg, .boton svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.exclusivo {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
   margin: 0;
-  font-size: 2.5rem;
-  font-weight: 650;
+  color: #5f6b80;
+  font-size: 0.95rem;
+}
+
+.exclusivo svg { color: var(--azul); }
+
+.contenido {
+  display: grid;
+  grid-template-columns: minmax(320px, 1fr) minmax(340px, 1fr);
+  min-height: 0;
+}
+
+.relato {
+  background: var(--cielo);
+  padding: 3.2rem 3.5rem 2rem;
+}
+
+.relato h1 {
+  margin: 0.8rem 0 0.9rem;
+  color: var(--azul-oscuro);
+  font-size: clamp(2.4rem, 4vw, 3.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+
+.relato-texto {
+  max-width: 34rem;
+  margin: 0 0 1.5rem;
+  color: #3d4b67;
+  font-size: 1.05rem;
+}
+
+.kicker {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  color: var(--azul);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.kicker-claro { color: var(--azul); }
+
+.mapa {
+  position: relative;
+  max-width: 34rem;
+  margin-bottom: 1.4rem;
+  border-radius: 1.4rem;
+  background: rgb(255 255 255 / 55%);
+}
+
+.mapa svg { display: block; width: 100%; height: auto; }
+
+.bloque { fill: #d9e6fb; }
+
+.camino {
+  fill: none;
+  stroke: var(--azul);
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.punto { fill: var(--azul); }
+
+.auto rect { fill: white; stroke: var(--azul); stroke-width: 2; }
+
+.auto path { fill: none; stroke: var(--azul); stroke-width: 2; }
+
+.campus circle { fill: var(--azul); }
+
+.campus path { fill: white; }
+
+.etiqueta {
+  position: absolute;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: white;
+  color: #31415f;
+  font-size: 0.82rem;
+  box-shadow: 0 6px 16px rgb(11 63 168 / 8%);
+}
+
+.origen { left: 4%; bottom: 18%; }
+
+.destino { left: 58%; top: 22%; }
+
+.beneficios {
+  display: flex;
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.beneficios li {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  max-width: 12rem;
+  color: var(--azul-oscuro);
+  font-weight: 700;
+}
+
+.beneficios span {
+  width: 2.2rem;
+  height: 2.2rem;
+  flex: none;
+  border-radius: 999px;
+  background: white;
+  color: var(--azul);
+}
+
+.beneficios svg { width: 1.2rem; height: 1.2rem; }
+
+.lugar {
+  margin: 2rem 0 0;
+  color: #8ea0c0;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.panel {
+  padding: 3rem 4.2rem 2rem;
+}
+
+.panel h2 {
+  margin: 0.35rem 0 0.4rem;
+  font-size: 2.15rem;
+  letter-spacing: -0.04em;
+}
+
+.ayuda, .legal, .cambio, .pista {
+  color: var(--texto-suave);
+}
+
+.ayuda { margin: 0 0 1.4rem; }
+
+.formulario {
+  display: grid;
+  gap: 0.95rem;
+}
+
+.formulario label {
+  display: grid;
+  gap: 0.4rem;
+  font-weight: 700;
+}
+
+.control {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 3.2rem;
+  padding: 0 0.85rem;
+  border: 1px solid var(--borde);
+  border-radius: 0.9rem;
+  background: white;
+}
+
+.control:focus-within { border-color: var(--azul); box-shadow: 0 0 0 3px rgb(0 96 249 / 12%); }
+
+.control-error { border-color: var(--error); }
+
+.control svg { flex: none; color: #98a2b3; }
+
+.control input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  color: inherit;
+  background: transparent;
+}
+
+.control em, .control b {
+  flex: none;
+  color: #98a2b3;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.ojo {
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: #98a2b3;
+  cursor: pointer;
+}
+
+.formulario small { font-weight: 500; color: var(--error); }
+
+.formulario small.pista { color: var(--texto-suave); }
+
+.legal { margin: 0.2rem 0 0; font-size: 0.92rem; }
+
+.boton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  min-height: 3.3rem;
+  margin-top: 0.4rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--azul);
+  color: white;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.boton:disabled { opacity: 0.7; cursor: wait; }
+
+.cambio { text-align: center; }
+
+.cambio a { color: var(--azul); font-weight: 700; text-decoration: none; }
+
+.aviso {
+  margin: 0 0 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 0.9rem;
+}
+
+.aviso-error { background: var(--error-fondo); color: var(--error); }
+
+.aviso-exito { background: var(--exito-fondo); color: var(--exito); }
+
+@media (max-width: 900px) {
+  .barra, .pie, .relato, .panel { padding-left: 1.2rem; padding-right: 1.2rem; }
+  .barra, .pie { align-items: flex-start; flex-direction: column; }
+  .contenido { grid-template-columns: 1fr; }
+  .panel { order: -1; padding-top: 1.5rem; }
+  .relato { padding-top: 2rem; }
+  .beneficios { flex-direction: column; }
 }
