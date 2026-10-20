@@ -320,6 +320,106 @@ button, input, a { font: inherit; }
 
 .aviso-exito { background: var(--exito-fondo); color: var(--exito); }
 
+.verificacion {
+  max-width: 28rem;
+}
+
+.verificacion-exito {
+  display: grid;
+  justify-items: start;
+  gap: 0;
+}
+
+.exito-marca {
+  display: grid;
+  justify-items: center;
+  gap: 0.85rem;
+  margin-bottom: 1.4rem;
+}
+
+.exito-circulo {
+  display: grid;
+  place-items: center;
+  width: 5.2rem;
+  height: 5.2rem;
+  border-radius: 999px;
+  background: var(--exito);
+  color: white;
+  box-shadow: 0 12px 28px rgb(6 118 71 / 22%);
+}
+
+.exito-circulo svg {
+  width: 2.4rem;
+  height: 2.4rem;
+}
+
+.exito-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  background: var(--exito-fondo);
+  color: var(--exito);
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.exito-badge i {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.correo-confirmado {
+  display: grid;
+  gap: 0.25rem;
+  width: 100%;
+  margin: 0.2rem 0 1.1rem;
+  padding: 1rem 1.15rem;
+  border-radius: 1rem;
+  background: var(--cielo);
+}
+
+.correo-confirmado small {
+  color: var(--texto-suave);
+  font-size: 0.88rem;
+}
+
+.correo-confirmado strong {
+  color: var(--azul);
+  font-size: 1.08rem;
+  letter-spacing: -0.02em;
+  word-break: break-word;
+}
+
+.confianza {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 1.1rem 0 0;
+  color: var(--texto-suave);
+  font-size: 0.95rem;
+}
+
+.confianza svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  color: var(--azul);
+}
+
+.verificacion-acciones {
+  display: grid;
+  gap: 0.85rem;
+  width: 100%;
+  margin-top: 0.4rem;
+}
+
+.verificacion-acciones .boton { margin-top: 0; }
+
+.verificacion-acciones .cambio { margin: 0; }
+
 @media (max-width: 900px) {
   .barra, .pie, .relato, .panel { padding-left: 1.2rem; padding-right: 1.2rem; }
   .barra, .pie { align-items: flex-start; flex-direction: column; }
@@ -327,4 +427,5 @@ button, input, a { font: inherit; }
   .panel { order: -1; padding-top: 1.5rem; }
   .relato { padding-top: 2rem; }
   .beneficios { flex-direction: column; }
+  .exito-marca { justify-items: start; }
 }

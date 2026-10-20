@@ -111,3 +111,14 @@ export function IconoFlecha() {
     </svg>
   );
 }
+
+export function IconoCheck() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        fill="currentColor"
+        d="M9.6 16.6 5.4 12.4l1.4-1.4 2.8 2.8 7.2-7.2 1.4 1.4-8.6 8.6Z"
+      />
+    </svg>
+  );
+}
