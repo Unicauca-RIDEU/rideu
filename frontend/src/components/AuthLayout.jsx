@@ -1,7 +1,21 @@
 import { Link } from "react-router-dom";
 import { IconoAuto, IconoEscudo, IconoPersona, IconoRuta } from "./Iconos.jsx";
 
-export default function AuthLayout({ children }) {
+const RELATO_POR_DEFECTO = {
+  titulo: (
+    <>
+      La U nos une.
+      <br />
+      El camino también.
+    </>
+  ),
+  texto: "Comparte tus trayectos por Popayán con personas de la Universidad del Cauca.",
+};
+
+export default function AuthLayout({ children, titulo, texto }) {
+  const relatoTitulo = titulo ?? RELATO_POR_DEFECTO.titulo;
+  const relatoTexto = texto ?? RELATO_POR_DEFECTO.texto;
+
   return (
     <div className="pantalla">
       <header className="barra">
@@ -26,14 +40,8 @@ export default function AuthLayout({ children }) {
             <IconoRuta />
             Juntos hacemos camino
           </p>
-          <h1>
-            La U nos une.
-            <br />
-            El camino también.
-          </h1>
-          <p className="relato-texto">
-            Comparte tus trayectos por Popayán con personas de la Universidad del Cauca.
-          </p>
+          <h1>{relatoTitulo}</h1>
+          <p className="relato-texto">{relatoTexto}</p>
           <MapaTrayecto />
           <ul className="beneficios">
             <li>
