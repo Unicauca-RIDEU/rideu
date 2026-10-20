@@ -2,13 +2,13 @@
 
 Página web de Ride U. El stack es React (Vite) en el frontend, Node.js con Express en el backend y PostgreSQL como base de datos.
 
-Esta versión solo trae la estructura del proyecto. No hay pantallas, rutas de API ni acceso a la base de datos.
+El registro de usuarios ya persiste cuentas en PostgreSQL. Todavía no hay pantallas ni envío del correo de verificación.
 
 ## Requisitos
 
 - Node.js 20 o superior
 - npm 10 o superior
-- PostgreSQL 16 o superior, solo cuando se implemente la persistencia. Hoy el servidor arranca sin base de datos.
+- PostgreSQL 16 o superior
 
 ## Instalación
 
@@ -20,7 +20,11 @@ npm install --prefix backend
 npm install --prefix frontend
 ```
 
-Ajusta `DATABASE_URL` en `.env` cuando vayas a conectar PostgreSQL. Crea la base `rideu` en ese momento; el código actual no la abre.
+Ajusta `DATABASE_URL` en `.env` y crea la base `rideu`. Luego crea la tabla:
+
+```bash
+npm run db:migrate --prefix backend
+```
 
 ## Ejecución
 
@@ -51,11 +55,11 @@ npm run build --prefix frontend
 ├── backend/          API en Node.js y Express
 │   └── src/
 │       ├── config/       Lectura de variables de entorno
-│       ├── controllers/  Lógica de cada endpoint (vacío)
+│       ├── controllers/  Registro de usuarios
 │       ├── middleware/   Middleware de Express (vacío)
-│       ├── models/       Acceso a PostgreSQL (vacío)
-│       ├── routes/       Definición de rutas HTTP (vacío)
-│       ├── app.js        Instancia de Express, sin rutas
+│       ├── models/       Acceso a PostgreSQL (usuarios)
+│       ├── routes/       Rutas HTTP de autenticación
+│       ├── app.js        Instancia de Express y rutas /api/auth
 │       └── server.js     Arranque del proceso HTTP
 ├── frontend/         Interfaz en React con Vite
 │   ├── public/           Archivos estáticos servidos tal cual
