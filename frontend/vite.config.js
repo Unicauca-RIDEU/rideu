@@ -10,5 +10,8 @@ export default defineConfig({
   envDir: path.resolve(frontendDir, ".."),
   server: {
     port: 5173,
+    proxy: {
+      "/api": "http://localhost:3000",
+    },
   },
 });
