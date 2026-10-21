@@ -1,5 +1,8 @@
 import bcrypt from "bcryptjs";
+import { crearSesion } from "../models/sesion.js";
 import {
+  ESTADO_VERIFICADA,
+  buscarCredencialesPorCorreo,
   crearTokenVerificacion,
   crearUsuario,
   buscarPorCorreo,
@@ -92,4 +95,44 @@ export async function verificar(req, res) {
     console.error("Error al verificar la cuenta:", error);
     return res.status(500).json({ mensaje: "No se pudo verificar la cuenta." });
   }
+}
+
+export async function iniciarSesion(req, res) {
+  const correo = typeof req.body?.correo === "string" ? req.body.correo.trim().toLowerCase() : "";
+  const contrasena = typeof req.body?.contrasena === "string" ? req.body.contrasena : "";
+  if (!correo || !contrasena) {
+    return res.status(400).json({
+      mensaje: "Ingresa tu correo institucional y tu contraseña.",
+    });
+  }
+
+  try {
+    const usuario = await buscarCredencialesPorCorreo(correo);
+    const accesoPermitido =
+      usuario?.estado === ESTADO_VERIFICADA &&
+      (await bcrypt.compare(contrasena, usuario.contrasena_hash));
+    if (!accesoPermitido) {
+      return res.status(401).json({ mensaje: "No se pudo iniciar sesión." });
+    }
+
+    const { token, expira } = await crearSesion(usuario.id);
+    return res.status(200).json({
+      mensaje: "Sesión iniciada.",
+      token,
+      expira,
+      usuario: {
+        id: usuario.id,
+        nombre: usuario.nombre,
+        correo: usuario.correo,
+        estado: usuario.estado,
+      },
+    });
+  } catch (error) {
+    console.error("Error al iniciar sesión:", error);
+    return res.status(500).json({ mensaje: "No se pudo iniciar sesión." });
+  }
+}
+
+export function sesionActual(req, res) {
+  return res.status(200).json({ usuario: req.usuario });
 }
