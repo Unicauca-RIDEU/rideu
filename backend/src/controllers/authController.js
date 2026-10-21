@@ -108,11 +108,18 @@ export async function iniciarSesion(req, res) {
 
   try {
     const usuario = await buscarCredencialesPorCorreo(correo);
-    const accesoPermitido =
-      usuario?.estado === ESTADO_VERIFICADA &&
-      (await bcrypt.compare(contrasena, usuario.contrasena_hash));
-    if (!accesoPermitido) {
+    const contrasenaValida = Boolean(
+      usuario && (await bcrypt.compare(contrasena, usuario.contrasena_hash)),
+    );
+    if (!contrasenaValida) {
       return res.status(401).json({ mensaje: "No se pudo iniciar sesión." });
+    }
+
+    if (usuario.estado !== ESTADO_VERIFICADA) {
+      return res.status(403).json({
+        codigo: "EMAIL_NOT_VERIFIED",
+        mensaje: "Debes verificar tu correo institucional para acceder",
+      });
     }
 
     const { token, expira } = await crearSesion(usuario.id);
