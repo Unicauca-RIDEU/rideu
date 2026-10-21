@@ -41,6 +41,10 @@ export default function Login() {
           setMensaje("Debes verificar tu correo institucional para acceder");
           return;
         }
+        if (respuesta.status === 401) {
+          setMensaje("Correo o contraseña incorrectos");
+          return;
+        }
         setMensaje(respuesta.mensaje || "No se pudo iniciar sesión.");
         return;
       }
