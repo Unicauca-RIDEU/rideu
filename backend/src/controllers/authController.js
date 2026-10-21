@@ -1,5 +1,8 @@
 import bcrypt from "bcryptjs";
+import { crearSesion } from "../models/sesion.js";
 import {
+  ESTADO_VERIFICADA,
+  buscarCredencialesPorCorreo,
   crearTokenVerificacion,
   crearUsuario,
   buscarPorCorreo,
@@ -10,6 +13,8 @@ import { enviarCorreoVerificacion } from "../services/correo.js";
 import { validarRegistro } from "../validation/registro.js";
 
 const RONDAS_BCRYPT = 10;
+const MENSAJE_CREDENCIALES_INVALIDAS = "Correo o contraseña incorrectos";
+const HASH_AUSENTE = bcrypt.hashSync("credencial-ausente", RONDAS_BCRYPT);
 
 export async function registrar(req, res) {
   const validacion = validarRegistro(req.body);
@@ -92,4 +97,49 @@ export async function verificar(req, res) {
     console.error("Error al verificar la cuenta:", error);
     return res.status(500).json({ mensaje: "No se pudo verificar la cuenta." });
   }
+}
+
+export async function iniciarSesion(req, res) {
+  const correo = typeof req.body?.correo === "string" ? req.body.correo.trim().toLowerCase() : "";
+  const contrasena = typeof req.body?.contrasena === "string" ? req.body.contrasena : "";
+  if (!correo || !contrasena) {
+    return res.status(400).json({
+      mensaje: "Ingresa tu correo institucional y tu contraseña.",
+    });
+  }
+
+  try {
+    const usuario = await buscarCredencialesPorCorreo(correo);
+    const coincide = await bcrypt.compare(contrasena, usuario?.contrasena_hash ?? HASH_AUSENTE);
+    if (!usuario || !coincide) {
+      return res.status(401).json({ mensaje: MENSAJE_CREDENCIALES_INVALIDAS });
+    }
+
+    if (usuario.estado !== ESTADO_VERIFICADA) {
+      return res.status(403).json({
+        codigo: "EMAIL_NOT_VERIFIED",
+        mensaje: "Debes verificar tu correo institucional para acceder",
+      });
+    }
+
+    const { token, expira } = await crearSesion(usuario.id);
+    return res.status(200).json({
+      mensaje: "Sesión iniciada.",
+      token,
+      expira,
+      usuario: {
+        id: usuario.id,
+        nombre: usuario.nombre,
+        correo: usuario.correo,
+        estado: usuario.estado,
+      },
+    });
+  } catch (error) {
+    console.error("Error al iniciar sesión:", error);
+    return res.status(500).json({ mensaje: "No se pudo iniciar sesión." });
+  }
+}
+
+export function sesionActual(req, res) {
+  return res.status(200).json({ usuario: req.usuario });
 }
