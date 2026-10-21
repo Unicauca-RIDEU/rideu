@@ -26,6 +26,16 @@ export async function buscarPorCorreo(correo) {
   return resultado.rows[0] ?? null;
 }
 
+export async function buscarCredencialesPorCorreo(correo) {
+  const resultado = await pool.query(
+    `SELECT id, nombre, correo, estado, contrasena_hash
+     FROM usuarios
+     WHERE correo = $1`,
+    [correo],
+  );
+  return resultado.rows[0] ?? null;
+}
+
 export async function crearUsuario({
   nombre,
   correo,
