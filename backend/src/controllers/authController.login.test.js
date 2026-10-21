@@ -40,14 +40,49 @@ test("el login con correo sin verificar responde 403 y no abre sesión", async (
 
     const incorrecto = await llamarLogin({ correo, contrasena: "otra-clave" });
     assert.equal(incorrecto.statusCode, 401);
-    assert.equal(incorrecto.cuerpo.mensaje, "No se pudo iniciar sesión.");
-    assert.equal(incorrecto.cuerpo.codigo, undefined);
-    assert.equal(incorrecto.cuerpo.token, undefined);
+    assert.deepEqual(incorrecto.cuerpo, { mensaje: "Correo o contraseña incorrectos" });
 
     await verificarCuenta(token);
     const aceptado = await llamarLogin({ correo, contrasena });
     assert.equal(aceptado.statusCode, 200);
     assert.equal(typeof aceptado.cuerpo.token, "string");
+  } finally {
+    await eliminarUsuario(usuario.id);
+  }
+});
+
+test("correo inexistente y contraseña incorrecta responden el mismo 401", async (t) => {
+  try {
+    await pool.query("SELECT 1");
+  } catch {
+    t.skip("PostgreSQL no está disponible");
+    return;
+  }
+
+  const correo = `login.clave-incorrecta.${Date.now()}@unicauca.edu.co`;
+  const { tokenHash, expira } = crearTokenVerificacion();
+  const usuario = await crearUsuario({
+    nombre: "Ana Pérez",
+    correo,
+    contrasenaHash: await bcrypt.hash("secreta12", 4),
+    whatsapp: "+573001234567",
+    tokenHash,
+    tokenExpira: expira,
+  });
+
+  try {
+    const inexistente = await llamarLogin({
+      correo: `nadie.${Date.now()}@unicauca.edu.co`,
+      contrasena: "secreta12",
+    });
+    const claveIncorrecta = await llamarLogin({ correo, contrasena: "otra-clave" });
+    const esperado = { mensaje: "Correo o contraseña incorrectos" };
+
+    assert.equal(inexistente.statusCode, 401);
+    assert.equal(claveIncorrecta.statusCode, 401);
+    assert.deepEqual(inexistente.cuerpo, esperado);
+    assert.deepEqual(claveIncorrecta.cuerpo, esperado);
+    assert.equal(await contarSesiones(usuario.id), 0);
   } finally {
     await eliminarUsuario(usuario.id);
   }
