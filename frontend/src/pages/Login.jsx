@@ -37,6 +37,10 @@ export default function Login() {
     try {
       const respuesta = await iniciarSesion({ correo, contrasena: datos.contrasena });
       if (!respuesta.ok) {
+        if (respuesta.status === 403 && respuesta.codigo === "EMAIL_NOT_VERIFIED") {
+          setMensaje("Debes verificar tu correo institucional para acceder");
+          return;
+        }
         setMensaje(respuesta.mensaje || "No se pudo iniciar sesión.");
         return;
       }
