@@ -420,8 +420,53 @@ button, input, a { font: inherit; }
 
 .verificacion-acciones .cambio { margin: 0; }
 
+.panel:has(.acceso) {
+  display: grid;
+  align-content: center;
+}
+
+.acceso {
+  width: 100%;
+  max-width: 30rem;
+  margin: 0 auto;
+}
+
+.acceso .formulario label { font-weight: 600; }
+
+.acceso .control input { font-weight: 400; }
+
+.olvido {
+  justify-self: end;
+  margin-top: -0.35rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--azul);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.acceso .boton { margin-top: 0.6rem; }
+
+.acceso .cambio { margin: 1.4rem 0 0; }
+
+.acceso .confianza { margin-top: 2rem; }
+
+.panel-principal {
+  padding: 3.2rem 3.5rem;
+  background: var(--cielo);
+}
+
+.panel-principal h2 {
+  margin: 0.35rem 0 0.4rem;
+  color: var(--azul-oscuro);
+  font-size: 2.15rem;
+  letter-spacing: -0.04em;
+}
+
 @media (max-width: 900px) {
-  .barra, .pie, .relato, .panel { padding-left: 1.2rem; padding-right: 1.2rem; }
+  .barra, .pie, .relato, .panel, .panel-principal { padding-left: 1.2rem; padding-right: 1.2rem; }
   .barra, .pie { align-items: flex-start; flex-direction: column; }
   .contenido { grid-template-columns: 1fr; }
   .panel { order: -1; padding-top: 1.5rem; }

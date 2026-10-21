@@ -4,12 +4,18 @@ import { fileURLToPath } from "node:url";
 import { pool } from "../config/database.js";
 
 const dbDir = path.dirname(fileURLToPath(import.meta.url));
-const sqlPath = path.resolve(dbDir, "../../sql/001_usuarios.sql");
-const sql = fs.readFileSync(sqlPath, "utf8");
+const sqlDir = path.resolve(dbDir, "../../sql");
+const archivos = fs
+  .readdirSync(sqlDir)
+  .filter((archivo) => archivo.endsWith(".sql"))
+  .sort();
 
 try {
-  await pool.query(sql);
-  console.log("Tabla usuarios lista.");
+  for (const archivo of archivos) {
+    await pool.query(fs.readFileSync(path.join(sqlDir, archivo), "utf8"));
+    console.log(`Migración aplicada: ${archivo}`);
+  }
+  console.log("Tablas listas.");
 } finally {
   await pool.end();
 }
