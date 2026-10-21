@@ -13,6 +13,8 @@ import { enviarCorreoVerificacion } from "../services/correo.js";
 import { validarRegistro } from "../validation/registro.js";
 
 const RONDAS_BCRYPT = 10;
+const MENSAJE_CREDENCIALES_INVALIDAS = "Correo o contraseña incorrectos";
+const HASH_AUSENTE = bcrypt.hashSync("credencial-ausente", RONDAS_BCRYPT);
 
 export async function registrar(req, res) {
   const validacion = validarRegistro(req.body);
@@ -108,11 +110,9 @@ export async function iniciarSesion(req, res) {
 
   try {
     const usuario = await buscarCredencialesPorCorreo(correo);
-    const contrasenaValida = Boolean(
-      usuario && (await bcrypt.compare(contrasena, usuario.contrasena_hash)),
-    );
-    if (!contrasenaValida) {
-      return res.status(401).json({ mensaje: "No se pudo iniciar sesión." });
+    const coincide = await bcrypt.compare(contrasena, usuario?.contrasena_hash ?? HASH_AUSENTE);
+    if (!usuario || !coincide) {
+      return res.status(401).json({ mensaje: MENSAJE_CREDENCIALES_INVALIDAS });
     }
 
     if (usuario.estado !== ESTADO_VERIFICADA) {
