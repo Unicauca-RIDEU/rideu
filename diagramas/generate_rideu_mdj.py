@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate RideU StarUML .mdj with Diagramas_De_Proceso hierarchy from backlog."""
+"""Generate RideU StarUML .mdj statechart diagrams from the product backlog."""
 
 from __future__ import annotations
 
@@ -26,224 +26,344 @@ def ref(eid: str) -> dict:
     return {"$ref": eid}
 
 
-def make_label(
-    parent_id: str,
-    text: str,
-    *,
-    left: int,
-    top: int,
-    width: int,
-    height: int = 13,
-) -> dict:
-    lid = IDS.next()
-    return {
-        "_type": "LabelView",
-        "_id": lid,
-        "_parent": ref(parent_id),
-        "visible": True,
-        "enabled": True,
-        "lineColor": "#000000",
-        "fillColor": "#ffffff",
-        "fontColor": "#000000",
-        "font": "Arial;13;0",
-        "parentStyle": True,
-        "left": left,
-        "top": top,
-        "width": width,
-        "height": height,
-        "text": text,
-        "horizontalAlignment": 2,
-        "verticalAlignment": 5,
-    }
-
-
-def base_view2(
-    vtype: str,
-    vid: str,
+def edge_label(
     parent_id: str,
     model_id: str,
     *,
+    text: str | None,
+    visible: bool,
     left: int,
     top: int,
-    width: int,
-    height: int,
-    fill: str = "#ffffff",
+    width: int = 10,
+    height: int = 13,
+    alpha: float = 1.5708,
+    distance: float = 15,
 ) -> dict:
-    return {
-        "_type": vtype,
-        "_id": vid,
+    lab: dict = {
+        "_type": "EdgeLabelView",
+        "_id": IDS.next(),
         "_parent": ref(parent_id),
         "model": ref(model_id),
-        "subViews": [],
-        "visible": True,
-        "enabled": True,
-        "lineColor": "#000000",
-        "fillColor": fill,
-        "fontColor": "#000000",
+        "visible": visible,
         "font": "Arial;13;0",
-        "parentStyle": True,
+        "left": left,
+        "top": top,
+        "width": width if text else 0,
+        "height": height,
+        "alpha": alpha,
+        "distance": distance,
+        "hostEdge": ref(parent_id),
+        "edgePosition": 1,
+    }
+    if text:
+        lab["text"] = text
+        lab["width"] = max(width, len(text) * 7)
+    return lab
+
+
+def node_label(parent_id: str, model_id: str) -> dict:
+    return {
+        "_type": "NodeLabelView",
+        "_id": IDS.next(),
+        "_parent": ref(parent_id),
+        "model": ref(model_id),
+        "visible": False,
+        "font": "Arial;13;0",
+        "height": 13,
+        "alpha": 2.356194490192345,
+        "distance": 20,
+    }
+
+
+def make_state_view(diagram_id: str, model_id: str, name: str, left: int, top: int) -> dict:
+    vid = IDS.next()
+    width = max(140, min(280, 20 + len(name) * 8))
+    height = 40
+
+    stereo = {
+        "_type": "LabelView",
+        "_id": IDS.next(),
+        "_parent": None,  # filled below
+        "visible": False,
+        "font": "Arial;13;0",
+        "top": -16,
+        "height": 13,
+    }
+    name_lab = {
+        "_type": "LabelView",
+        "_id": IDS.next(),
+        "_parent": None,
+        "font": "Arial;13;1",
+        "left": left + 8,
+        "top": top + 12,
+        "width": width - 16,
+        "height": 13,
+        "text": name,
+    }
+    ns_lab = {
+        "_type": "LabelView",
+        "_id": IDS.next(),
+        "_parent": None,
+        "visible": False,
+        "font": "Arial;13;0",
+        "top": -16,
+        "height": 13,
+        "text": "(from )",
+    }
+    prop_lab = {
+        "_type": "LabelView",
+        "_id": IDS.next(),
+        "_parent": None,
+        "visible": False,
+        "font": "Arial;13;0",
+        "top": -16,
+        "height": 13,
+        "horizontalAlignment": 1,
+    }
+
+    nc_id = IDS.next()
+    for lab in (stereo, name_lab, ns_lab, prop_lab):
+        lab["_parent"] = ref(nc_id)
+
+    name_comp = {
+        "_type": "UMLNameCompartmentView",
+        "_id": nc_id,
+        "_parent": ref(vid),
+        "model": ref(model_id),
+        "subViews": [stereo, name_lab, ns_lab, prop_lab],
+        "font": "Arial;13;0",
+        "left": left,
+        "top": top,
+        "width": width,
+        "height": 25,
+        "stereotypeLabel": ref(stereo["_id"]),
+        "nameLabel": ref(name_lab["_id"]),
+        "namespaceLabel": ref(ns_lab["_id"]),
+        "propertyLabel": ref(prop_lab["_id"]),
+    }
+
+    ia = {
+        "_type": "UMLInternalActivityCompartmentView",
+        "_id": IDS.next(),
+        "_parent": ref(vid),
+        "model": ref(model_id),
+        "visible": False,
+        "font": "Arial;13;0",
+        "top": -8,
+        "width": 10,
+        "height": 10,
+    }
+    it = {
+        "_type": "UMLInternalTransitionCompartmentView",
+        "_id": IDS.next(),
+        "_parent": ref(vid),
+        "model": ref(model_id),
+        "visible": False,
+        "font": "Arial;13;0",
+        "top": -8,
+        "width": 10,
+        "height": 10,
+    }
+    dec = {
+        "_type": "UMLDecompositionCompartmentView",
+        "_id": IDS.next(),
+        "_parent": ref(vid),
+        "model": ref(model_id),
+        "visible": False,
+        "font": "Arial;13;0",
+        "top": -8,
+        "width": 10,
+        "height": 10,
+        "subViews": [],
+    }
+
+    return {
+        "_type": "UMLStateView",
+        "_id": vid,
+        "_parent": ref(diagram_id),
+        "model": ref(model_id),
+        "subViews": [name_comp, ia, it, dec],
+        "font": "Arial;13;0",
+        "fillColor": "#E3F2FD",
+        "lineColor": "#1565C0",
+        "containerChangeable": True,
         "left": left,
         "top": top,
         "width": width,
         "height": height,
+        "nameCompartment": ref(nc_id),
+        "internalActivityCompartment": ref(ia["_id"]),
+        "internalTransitionCompartment": ref(it["_id"]),
+        "decompositionCompartment": ref(dec["_id"]),
     }
 
 
-def action_view(diagram_id: str, model_id: str, name: str, left: int, top: int) -> dict:
+def make_pseudostate_view(diagram_id: str, model_id: str, left: int, top: int) -> dict:
     vid = IDS.next()
-    width = max(180, min(340, 12 + len(name) * 7))
-    height = 44
-    name_label = make_label(vid, name, left=left + 6, top=top + 15, width=width - 12)
-    v = base_view2(
-        "UMLActionView",
-        vid,
-        diagram_id,
-        model_id,
-        left=left,
-        top=top,
-        width=width,
-        height=height,
-        fill="#FFFDE7",
-    )
-    v["nameLabel"] = ref(name_label["_id"])
-    v["subViews"] = [name_label]
-    v["containerChangeable"] = True
-    return v
-
-
-def initial_view(diagram_id: str, model_id: str, left: int, top: int) -> dict:
-    return base_view2(
-        "UMLInitialNodeView",
-        IDS.next(),
-        diagram_id,
-        model_id,
-        left=left,
-        top=top,
-        width=18,
-        height=18,
-        fill="#000000",
-    )
-
-
-def final_view(diagram_id: str, model_id: str, left: int, top: int) -> dict:
-    return base_view2(
-        "UMLActivityFinalNodeView",
-        IDS.next(),
-        diagram_id,
-        model_id,
-        left=left,
-        top=top,
-        width=22,
-        height=22,
-        fill="#ffffff",
-    )
-
-
-def decision_view(diagram_id: str, model_id: str, left: int, top: int) -> dict:
-    return base_view2(
-        "UMLDecisionNodeView",
-        IDS.next(),
-        diagram_id,
-        model_id,
-        left=left,
-        top=top,
-        width=32,
-        height=32,
-        fill="#ffffff",
-    )
-
-
-def flow_view(
-    diagram_id: str,
-    flow_id: str,
-    head_view_id: str,
-    tail_view_id: str,
-    label: str | None,
-    points: list[int],
-) -> dict:
-    vid = IDS.next()
-    sub: list[dict] = []
-    v: dict = {
-        "_type": "UMLControlFlowView",
+    labels = [node_label(vid, model_id) for _ in range(3)]
+    return {
+        "_type": "UMLPseudostateView",
         "_id": vid,
         "_parent": ref(diagram_id),
-        "model": ref(flow_id),
-        "subViews": sub,
-        "visible": True,
-        "enabled": True,
-        "lineColor": "#000000",
-        "fillColor": "#ffffff",
-        "fontColor": "#000000",
+        "model": ref(model_id),
+        "subViews": labels,
         "font": "Arial;13;0",
-        "parentStyle": True,
-        "head": ref(head_view_id),
-        "tail": ref(tail_view_id),
-        "lineStyle": 1,
-        "points": ",".join(str(p) for p in points),
+        "fillColor": "#000000",
+        "containerChangeable": True,
+        "left": left,
+        "top": top,
+        "width": 20,
+        "height": 20,
+        "nameLabel": ref(labels[0]["_id"]),
+        "stereotypeLabel": ref(labels[1]["_id"]),
+        "propertyLabel": ref(labels[2]["_id"]),
     }
-    if label:
-        mid_x = (points[0] + points[-2]) // 2
-        mid_y = (points[1] + points[-1]) // 2
-        lbl = make_label(
-            vid,
-            label,
-            left=mid_x + 6,
-            top=mid_y - 14,
-            width=max(28, len(label) * 8),
-        )
-        sub.append(lbl)
-        v["nameLabel"] = ref(lbl["_id"])
-    return v
+
+
+def make_final_view(diagram_id: str, model_id: str, left: int, top: int) -> dict:
+    return {
+        "_type": "UMLFinalStateView",
+        "_id": IDS.next(),
+        "_parent": ref(diagram_id),
+        "model": ref(model_id),
+        "subViews": [],
+        "font": "Arial;13;0",
+        "containerChangeable": True,
+        "left": left,
+        "top": top,
+        "width": 26,
+        "height": 26,
+    }
+
+
+def make_choice_view(diagram_id: str, model_id: str, left: int, top: int) -> dict:
+    vid = IDS.next()
+    labels = [node_label(vid, model_id) for _ in range(3)]
+    return {
+        "_type": "UMLPseudostateView",
+        "_id": vid,
+        "_parent": ref(diagram_id),
+        "model": ref(model_id),
+        "subViews": labels,
+        "font": "Arial;13;0",
+        "fillColor": "#ffffff",
+        "containerChangeable": True,
+        "left": left,
+        "top": top,
+        "width": 24,
+        "height": 24,
+        "nameLabel": ref(labels[0]["_id"]),
+        "stereotypeLabel": ref(labels[1]["_id"]),
+        "propertyLabel": ref(labels[2]["_id"]),
+    }
 
 
 def cx(view: dict) -> int:
     return view["left"] + view["width"] // 2
 
 
+def mid_y(view: dict) -> int:
+    return view["top"] + view["height"] // 2
+
+
 def bottom(view: dict) -> int:
     return view["top"] + view["height"]
 
 
-def build_activity(parent_id: str, diagram_name: str, documentation: str, steps: dict) -> dict:
-    activity_id = IDS.next()
+def make_transition_view(
+    diagram_id: str,
+    transition_id: str,
+    head_view: dict,
+    tail_view: dict,
+    label: str,
+    points: list[int],
+) -> dict:
+    vid = IDS.next()
+    mid_x = (points[0] + points[-2]) // 2
+    mid_y_ = (points[1] + points[-1]) // 2
+    name_lab = edge_label(
+        vid,
+        transition_id,
+        text=label,
+        visible=True,
+        left=mid_x + 4,
+        top=mid_y_ - 16,
+        width=max(40, len(label) * 7),
+    )
+    stereo = edge_label(
+        vid, transition_id, text=None, visible=False, left=mid_x, top=mid_y_, width=0
+    )
+    prop = edge_label(
+        vid, transition_id, text=None, visible=False, left=mid_x, top=mid_y_, width=0
+    )
+    return {
+        "_type": "UMLTransitionView",
+        "_id": vid,
+        "_parent": ref(diagram_id),
+        "model": ref(transition_id),
+        "subViews": [name_lab, stereo, prop],
+        "font": "Arial;13;0",
+        "lineColor": "#000000",
+        "head": ref(head_view["_id"]),
+        "tail": ref(tail_view["_id"]),
+        "lineStyle": 1,
+        "points": ";".join(f"{points[i]}:{points[i+1]}" for i in range(0, len(points), 2)),
+        "showVisibility": True,
+        "nameLabel": ref(name_lab["_id"]),
+        "stereotypeLabel": ref(stereo["_id"]),
+        "propertyLabel": ref(prop["_id"]),
+    }
+
+
+def build_state_machine(
+    parent_id: str,
+    name: str,
+    documentation: str,
+    spec: dict,
+) -> dict:
+    """
+    spec:
+      states: [{id, kind: initial|state|choice|final, name?, lane?, align?}]
+      transitions: [{from, to, label}]
+    """
+    sm_id = IDS.next()
+    region_id = IDS.next()
     diagram_id = IDS.next()
 
-    nodes: dict[str, dict] = {}
-    views: dict[str, dict] = {}
-    owned: list[dict] = []
-    owned_views: list[dict] = []
+    main_col = 260
+    left_col = 20
+    right_col = 520
+    gap = 90
 
-    main_col = 300
-    left_col = 40
-    right_col = 560
-    gap = 78
-
-    # Assign Y for main-lane nodes in declaration order
     y_pos: dict[str, int] = {}
     main_i = 0
-    for nd in steps["nodes"]:
-        if nd.get("lane", "main") == "main":
-            y_pos[nd["id"]] = 36 + main_i * gap
+    for st in spec["states"]:
+        if st.get("lane", "main") == "main":
+            y_pos[st["id"]] = 40 + main_i * gap
             main_i += 1
 
-    # Side-lane nodes: stack under their align anchor, with offset per sibling
     side_counters: dict[tuple[str, str], int] = {}
-    for nd in steps["nodes"]:
-        lane = nd.get("lane", "main")
+    for st in spec["states"]:
+        lane = st.get("lane", "main")
         if lane == "main":
             continue
-        align = nd.get("align")
-        base_y = y_pos.get(align, 36)
-        key = (lane, align or "")
+        align = st.get("align", "")
+        key = (lane, align)
         offset = side_counters.get(key, 0)
         side_counters[key] = offset + 1
-        y_pos[nd["id"]] = base_y + offset * gap
+        base = y_pos.get(align, 40)
+        y_pos[st["id"]] = base + offset * gap
 
-    for nd in steps["nodes"]:
-        nid = IDS.next()
-        kind = nd["kind"]
-        key = nd["id"]
-        lane = nd.get("lane", "main")
+    models: dict[str, dict] = {}
+    views: dict[str, dict] = {}
+    vertices: list[dict] = []
+    owned_views: list[dict] = []
+
+    for st in spec["states"]:
+        sid = IDS.next()
+        kind = st["kind"]
+        key = st["id"]
+        lane = st.get("lane", "main")
         top = y_pos[key]
         if lane == "main":
             left = main_col
@@ -254,524 +374,635 @@ def build_activity(parent_id: str, diagram_name: str, documentation: str, steps:
 
         if kind == "initial":
             model = {
-                "_type": "UMLInitialNode",
-                "_id": nid,
-                "_parent": ref(activity_id),
-                "name": "",
+                "_type": "UMLPseudostate",
+                "_id": sid,
+                "_parent": ref(region_id),
+                "kind": "initial",
             }
-            view = initial_view(diagram_id, nid, left + 100, top + 8)
+            view = make_pseudostate_view(diagram_id, sid, left + 70, top + 10)
+        elif kind == "choice":
+            model = {
+                "_type": "UMLPseudostate",
+                "_id": sid,
+                "_parent": ref(region_id),
+                "kind": "choice",
+                "name": st.get("name", ""),
+            }
+            view = make_choice_view(diagram_id, sid, left + 68, top + 8)
         elif kind == "final":
             model = {
-                "_type": "UMLActivityFinalNode",
-                "_id": nid,
-                "_parent": ref(activity_id),
-                "name": "",
+                "_type": "UMLFinalState",
+                "_id": sid,
+                "_parent": ref(region_id),
+                "name": st.get("name", ""),
             }
-            view = final_view(diagram_id, nid, left + 98, top + 6)
-        elif kind == "decision":
+            view = make_final_view(diagram_id, sid, left + 67, top + 7)
+        elif kind == "state":
             model = {
-                "_type": "UMLDecisionNode",
-                "_id": nid,
-                "_parent": ref(activity_id),
-                "name": nd.get("name", ""),
+                "_type": "UMLState",
+                "_id": sid,
+                "_parent": ref(region_id),
+                "name": st["name"],
             }
-            view = decision_view(diagram_id, nid, left + 94, top + 4)
-        elif kind == "action":
-            model = {
-                "_type": "UMLAction",
-                "_id": nid,
-                "_parent": ref(activity_id),
-                "name": nd["name"],
-            }
-            view = action_view(diagram_id, nid, nd["name"], left, top)
+            view = make_state_view(diagram_id, sid, st["name"], left, top)
         else:
             raise ValueError(kind)
 
-        nodes[key] = model
+        models[key] = model
         views[key] = view
-        owned.append(model)
+        vertices.append(model)
         owned_views.append(view)
 
-    for edge in steps["edges"]:
-        frm, to = edge[0], edge[1]
-        label = edge[2] if len(edge) > 2 else None
-        sm, sv = nodes[frm], views[frm]
-        tm, tv = nodes[to], views[to]
-
-        fid = IDS.next()
-        flow: dict = {
-            "_type": "UMLControlFlow",
-            "_id": fid,
-            "_parent": ref(activity_id),
-            "source": ref(sm["_id"]),
-            "target": ref(tm["_id"]),
+    transitions: list[dict] = []
+    for edge in spec["transitions"]:
+        frm, to, label = edge["from"], edge["to"], edge["label"]
+        assert frm in models, f"missing state {frm} in {name}"
+        assert to in models, f"missing state {to} in {name}"
+        tid = IDS.next()
+        ev = {
+            "_type": "UMLEvent",
+            "_id": IDS.next(),
+            "_parent": ref(tid),
+            "name": label,
         }
-        if label:
-            flow["name"] = label
-        owned.append(flow)
+        tr = {
+            "_type": "UMLTransition",
+            "_id": tid,
+            "_parent": ref(region_id),
+            "source": ref(models[frm]["_id"]),
+            "target": ref(models[to]["_id"]),
+            "triggers": [ev],
+        }
+        transitions.append(tr)
 
+        sv, tv = views[frm], views[to]
         sx, sy = cx(sv), bottom(sv)
         tx, ty = cx(tv), tv["top"]
-        if abs(sx - tx) > 30:
-            points = [sx, sy, tx, sy, tx, ty]
+        # side to side / up connections
+        if abs(sx - tx) > 40 and abs(sy - ty) > 20:
+            # route: down a bit / across / to target
+            if tv["top"] >= sv["top"]:
+                points = [sx, sy, sx, sy + 20, tx, sy + 20, tx, ty]
+            else:
+                points = [sx, mid_y(sv), tx, mid_y(sv), tx, ty]
+        elif abs(sx - tx) > 40:
+            points = [sx, mid_y(sv), tx, mid_y(sv), tx, mid_y(tv)]
         else:
             points = [sx, sy, tx, ty]
 
         owned_views.append(
-            flow_view(diagram_id, fid, tv["_id"], sv["_id"], label, points)
+            make_transition_view(diagram_id, tid, tv, sv, label, points)
         )
 
     diagram = {
-        "_type": "UMLActivityDiagram",
+        "_type": "UMLStatechartDiagram",
         "_id": diagram_id,
-        "_parent": ref(activity_id),
-        "name": diagram_name,
+        "_parent": ref(sm_id),
+        "name": name,
         "visible": True,
         "defaultDiagram": False,
         "ownedViews": owned_views,
     }
-    owned.insert(0, diagram)
+
+    region = {
+        "_type": "UMLRegion",
+        "_id": region_id,
+        "_parent": ref(sm_id),
+        "vertices": vertices,
+        "transitions": transitions,
+    }
 
     return {
-        "_type": "UMLActivity",
-        "_id": activity_id,
+        "_type": "UMLStateMachine",
+        "_id": sm_id,
         "_parent": ref(parent_id),
-        "name": diagram_name,
+        "name": name,
         "documentation": documentation,
-        "ownedElements": owned,
+        "ownedElements": [diagram],
+        "regions": [region],
     }
 
 
-PROCESSES: dict[str, dict] = {
+# --- Business-logic state machines per user story ---
+
+MACHINES: dict[str, dict] = {
     "E1_HU1": {
         "doc": (
             "HU01 — Registro con correo institucional\n"
-            "Path: /registro, /registro/verificacion\n"
-            "Épica E01: Gestión de identidad y autenticación institucional"
+            "Estados de la cuenta durante el registro y verificación.\n"
+            "Paths: /registro, /registro/verificacion"
         ),
-        "nodes": [
-            {"id": "s", "kind": "initial"},
-            {"id": "a1", "kind": "action", "name": "Abrir /registro e ingresar datos"},
-            {"id": "d1", "kind": "decision", "name": "¿Dominio @unicauca.edu.co?"},
+        "states": [
+            {"id": "ini", "kind": "initial"},
+            {"id": "form", "kind": "state", "name": "Formulario de registro"},
+            {"id": "ch_dom", "kind": "choice", "name": "¿Dominio institucional?"},
             {
-                "id": "rej",
-                "kind": "action",
-                "name": "Rechazar: solo correo institucional",
+                "id": "rech",
+                "kind": "state",
+                "name": "Registro rechazado",
                 "lane": "left",
-                "align": "d1",
+                "align": "ch_dom",
             },
-            {"id": "a2", "kind": "action", "name": "Crear cuenta «Sin verificar»"},
-            {"id": "a3", "kind": "action", "name": "Enviar enlace de verificación"},
-            {"id": "a4", "kind": "action", "name": "Usuario abre /registro/verificacion"},
-            {"id": "a5", "kind": "action", "name": "Activar cuenta «Verificada»"},
-            {"id": "a6", "kind": "action", "name": "Ofrecer ir a /login"},
-            {"id": "f1", "kind": "final"},
-            {"id": "f2", "kind": "final", "lane": "left", "align": "d1"},
+            {"id": "sin_ver", "kind": "state", "name": "Cuenta sin verificar"},
+            {"id": "verif", "kind": "state", "name": "Cuenta verificada"},
+            {"id": "fin", "kind": "final"},
+            {"id": "fin_r", "kind": "final", "lane": "left", "align": "ch_dom"},
         ],
-        "edges": [
-            ("s", "a1"),
-            ("a1", "d1"),
-            ("d1", "rej", "No"),
-            ("d1", "a2", "Sí"),
-            ("rej", "f2"),
-            ("a2", "a3"),
-            ("a3", "a4"),
-            ("a4", "a5"),
-            ("a5", "a6"),
-            ("a6", "f1"),
+        "transitions": [
+            {"from": "ini", "to": "form", "label": "abrir /registro"},
+            {"from": "form", "to": "ch_dom", "label": "enviar registro"},
+            {
+                "from": "ch_dom",
+                "to": "rech",
+                "label": "[dominio ≠ @unicauca.edu.co]",
+            },
+            {
+                "from": "ch_dom",
+                "to": "sin_ver",
+                "label": "[dominio = @unicauca.edu.co] / crear cuenta + enviar enlace",
+            },
+            {"from": "rech", "to": "fin_r", "label": "mostrar rechazo"},
+            {
+                "from": "sin_ver",
+                "to": "verif",
+                "label": "clic enlace /registro/verificacion",
+            },
+            {"from": "verif", "to": "fin", "label": "ofrecer ir a /login"},
         ],
     },
     "E1_HU2": {
         "doc": (
             "HU02 — Inicio de sesión validado\n"
-            "Path: /login\n"
-            "Épica E01: Gestión de identidad y autenticación institucional"
+            "Estados de autenticación y control de verificación.\n"
+            "Path: /login"
         ),
-        "nodes": [
-            {"id": "s", "kind": "initial"},
-            {"id": "a1", "kind": "action", "name": "Abrir /login e ingresar credenciales"},
-            {"id": "d1", "kind": "decision", "name": "¿Credenciales correctas?"},
+        "states": [
+            {"id": "ini", "kind": "initial"},
+            {"id": "login", "kind": "state", "name": "Pantalla de login"},
+            {"id": "ch_cred", "kind": "choice", "name": "¿Credenciales correctas?"},
             {
                 "id": "err",
-                "kind": "action",
-                "name": "Mensaje de error genérico",
+                "kind": "state",
+                "name": "Error genérico",
                 "lane": "left",
-                "align": "d1",
+                "align": "ch_cred",
             },
-            {"id": "d2", "kind": "decision", "name": "¿Cuenta verificada?"},
+            {"id": "ch_ver", "kind": "choice", "name": "¿Cuenta verificada?"},
             {
-                "id": "nv",
-                "kind": "action",
-                "name": "Impedir acceso: verificar correo",
+                "id": "pend",
+                "kind": "state",
+                "name": "Acceso bloqueado (sin verificar)",
                 "lane": "right",
-                "align": "d2",
+                "align": "ch_ver",
             },
-            {"id": "ok", "kind": "action", "name": "Acceso al panel principal"},
-            {"id": "f1", "kind": "final"},
-            {"id": "f2", "kind": "final", "lane": "left", "align": "d1"},
-            {"id": "f3", "kind": "final", "lane": "right", "align": "d2"},
+            {"id": "auth", "kind": "state", "name": "Sesión autenticada"},
+            {"id": "fin", "kind": "final"},
         ],
-        "edges": [
-            ("s", "a1"),
-            ("a1", "d1"),
-            ("d1", "err", "No"),
-            ("d1", "d2", "Sí"),
-            ("err", "f2"),
-            ("d2", "nv", "No"),
-            ("d2", "ok", "Sí"),
-            ("nv", "f3"),
-            ("ok", "f1"),
+        "transitions": [
+            {"from": "ini", "to": "login", "label": "abrir /login"},
+            {"from": "login", "to": "ch_cred", "label": "iniciar sesión"},
+            {"from": "ch_cred", "to": "err", "label": "[credenciales incorrectas]"},
+            {"from": "err", "to": "login", "label": "reintentar"},
+            {"from": "ch_cred", "to": "ch_ver", "label": "[credenciales correctas]"},
+            {
+                "from": "ch_ver",
+                "to": "pend",
+                "label": "[cuenta sin verificar]",
+            },
+            {"from": "pend", "to": "login", "label": "volver a login"},
+            {
+                "from": "ch_ver",
+                "to": "auth",
+                "label": "[cuenta verificada] / acceso al panel",
+            },
+            {"from": "auth", "to": "fin", "label": "sesión activa"},
         ],
     },
     "E2_HU1": {
         "doc": (
             "HU03 — Registrar vehículo y licencia\n"
-            "Path: /perfil/vehiculo\n"
-            "Épica E02: Gestión de oferta de trayectos (conductores)"
+            "Estados de habilitación del conductor.\n"
+            "Path: /perfil/vehiculo"
         ),
-        "nodes": [
-            {"id": "s", "kind": "initial"},
-            {"id": "a1", "kind": "action", "name": "Abrir /perfil/vehiculo"},
-            {"id": "a2", "kind": "action", "name": "Ingresar vehículo y licencia"},
-            {"id": "d1", "kind": "decision", "name": "¿Campos válidos?"},
+        "states": [
+            {"id": "ini", "kind": "initial"},
+            {"id": "nohab", "kind": "state", "name": "No habilitado"},
+            {"id": "form", "kind": "state", "name": "Registro de vehículo/licencia"},
+            {"id": "ch_val", "kind": "choice", "name": "¿Datos válidos?"},
             {
                 "id": "inv",
-                "kind": "action",
-                "name": "Señalar campos inválidos",
+                "kind": "state",
+                "name": "Datos inválidos",
                 "lane": "left",
-                "align": "d1",
+                "align": "ch_val",
             },
-            {"id": "d2", "kind": "decision", "name": "¿Licencia vigente?"},
+            {"id": "ch_lic", "kind": "choice", "name": "¿Licencia vigente?"},
             {
-                "id": "ven",
-                "kind": "action",
-                "name": "Rechazar: licencia no vigente",
+                "id": "venc",
+                "kind": "state",
+                "name": "Licencia no vigente",
                 "lane": "right",
-                "align": "d2",
+                "align": "ch_lic",
             },
-            {"id": "ok", "kind": "action", "name": "Registrar y marcar «Habilitado»"},
-            {"id": "f1", "kind": "final"},
-            {"id": "f2", "kind": "final", "lane": "left", "align": "d1"},
-            {"id": "f3", "kind": "final", "lane": "right", "align": "d2"},
+            {"id": "hab", "kind": "state", "name": "Habilitado para publicar"},
+            {"id": "fin", "kind": "final"},
         ],
-        "edges": [
-            ("s", "a1"),
-            ("a1", "a2"),
-            ("a2", "d1"),
-            ("d1", "inv", "No"),
-            ("d1", "d2", "Sí"),
-            ("inv", "f2"),
-            ("d2", "ven", "No"),
-            ("d2", "ok", "Sí"),
-            ("ven", "f3"),
-            ("ok", "f1"),
+        "transitions": [
+            {"from": "ini", "to": "nohab", "label": "cuenta verificada sin vehículo"},
+            {"from": "nohab", "to": "form", "label": "abrir /perfil/vehiculo"},
+            {"from": "form", "to": "ch_val", "label": "guardar vehículo"},
+            {"from": "ch_val", "to": "inv", "label": "[campos vacíos o placa inválida]"},
+            {"from": "inv", "to": "form", "label": "corregir datos"},
+            {"from": "ch_val", "to": "ch_lic", "label": "[campos válidos]"},
+            {
+                "from": "ch_lic",
+                "to": "venc",
+                "label": "[fecha vencimiento < hoy]",
+            },
+            {"from": "venc", "to": "nohab", "label": "mantener No habilitado"},
+            {
+                "from": "ch_lic",
+                "to": "hab",
+                "label": "[licencia vigente] / registrar vehículo",
+            },
+            {"from": "hab", "to": "fin", "label": "perfil actualizado"},
         ],
     },
     "E2_HU2": {
         "doc": (
             "HU04 — Publicar trayecto\n"
-            "Path: /trayectos/publicar\n"
-            "Épica E02: Gestión de oferta de trayectos (conductores)"
+            "Estados de publicación de un trayecto.\n"
+            "Path: /trayectos/publicar"
         ),
-        "nodes": [
-            {"id": "s", "kind": "initial"},
-            {"id": "a1", "kind": "action", "name": "Abrir /trayectos/publicar"},
-            {"id": "d0", "kind": "decision", "name": "¿Conductor habilitado?"},
+        "states": [
+            {"id": "ini", "kind": "initial"},
+            {"id": "pub", "kind": "state", "name": "Pantalla publicar trayecto"},
+            {"id": "ch_hab", "kind": "choice", "name": "¿Conductor habilitado?"},
             {
-                "id": "nh",
-                "kind": "action",
-                "name": "Dirigir a /perfil/vehiculo",
+                "id": "redir",
+                "kind": "state",
+                "name": "Debe registrar vehículo",
                 "lane": "left",
-                "align": "d0",
+                "align": "ch_hab",
             },
-            {
-                "id": "a2",
-                "kind": "action",
-                "name": "Ingresar origen, sede, fecha, hora, cupos, aporte",
-            },
-            {"id": "d1", "kind": "decision", "name": "¿Campos y cupos válidos?"},
+            {"id": "datos", "kind": "state", "name": "Datos del trayecto capturados"},
+            {"id": "ch_cup", "kind": "choice", "name": "¿Cupos válidos?"},
             {
                 "id": "inv",
-                "kind": "action",
-                "name": "Mostrar validación / capacidad máx.",
+                "kind": "state",
+                "name": "Publicación rechazada",
                 "lane": "right",
-                "align": "d1",
+                "align": "ch_cup",
             },
-            {"id": "ok", "kind": "action", "name": "Crear trayecto disponible"},
-            {"id": "f1", "kind": "final"},
-            {"id": "f2", "kind": "final", "lane": "left", "align": "d0"},
-            {"id": "f3", "kind": "final", "lane": "right", "align": "d1"},
+            {"id": "disp", "kind": "state", "name": "Trayecto disponible"},
+            {"id": "fin", "kind": "final"},
+            {"id": "fin_r", "kind": "final", "lane": "left", "align": "ch_hab"},
         ],
-        "edges": [
-            ("s", "a1"),
-            ("a1", "d0"),
-            ("d0", "nh", "No"),
-            ("d0", "a2", "Sí"),
-            ("nh", "f2"),
-            ("a2", "d1"),
-            ("d1", "inv", "No"),
-            ("d1", "ok", "Sí"),
-            ("inv", "f3"),
-            ("ok", "f1"),
+        "transitions": [
+            {"from": "ini", "to": "pub", "label": "abrir /trayectos/publicar"},
+            {"from": "pub", "to": "ch_hab", "label": "intentar publicar"},
+            {
+                "from": "ch_hab",
+                "to": "redir",
+                "label": "[sin vehículo/licencia]",
+            },
+            {"from": "redir", "to": "fin_r", "label": "dirigir a /perfil/vehiculo"},
+            {
+                "from": "ch_hab",
+                "to": "datos",
+                "label": "[habilitado] / ingresar origen, sede, fecha, hora, cupos, aporte",
+            },
+            {"from": "datos", "to": "ch_cup", "label": "publicar trayecto"},
+            {
+                "from": "ch_cup",
+                "to": "inv",
+                "label": "[cupos ≤ 0 o > capacidad o campos vacíos]",
+            },
+            {"from": "inv", "to": "datos", "label": "corregir"},
+            {
+                "from": "ch_cup",
+                "to": "disp",
+                "label": "[cupos válidos] / crear trayecto",
+            },
+            {"from": "disp", "to": "fin", "label": "visible para pasajeros"},
         ],
     },
     "E2_HU3": {
         "doc": (
             "HU05 — Editar o cancelar trayecto\n"
-            "Path: /trayectos/editar\n"
-            "Épica E02: Gestión de oferta de trayectos (conductores)"
+            "Estados de un trayecto publicado.\n"
+            "Path: /trayectos/editar"
         ),
-        "nodes": [
-            {"id": "s", "kind": "initial"},
-            {"id": "a1", "kind": "action", "name": "Abrir /trayectos/editar"},
-            {"id": "d1", "kind": "decision", "name": "¿Editar o cancelar?"},
+        "states": [
+            {"id": "ini", "kind": "initial"},
+            {"id": "vig", "kind": "state", "name": "Trayecto vigente"},
+            {"id": "ch_op", "kind": "choice", "name": "¿Editar o cancelar?"},
             {
-                "id": "ed",
-                "kind": "action",
-                "name": "Modificar fecha/hora/cupos",
+                "id": "edit",
+                "kind": "state",
+                "name": "Editando trayecto",
                 "lane": "left",
-                "align": "d1",
+                "align": "ch_op",
             },
+            {"id": "ch_res", "kind": "choice", "name": "¿Hay reservas?"},
             {
-                "id": "sv",
-                "kind": "action",
-                "name": "Guardar cambios visibles",
-                "lane": "left",
-                "align": "d1",
-            },
-            {"id": "d2", "kind": "decision", "name": "¿Hay reservas confirmadas?"},
-            {
-                "id": "cf",
-                "kind": "action",
-                "name": "Confirmar pasajeros afectados",
+                "id": "conf",
+                "kind": "state",
+                "name": "Confirmación con pasajeros afectados",
                 "lane": "right",
-                "align": "d2",
+                "align": "ch_res",
             },
-            {"id": "can", "kind": "action", "name": "Cancelar trayecto y reservas"},
-            {"id": "nt", "kind": "action", "name": "Notificar pasajeros afectados"},
-            {"id": "f1", "kind": "final"},
-            {"id": "f2", "kind": "final", "lane": "left", "align": "d1"},
+            {"id": "canc", "kind": "state", "name": "Trayecto cancelado"},
+            {"id": "fin", "kind": "final"},
         ],
-        "edges": [
-            ("s", "a1"),
-            ("a1", "d1"),
-            ("d1", "ed", "Editar"),
-            ("d1", "d2", "Cancelar"),
-            ("ed", "sv"),
-            ("sv", "f2"),
-            ("d2", "can", "No"),
-            ("d2", "cf", "Sí"),
-            ("cf", "can"),
-            ("can", "nt"),
-            ("nt", "f1"),
+        "transitions": [
+            {"from": "ini", "to": "vig", "label": "trayecto publicado"},
+            {"from": "vig", "to": "ch_op", "label": "abrir /trayectos/editar"},
+            {"from": "ch_op", "to": "edit", "label": "editar fecha/hora/cupos"},
+            {
+                "from": "edit",
+                "to": "vig",
+                "label": "guardar cambios / actualizar para no reservados",
+            },
+            {"from": "ch_op", "to": "ch_res", "label": "cancelar trayecto"},
+            {
+                "from": "ch_res",
+                "to": "canc",
+                "label": "[sin reservas] / estado Cancelado",
+            },
+            {
+                "from": "ch_res",
+                "to": "conf",
+                "label": "[con reservas] / pedir confirmación",
+            },
+            {
+                "from": "conf",
+                "to": "canc",
+                "label": "confirmar / cancelar reservas + notificar",
+            },
+            {
+                "from": "canc",
+                "to": "fin",
+                "label": "retirar de búsqueda",
+            },
         ],
     },
     "E3_HU1": {
         "doc": (
             "HU06 — Buscar trayectos disponibles\n"
-            "Path: /trayectos/buscar\n"
-            "Épica E03: Búsqueda y demanda de trayectos (pasajeros)"
+            "Estados de la búsqueda de oferta.\n"
+            "Path: /trayectos/buscar"
         ),
-        "nodes": [
-            {"id": "s", "kind": "initial"},
-            {"id": "a1", "kind": "action", "name": "Abrir /trayectos/buscar"},
-            {"id": "a2", "kind": "action", "name": "Filtrar por sede, fecha y hora"},
-            {"id": "a3", "kind": "action", "name": "Excluir trayectos sin cupos"},
-            {"id": "d1", "kind": "decision", "name": "¿Hay resultados?"},
+        "states": [
+            {"id": "ini", "kind": "initial"},
+            {"id": "bus", "kind": "state", "name": "Pantalla de búsqueda"},
+            {"id": "filt", "kind": "state", "name": "Filtros aplicados"},
+            {"id": "ch", "kind": "choice", "name": "¿Hay cupos disponibles?"},
             {
-                "id": "empty",
-                "kind": "action",
-                "name": "«No hay resultados disponibles»",
+                "id": "vacio",
+                "kind": "state",
+                "name": "Sin resultados",
                 "lane": "left",
-                "align": "d1",
+                "align": "ch",
             },
-            {"id": "ok", "kind": "action", "name": "Listar trayectos ordenados por hora"},
-            {"id": "f1", "kind": "final"},
-            {"id": "f2", "kind": "final", "lane": "left", "align": "d1"},
+            {"id": "list", "kind": "state", "name": "Resultados ordenados por hora"},
+            {"id": "fin", "kind": "final"},
+            {"id": "fin_v", "kind": "final", "lane": "left", "align": "ch"},
         ],
-        "edges": [
-            ("s", "a1"),
-            ("a1", "a2"),
-            ("a2", "a3"),
-            ("a3", "d1"),
-            ("d1", "empty", "No"),
-            ("d1", "ok", "Sí"),
-            ("empty", "f2"),
-            ("ok", "f1"),
+        "transitions": [
+            {"from": "ini", "to": "bus", "label": "abrir /trayectos/buscar"},
+            {
+                "from": "bus",
+                "to": "filt",
+                "label": "filtrar sede, fecha y hora",
+            },
+            {
+                "from": "filt",
+                "to": "ch",
+                "label": "buscar / excluir sin cupos",
+            },
+            {
+                "from": "ch",
+                "to": "vacio",
+                "label": "[sin coincidencias]",
+            },
+            {"from": "vacio", "to": "fin_v", "label": "«No hay resultados disponibles»"},
+            {
+                "from": "ch",
+                "to": "list",
+                "label": "[hay trayectos con cupos]",
+            },
+            {"from": "list", "to": "fin", "label": "mostrar listado"},
+            {"from": "vacio", "to": "bus", "label": "cambiar filtros"},
+            {"from": "list", "to": "bus", "label": "nueva búsqueda"},
         ],
     },
     "E4_HU1": {
         "doc": (
             "HU07 — Reservar cupo en trayecto\n"
-            "Path: /trayectos/reservar\n"
-            "Épica E04: Gestión de reservas y disponibilidad en tiempo real"
+            "Estados de la reserva con control de concurrencia.\n"
+            "Path: /trayectos/reservar"
         ),
-        "nodes": [
-            {"id": "s", "kind": "initial"},
-            {
-                "id": "a1",
-                "kind": "action",
-                "name": "Seleccionar trayecto y abrir /trayectos/reservar",
-            },
-            {"id": "a2", "kind": "action", "name": "Confirmar reserva"},
-            {"id": "d1", "kind": "decision", "name": "¿Cupo disponible (concurrencia)?"},
+        "states": [
+            {"id": "ini", "kind": "initial"},
+            {"id": "sel", "kind": "state", "name": "Trayecto seleccionado"},
+            {"id": "res", "kind": "state", "name": "Confirmando reserva"},
+            {"id": "ch", "kind": "choice", "name": "¿Cupo disponible?"},
             {
                 "id": "agot",
-                "kind": "action",
-                "name": "«Cupos agotados» / volver a buscar",
+                "kind": "state",
+                "name": "Cupos agotados",
                 "lane": "left",
-                "align": "d1",
+                "align": "ch",
             },
-            {"id": "ok", "kind": "action", "name": "Confirmar, descontar cupo y actualizar"},
-            {"id": "f1", "kind": "final"},
-            {"id": "f2", "kind": "final", "lane": "left", "align": "d1"},
+            {"id": "conf", "kind": "state", "name": "Reserva confirmada"},
+            {"id": "fin", "kind": "final"},
+            {"id": "fin_a", "kind": "final", "lane": "left", "align": "ch"},
         ],
-        "edges": [
-            ("s", "a1"),
-            ("a1", "a2"),
-            ("a2", "d1"),
-            ("d1", "agot", "No"),
-            ("d1", "ok", "Sí"),
-            ("agot", "f2"),
-            ("ok", "f1"),
+        "transitions": [
+            {
+                "from": "ini",
+                "to": "sel",
+                "label": "elegir trayecto desde búsqueda",
+            },
+            {"from": "sel", "to": "res", "label": "abrir /trayectos/reservar"},
+            {"from": "res", "to": "ch", "label": "confirmar reserva"},
+            {
+                "from": "ch",
+                "to": "agot",
+                "label": "[sin cupo / segunda solicitud concurrente]",
+            },
+            {
+                "from": "agot",
+                "to": "fin_a",
+                "label": "mensaje + volver a /trayectos/buscar",
+            },
+            {
+                "from": "ch",
+                "to": "conf",
+                "label": "[cupo asignado] / descontar cupo en tiempo real",
+            },
+            {"from": "conf", "to": "fin", "label": "reserva activa"},
         ],
     },
     "E4_HU2": {
         "doc": (
             "HU08 — Cancelar reserva\n"
-            "Path: /reservas/cancelar\n"
-            "Épica E04: Gestión de reservas y disponibilidad en tiempo real"
+            "Estados de una reserva confirmada.\n"
+            "Path: /reservas/cancelar"
         ),
-        "nodes": [
-            {"id": "s", "kind": "initial"},
-            {"id": "a1", "kind": "action", "name": "Abrir /reservas/cancelar"},
-            {"id": "a2", "kind": "action", "name": "Seleccionar reserva y confirmar"},
-            {"id": "d1", "kind": "decision", "name": "¿Trayecto ya inició?"},
+        "states": [
+            {"id": "ini", "kind": "initial"},
+            {"id": "conf", "kind": "state", "name": "Reserva confirmada"},
+            {"id": "ch", "kind": "choice", "name": "¿Trayecto ya inició?"},
             {
                 "id": "bloq",
-                "kind": "action",
-                "name": "Impedir cancelación",
+                "kind": "state",
+                "name": "Cancelación impedida",
                 "lane": "left",
-                "align": "d1",
+                "align": "ch",
             },
-            {"id": "ok", "kind": "action", "name": "Estado «Cancelada» y liberar cupo"},
-            {"id": "nt", "kind": "action", "name": "Notificar al conductor"},
-            {"id": "f1", "kind": "final"},
-            {"id": "f2", "kind": "final", "lane": "left", "align": "d1"},
+            {"id": "canc", "kind": "state", "name": "Reserva cancelada"},
+            {"id": "fin", "kind": "final"},
+            {"id": "fin_b", "kind": "final", "lane": "left", "align": "ch"},
         ],
-        "edges": [
-            ("s", "a1"),
-            ("a1", "a2"),
-            ("a2", "d1"),
-            ("d1", "bloq", "Sí"),
-            ("d1", "ok", "No"),
-            ("bloq", "f2"),
-            ("ok", "nt"),
-            ("nt", "f1"),
+        "transitions": [
+            {"from": "ini", "to": "conf", "label": "reserva existente"},
+            {
+                "from": "conf",
+                "to": "ch",
+                "label": "cancelar reserva en /reservas/cancelar",
+            },
+            {
+                "from": "ch",
+                "to": "bloq",
+                "label": "[trayecto iniciado]",
+            },
+            {"from": "bloq", "to": "fin_b", "label": "mostrar mensaje de bloqueo"},
+            {
+                "from": "ch",
+                "to": "canc",
+                "label": "[no iniciado] / liberar cupo + notificar conductor",
+            },
+            {"from": "canc", "to": "fin", "label": "estado Cancelada"},
         ],
     },
     "E4_HU3": {
         "doc": (
             "HU09 — Consultar historial de trayectos y reservas\n"
-            "Path: /historial\n"
-            "Épica E04: Gestión de reservas y disponibilidad en tiempo real"
+            "Estados de consulta del historial.\n"
+            "Path: /historial"
         ),
-        "nodes": [
-            {"id": "s", "kind": "initial"},
-            {"id": "a1", "kind": "action", "name": "Acceder a /historial"},
-            {"id": "d1", "kind": "decision", "name": "¿Hay actividad registrada?"},
+        "states": [
+            {"id": "ini", "kind": "initial"},
+            {"id": "hist", "kind": "state", "name": "Sección historial"},
+            {"id": "ch", "kind": "choice", "name": "¿Hay actividad?"},
             {
-                "id": "empty",
-                "kind": "action",
-                "name": "Mensaje: aún no hay registros",
+                "id": "vacio",
+                "kind": "state",
+                "name": "Sin registros",
                 "lane": "left",
-                "align": "d1",
+                "align": "ch",
             },
-            {"id": "ok", "kind": "action", "name": "Listar actividad con estado"},
-            {"id": "f1", "kind": "final"},
-            {"id": "f2", "kind": "final", "lane": "left", "align": "d1"},
+            {
+                "id": "lista",
+                "kind": "state",
+                "name": "Historial con estados",
+            },
+            {"id": "fin", "kind": "final"},
+            {"id": "fin_v", "kind": "final", "lane": "left", "align": "ch"},
         ],
-        "edges": [
-            ("s", "a1"),
-            ("a1", "d1"),
-            ("d1", "empty", "No"),
-            ("d1", "ok", "Sí"),
-            ("empty", "f2"),
-            ("ok", "f1"),
+        "transitions": [
+            {"from": "ini", "to": "hist", "label": "acceder a /historial"},
+            {"from": "hist", "to": "ch", "label": "cargar actividad"},
+            {"from": "ch", "to": "vacio", "label": "[sin actividad]"},
+            {"from": "vacio", "to": "fin_v", "label": "mensaje sin registros"},
+            {
+                "from": "ch",
+                "to": "lista",
+                "label": "[hay actividad] / listar completado|cancelado|pendiente",
+            },
+            {"from": "lista", "to": "fin", "label": "consulta realizada"},
         ],
     },
     "E5_HU1": {
         "doc": (
             "HU10 — Contacto WhatsApp para el pasajero\n"
-            "Path: /reservas/contacto-conductor\n"
-            "Épica E05: Coordinación externa vía WhatsApp"
+            "Estados del contacto externo al conductor.\n"
+            "Path: /reservas/contacto-conductor"
         ),
-        "nodes": [
-            {"id": "s", "kind": "initial"},
-            {
-                "id": "a1",
-                "kind": "action",
-                "name": "Abrir detalle /reservas/contacto-conductor",
-            },
-            {"id": "a2", "kind": "action", "name": "Clic en contacto del conductor"},
-            {"id": "d1", "kind": "decision", "name": "¿WhatsApp válido?"},
+        "states": [
+            {"id": "ini", "kind": "initial"},
+            {"id": "det", "kind": "state", "name": "Detalle de reserva"},
+            {"id": "ch", "kind": "choice", "name": "¿WhatsApp válido?"},
             {
                 "id": "na",
-                "kind": "action",
+                "kind": "state",
                 "name": "Contacto no disponible",
                 "lane": "left",
-                "align": "d1",
+                "align": "ch",
             },
-            {
-                "id": "ok",
-                "kind": "action",
-                "name": "Abrir enlace wa.me (sin chat interno)",
-            },
-            {"id": "f1", "kind": "final"},
-            {"id": "f2", "kind": "final", "lane": "left", "align": "d1"},
+            {"id": "wa", "kind": "state", "name": "Enlace wa.me abierto"},
+            {"id": "fin", "kind": "final"},
+            {"id": "fin_n", "kind": "final", "lane": "left", "align": "ch"},
         ],
-        "edges": [
-            ("s", "a1"),
-            ("a1", "a2"),
-            ("a2", "d1"),
-            ("d1", "na", "No"),
-            ("d1", "ok", "Sí"),
-            ("na", "f2"),
-            ("ok", "f1"),
+        "transitions": [
+            {
+                "from": "ini",
+                "to": "det",
+                "label": "reserva confirmada /reservas/contacto-conductor",
+            },
+            {"from": "det", "to": "ch", "label": "clic contacto conductor"},
+            {"from": "ch", "to": "na", "label": "[sin número válido]"},
+            {"from": "na", "to": "fin_n", "label": "mostrar alternativa"},
+            {
+                "from": "ch",
+                "to": "wa",
+                "label": "[número válido] / abrir wa.me (sin chat interno)",
+            },
+            {"from": "wa", "to": "fin", "label": "coordinación externa"},
         ],
     },
     "E5_HU2": {
         "doc": (
             "HU11 — Contacto WhatsApp para el conductor\n"
-            "Path: /trayectos/pasajeros/contacto\n"
-            "Épica E05: Coordinación externa vía WhatsApp"
+            "Estados del listado de contacto a pasajeros.\n"
+            "Path: /trayectos/pasajeros/contacto"
         ),
-        "nodes": [
-            {"id": "s", "kind": "initial"},
-            {"id": "a1", "kind": "action", "name": "Abrir /trayectos/pasajeros/contacto"},
+        "states": [
+            {"id": "ini", "kind": "initial"},
+            {"id": "lista", "kind": "state", "name": "Lista de pasajeros"},
+            {"id": "ch", "kind": "choice", "name": "¿Reserva confirmada?"},
             {
-                "id": "a2",
-                "kind": "action",
-                "name": "Listar pasajeros con reserva confirmada",
+                "id": "oculto",
+                "kind": "state",
+                "name": "Sin enlace (canceló)",
+                "lane": "left",
+                "align": "ch",
             },
-            {
-                "id": "a3",
-                "kind": "action",
-                "name": "Mostrar wa.me por pasajero confirmado",
-            },
-            {
-                "id": "a4",
-                "kind": "action",
-                "name": "Ocultar enlace si canceló reserva",
-            },
-            {"id": "f1", "kind": "final"},
+            {"id": "wa", "kind": "state", "name": "Enlace wa.me visible"},
+            {"id": "fin", "kind": "final"},
         ],
-        "edges": [
-            ("s", "a1"),
-            ("a1", "a2"),
-            ("a2", "a3"),
-            ("a3", "a4"),
-            ("a4", "f1"),
+        "transitions": [
+            {
+                "from": "ini",
+                "to": "lista",
+                "label": "abrir /trayectos/pasajeros/contacto",
+            },
+            {"from": "lista", "to": "ch", "label": "evaluar cada pasajero"},
+            {
+                "from": "ch",
+                "to": "oculto",
+                "label": "[reserva cancelada] / ocultar enlace",
+            },
+            {"from": "oculto", "to": "lista", "label": "actualizar lista"},
+            {
+                "from": "ch",
+                "to": "wa",
+                "label": "[reserva confirmada] / mostrar wa.me",
+            },
+            {"from": "wa", "to": "fin", "label": "contacto disponible"},
+            {"from": "wa", "to": "lista", "label": "volver a lista"},
         ],
     },
 }
@@ -808,17 +1039,17 @@ EPICS = [
 
 def build_project() -> dict:
     project_id = IDS.next()
-    model_id = IDS.next()
+    root_pkg_id = IDS.next()
     epic_packages: list[dict] = []
 
     for epic in EPICS:
         pkg_id = IDS.next()
-        activities = [
-            build_activity(
+        machines = [
+            build_state_machine(
                 pkg_id,
                 hu_key,
-                PROCESSES[hu_key]["doc"],
-                PROCESSES[hu_key],
+                MACHINES[hu_key]["doc"],
+                MACHINES[hu_key],
             )
             for hu_key in epic["hus"]
         ]
@@ -826,10 +1057,10 @@ def build_project() -> dict:
             {
                 "_type": "UMLPackage",
                 "_id": pkg_id,
-                "_parent": ref(model_id),
+                "_parent": ref(root_pkg_id),
                 "name": epic["name"],
                 "documentation": epic["title"],
-                "ownedElements": activities,
+                "ownedElements": machines,
             }
         )
 
@@ -840,11 +1071,11 @@ def build_project() -> dict:
         "ownedElements": [
             {
                 "_type": "UMLPackage",
-                "_id": model_id,
+                "_id": root_pkg_id,
                 "_parent": ref(project_id),
                 "name": "Diagramas_De_Proceso",
                 "documentation": (
-                    "Diagramas de proceso de RideU organizados por épicas e historias "
+                    "Diagramas de estados de RideU organizados por épicas e historias "
                     "de usuario del BackLog de Producto."
                 ),
                 "ownedElements": epic_packages,
@@ -862,7 +1093,7 @@ def validate(project: dict) -> None:
             if "_id" in obj:
                 assert obj["_id"] not in ids, f"duplicate id {obj['_id']}"
                 ids.add(obj["_id"])
-            if "$ref" in obj and len(obj) == 1:
+            if set(obj.keys()) == {"$ref"}:
                 refs_found.append(obj["$ref"])
             for v in obj.values():
                 walk(v)
@@ -872,13 +1103,59 @@ def validate(project: dict) -> None:
 
     walk(project)
     missing = [r for r in refs_found if r not in ids]
-    assert not missing, f"missing refs: {missing[:10]}"
+    assert not missing, f"missing refs: {missing[:15]}"
 
-    model = project["ownedElements"][0]
-    assert model["name"] == "Diagramas_De_Proceso"
-    assert len(model["ownedElements"]) == 5
-    hu_count = sum(len(p["ownedElements"]) for p in model["ownedElements"])
-    assert hu_count == 11, hu_count
+    # Structural + connectivity checks
+    machines = []
+
+    def find_machines(obj):
+        if isinstance(obj, dict):
+            if obj.get("_type") == "UMLStateMachine":
+                machines.append(obj)
+            for v in obj.values():
+                find_machines(v)
+        elif isinstance(obj, list):
+            for v in obj:
+                find_machines(v)
+
+    find_machines(project)
+    assert len(machines) == 11, len(machines)
+
+    for sm in machines:
+        assert sm["ownedElements"][0]["_type"] == "UMLStatechartDiagram"
+        region = sm["regions"][0]
+        vertex_ids = {v["_id"] for v in region["vertices"]}
+        initials = [v for v in region["vertices"] if v.get("kind") == "initial"]
+        assert len(initials) == 1, sm["name"]
+        assert region["transitions"], f"{sm['name']} has no transitions"
+
+        # Every transition connects existing vertices
+        outgoing = {vid: 0 for vid in vertex_ids}
+        incoming = {vid: 0 for vid in vertex_ids}
+        for tr in region["transitions"]:
+            s, t = tr["source"]["$ref"], tr["target"]["$ref"]
+            assert s in vertex_ids and t in vertex_ids, sm["name"]
+            assert tr.get("triggers"), f"{sm['name']} transition without label"
+            outgoing[s] += 1
+            incoming[t] += 1
+
+        # Initial must have outgoing; finals may have none
+        assert outgoing[initials[0]["_id"]] >= 1, sm["name"]
+        for v in region["vertices"]:
+            if v["_type"] == "UMLState":
+                assert outgoing[v["_id"]] + incoming[v["_id"]] >= 1, (
+                    f"{sm['name']} isolated state {v.get('name')}"
+                )
+
+        # Diagram views must include transition views matching transitions
+        diagram = sm["ownedElements"][0]
+        tviews = [
+            v for v in diagram["ownedViews"] if v["_type"] == "UMLTransitionView"
+        ]
+        assert len(tviews) == len(region["transitions"]), sm["name"]
+        for tv in tviews:
+            assert "points" in tv and tv["points"], f"{sm['name']} empty points"
+            assert "head" in tv and "tail" in tv, sm["name"]
 
 
 def main() -> None:
@@ -887,14 +1164,15 @@ def main() -> None:
     validate(project)
     out.write_text(json.dumps(project, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"Wrote {out} ({out.stat().st_size} bytes)")
-    model = project["ownedElements"][0]
-    print(f"Project: {project['name']}")
-    print(f"  {model['name']}")
-    for pkg in model["ownedElements"]:
-        print(f"    {pkg['name']}")
-        for act in pkg["ownedElements"]:
-            n_actions = sum(1 for e in act["ownedElements"] if e["_type"] == "UMLAction")
-            print(f"      {act['name']}  [actions={n_actions}]")
+    root = project["ownedElements"][0]
+    print(f"{project['name']} / {root['name']}")
+    for pkg in root["ownedElements"]:
+        print(f"  {pkg['name']}")
+        for sm in pkg["ownedElements"]:
+            region = sm["regions"][0]
+            n_states = sum(1 for v in region["vertices"] if v["_type"] == "UMLState")
+            n_tr = len(region["transitions"])
+            print(f"    {sm['name']}  [states={n_states} transitions={n_tr}]")
 
 
 if __name__ == "__main__":
