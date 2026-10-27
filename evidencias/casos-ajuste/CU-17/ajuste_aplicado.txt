@@ -1,0 +1,10 @@
+Caso: CU-17
+Título: WhatsApp de teléfono fijo (inicia en 6) era aceptado
+Módulo: validation/registro.js
+Criterio: Solo celulares colombianos que empiecen por 3 (10 dígitos)
+Inconformidad: Aceptaba 6012345678
+Ajuste: Validar con /^3\d{9}$/
+Test file: tests/validation/registro.test.js
+Test: debería rechazar WhatsApp que no sea celular colombiano
+Exit fallo: 1
+Exit éxito: 0

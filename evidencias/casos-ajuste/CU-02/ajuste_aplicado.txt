@@ -1,0 +1,10 @@
+Caso: CU-02
+Título: Registro duplicado respondía 400 en lugar de 409
+Módulo: controllers/authController.js
+Criterio: Correo ya registrado → HTTP 409 Conflict
+Inconformidad: Devolvía 400 Bad Request
+Ajuste: Usar status 409 cuando el correo existe
+Test file: tests/controllers/authController.test.js
+Test: debería responder 409 si el correo ya existe
+Exit fallo: 1
+Exit éxito: 0

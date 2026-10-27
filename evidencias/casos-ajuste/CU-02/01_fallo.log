@@ -1,0 +1,35 @@
+# Caso CU-02 — etapa: 01_fallo
+# exit_code=1
+
+=== STDOUT ===
+
+> rideu-backend@0.1.0 test
+> NODE_OPTIONS=--experimental-vm-modules jest --runInBand --runInBand tests/controllers/authController.test.js -t debería responder 409 si el correo ya existe
+
+
+=== STDERR ===
+(node:6994) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+FAIL tests/controllers/authController.test.js
+  ● authController.registrar › debería responder 409 si el correo ya existe
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 409
+    Received: 400
+
+      104 |
+      105 |     // Assert
+    > 106 |     expect(res.statusCode).toBe(409);
+          |                            ^
+      107 |     expect(res.cuerpo.mensaje).toMatch(/Ya existe/);
+      108 |   });
+      109 |
+
+      at Object.<anonymous> (tests/controllers/authController.test.js:106:28)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 16 skipped, 17 total
+Snapshots:   0 total
+Time:        0.092 s, estimated 1 s
+Ran all test suites matching tests/controllers/authController.test.js with tests matching "debería responder 409 si el correo ya existe".

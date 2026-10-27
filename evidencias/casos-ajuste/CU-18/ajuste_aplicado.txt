@@ -1,0 +1,10 @@
+Caso: CU-18
+Título: MAIL_MODE desconocido no lanzaba error
+Módulo: services/correo.js
+Criterio: MAIL_MODE distinto de console|smtp → Error
+Inconformidad: Continuaba como si fuera válido
+Ajuste: throw new Error('MAIL_MODE debe ser console o smtp.')
+Test file: tests/services/correo.test.js
+Test: debería rechazar un MAIL_MODE desconocido
+Exit fallo: 1
+Exit éxito: 0
