@@ -1,0 +1,10 @@
+Caso: CU-06
+Título: Enlace de verificación expirado respondía 404
+Módulo: controllers/authController.js
+Criterio: Token vencido → HTTP 400
+Inconformidad: Respondía 404 Not Found
+Ajuste: status(400) con mensaje de expiración
+Test file: tests/controllers/authController.test.js
+Test: debería responder 400 si el enlace expiró
+Exit fallo: 1
+Exit éxito: 0

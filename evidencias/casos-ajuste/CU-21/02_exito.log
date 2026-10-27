@@ -1,0 +1,17 @@
+# Caso CU-21 — etapa: 02_exito
+# exit_code=0
+
+=== STDOUT ===
+
+> rideu-backend@0.1.0 test
+> NODE_OPTIONS=--experimental-vm-modules jest --runInBand --runInBand tests/models/sesion.test.js -t debería crear una sesión con token opaco y expiración a 7 días
+
+
+=== STDERR ===
+(node:8383) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+Test Suites: 1 passed, 1 total
+Tests:       2 skipped, 1 passed, 3 total
+Snapshots:   0 total
+Time:        0.082 s, estimated 1 s
+Ran all test suites matching tests/models/sesion.test.js with tests matching "debería crear una sesión con token opaco y expiración a 7 días".

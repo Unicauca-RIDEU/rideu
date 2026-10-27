@@ -1,0 +1,35 @@
+# Caso CU-15 — etapa: 01_fallo
+# exit_code=1
+
+=== STDOUT ===
+
+> rideu-backend@0.1.0 test
+> NODE_OPTIONS=--experimental-vm-modules jest --runInBand --runInBand tests/models/usuario.test.js -t debería hashear el token con SHA-256 en hexadecimal
+
+
+=== STDERR ===
+(node:7922) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+FAIL tests/models/usuario.test.js
+  ● modelo usuario › debería hashear el token con SHA-256 en hexadecimal
+
+    expect(received).toMatch(expected)
+
+    Expected pattern: /^[a-f0-9]{64}$/
+    Received string:  "a9993e364706816aba3e25717850c26c9cd0d89d"
+
+      29 |
+      30 |     // Assert
+    > 31 |     expect(hash).toMatch(/^[a-f0-9]{64}$/);
+         |                  ^
+      32 |     expect(hash).toBe(hashToken("abc"));
+      33 |     expect(hash).not.toBe(hashToken("abd"));
+      34 |   });
+
+      at Object.<anonymous> (tests/models/usuario.test.js:31:18)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 9 skipped, 10 total
+Snapshots:   0 total
+Time:        0.099 s, estimated 1 s
+Ran all test suites matching tests/models/usuario.test.js with tests matching "debería hashear el token con SHA-256 en hexadecimal".

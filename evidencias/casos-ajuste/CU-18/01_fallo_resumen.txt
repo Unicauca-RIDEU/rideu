@@ -1,0 +1,6 @@
+FAIL tests/services/correo.test.js
+● servicio correo › debería rechazar un MAIL_MODE desconocido
+expect(received).rejects.toThrow()
+expect(
+Tests:       1 failed, 5 skipped, 6 total
+Test Suites: 1 failed, 1 total

@@ -1,0 +1,35 @@
+# Caso CU-08 — etapa: 01_fallo
+# exit_code=1
+
+=== STDOUT ===
+
+> rideu-backend@0.1.0 test
+> NODE_OPTIONS=--experimental-vm-modules jest --runInBand --runInBand tests/validation/registro.test.js -t debería rechazar una contraseña de exactamente 7 caracteres
+
+
+=== STDERR ===
+(node:7454) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+FAIL tests/validation/registro.test.js
+  ● validarRegistro › debería rechazar una contraseña de exactamente 7 caracteres
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: true
+
+      104 |
+      105 |     // Assert
+    > 106 |     expect(resultado.ok).toBe(false);
+          |                          ^
+      107 |     expect(resultado.errores.some((e) => e.campo === "contrasena")).toBe(true);
+      108 |   });
+      109 |
+
+      at Object.<anonymous> (tests/validation/registro.test.js:106:26)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 9 skipped, 10 total
+Snapshots:   0 total
+Time:        0.095 s, estimated 1 s
+Ran all test suites matching tests/validation/registro.test.js with tests matching "debería rechazar una contraseña de exactamente 7 caracteres".

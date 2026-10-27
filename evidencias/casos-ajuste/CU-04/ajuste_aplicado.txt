@@ -1,0 +1,10 @@
+Caso: CU-04
+Título: Middleware sin Bearer devolvía 400
+Módulo: middleware/requiereSesion.js
+Criterio: Sin Authorization Bearer → HTTP 401
+Inconformidad: Falta de auth reportada como 400
+Ajuste: Responder 401 Unauthorized
+Test file: tests/middleware/requiereSesion.test.js
+Test: debería responder 401 si no hay encabezado Authorization Bearer
+Exit fallo: 1
+Exit éxito: 0

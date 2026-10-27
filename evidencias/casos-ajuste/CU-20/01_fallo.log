@@ -1,0 +1,35 @@
+# Caso CU-20 — etapa: 01_fallo
+# exit_code=1
+
+=== STDOUT ===
+
+> rideu-backend@0.1.0 test
+> NODE_OPTIONS=--experimental-vm-modules jest --runInBand --runInBand tests/middleware/requiereSesion.test.js -t debería rechazar el esquema Basic y exigir Bearer
+
+
+=== STDERR ===
+(node:8280) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+FAIL tests/middleware/requiereSesion.test.js
+  ● middleware requiereSesion › debería rechazar el esquema Basic y exigir Bearer
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 401
+    Received: 0
+
+      47 |
+      48 |     // Assert
+    > 49 |     expect(res.statusCode).toBe(401);
+         |                            ^
+      50 |     expect(buscarUsuarioPorSesion).not.toHaveBeenCalled();
+      51 |     expect(next).not.toHaveBeenCalled();
+      52 |   });
+
+      at Object.<anonymous> (tests/middleware/requiereSesion.test.js:49:28)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 4 skipped, 5 total
+Snapshots:   0 total
+Time:        0.093 s, estimated 1 s
+Ran all test suites matching tests/middleware/requiereSesion.test.js with tests matching "debería rechazar el esquema Basic y exigir Bearer".

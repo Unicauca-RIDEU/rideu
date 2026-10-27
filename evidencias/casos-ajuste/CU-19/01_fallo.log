@@ -1,0 +1,33 @@
+# Caso CU-19 — etapa: 01_fallo
+# exit_code=1
+
+=== STDOUT ===
+
+> rideu-backend@0.1.0 test
+> NODE_OPTIONS=--experimental-vm-modules jest --runInBand --runInBand tests/validation/registro.test.js -t debería rechazar campos vacíos o nulos en el cuerpo
+
+
+=== STDERR ===
+(node:8221) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+FAIL tests/validation/registro.test.js
+  ● validarRegistro › debería rechazar campos vacíos o nulos en el cuerpo
+
+    TypeError: Cannot read properties of null (reading 'nombre')
+
+      10 |
+      11 |   const errores = [];
+    > 12 |   const nombre = texto(body.nombre);
+         |                             ^
+      13 |   const correo = texto(body.correo).toLowerCase();
+      14 |   const contrasena = typeof body.contrasena === "string" ? body.contrasena : "";
+      15 |   const whatsappEntrada = texto(body.whatsapp);
+
+      at validarRegistro (src/validation/registro.js:12:29)
+      at Object.<anonymous> (tests/validation/registro.test.js:61:18)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 9 skipped, 10 total
+Snapshots:   0 total
+Time:        0.092 s, estimated 1 s
+Ran all test suites matching tests/validation/registro.test.js with tests matching "debería rechazar campos vacíos o nulos en el cuerpo".

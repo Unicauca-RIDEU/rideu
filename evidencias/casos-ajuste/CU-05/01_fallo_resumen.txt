@@ -1,0 +1,9 @@
+FAIL tests/validation/registro.test.js
+● validarRegistro › debería normalizar WhatsApp con prefijo 57 a formato +57
+Expected: "+573001234567"
+Received: "3001234567"
+expect(received).toBe(expected) // Object.is equality
+expect(resultado.ok).toBe(true);
+expect(resultado.datos.whatsapp).toBe("+573001234567");
+Tests:       1 failed, 9 skipped, 10 total
+Test Suites: 1 failed, 1 total
