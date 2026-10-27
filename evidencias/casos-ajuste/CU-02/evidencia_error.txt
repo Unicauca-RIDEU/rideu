@@ -1,0 +1,4 @@
+FAIL tests/controllers/authController.test.js
+● authController.registrar › debería responder 409 si el correo ya existe
+Expected: 409
+Received: 400

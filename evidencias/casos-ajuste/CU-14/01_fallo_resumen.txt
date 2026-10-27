@@ -1,0 +1,8 @@
+FAIL tests/services/correo.test.js
+● servicio correo › debería armar el enlace de verificación sin barra final duplicada
+Expected: "http://localhost:5173/registro/verificacion?token=abc123"
+Received: "http://localhost:5173//registro/verificacion?token=abc123"
+expect(received).toBe(expected) // Object.is equality
+expect(enlace).toBe("http://localhost:5173/registro/verificacion?token=abc123");
+Tests:       1 failed, 5 skipped, 6 total
+Test Suites: 1 failed, 1 total

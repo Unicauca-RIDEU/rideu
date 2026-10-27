@@ -1,0 +1,10 @@
+Caso: CU-11
+Título: Contraseña incorrecta respondía 404
+Módulo: controllers/authController.js
+Criterio: Credenciales inválidas → HTTP 401 genérico
+Inconformidad: Respondía 404 Not Found
+Ajuste: status(401) con mensaje genérico
+Test file: tests/controllers/authController.test.js
+Test: debería responder 401 si la contraseña no coincide
+Exit fallo: 1
+Exit éxito: 0

@@ -1,0 +1,4 @@
+FAIL tests/controllers/authController.test.js
+● authController.verificar › debería responder 400 si el enlace expiró
+Expected: 400
+Received: 404

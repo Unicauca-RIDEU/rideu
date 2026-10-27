@@ -1,0 +1,1 @@
+const HORAS_SESION = 1; // BUG CU-21

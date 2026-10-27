@@ -1,0 +1,35 @@
+# Caso CU-06 — etapa: 01_fallo
+# exit_code=1
+
+=== STDOUT ===
+
+> rideu-backend@0.1.0 test
+> NODE_OPTIONS=--experimental-vm-modules jest --runInBand --runInBand tests/controllers/authController.test.js -t debería responder 400 si el enlace expiró
+
+
+=== STDERR ===
+(node:7303) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+FAIL tests/controllers/authController.test.js
+  ● authController.verificar › debería responder 400 si el enlace expiró
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 400
+    Received: 404
+
+      203 |
+      204 |     // Assert
+    > 205 |     expect(res.statusCode).toBe(400);
+          |                            ^
+      206 |     expect(res.cuerpo.mensaje).toMatch(/expiró/);
+      207 |   });
+      208 |
+
+      at Object.<anonymous> (tests/controllers/authController.test.js:205:28)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 16 skipped, 17 total
+Snapshots:   0 total
+Time:        0.096 s, estimated 1 s
+Ran all test suites matching tests/controllers/authController.test.js with tests matching "debería responder 400 si el enlace expiró".

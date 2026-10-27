@@ -1,0 +1,10 @@
+FAIL tests/models/sesion.test.js
+● modelo sesion › debería crear una sesión con token opaco y expiración a 7 días
+Expected: > 1793652683731
+Received:   1793137883731
+expect(received).toBeGreaterThan(expected)
+expect(token).toMatch(/^[a-f0-9]{64}$/);
+expect(expira.getTime()).toBeGreaterThan(antes + 6 * 24 * 60 * 60 * 1000);
+expect(query).toHaveBeenCalledWith(
+Tests:       1 failed, 2 skipped, 3 total
+Test Suites: 1 failed, 1 total
