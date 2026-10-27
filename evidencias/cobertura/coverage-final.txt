@@ -1,0 +1,100 @@
+
+> rideu-backend@0.1.0 test:coverage
+> NODE_OPTIONS=--experimental-vm-modules jest --runInBand --coverage
+
+(node:3703) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+  console.error
+    Error al enviar el correo de verificación: Error: SMTP caído
+        at Object.<anonymous> (/workspace/backend/tests/controllers/authController.test.js:126:48)
+        at Promise.finally.completed (/workspace/backend/node_modules/jest-circus/build/jestAdapterInit.js:1834:28)
+        at new Promise (<anonymous>)
+        at callAsyncCircusFn (/workspace/backend/node_modules/jest-circus/build/jestAdapterInit.js:1774:10)
+        at _callCircusTest (/workspace/backend/node_modules/jest-circus/build/jestAdapterInit.js:1167:40)
+        at _runTestInContext (/workspace/backend/node_modules/jest-circus/build/jestAdapterInit.js:1103:3)
+        at runTestWithContext (/workspace/backend/node_modules/jest-circus/build/jestAdapterInit.js:996:5)
+        at _runTestsForDescribeBlockOnce (/workspace/backend/node_modules/jest-circus/build/jestAdapterInit.js:1008:11)
+        at _runTestsForDescribeBlock (/workspace/backend/node_modules/jest-circus/build/jestAdapterInit.js:824:5)
+        at _runTestsForDescribeBlockOnce (/workspace/backend/node_modules/jest-circus/build/jestAdapterInit.js:1003:11)
+        at _runTestsForDescribeBlock (/workspace/backend/node_modules/jest-circus/build/jestAdapterInit.js:824:5)
+        at run (/workspace/backend/node_modules/jest-circus/build/jestAdapterInit.js:789:3)
+        at runAndTransformResultsToJestFormat (/workspace/backend/node_modules/jest-circus/build/jestAdapterInit.js:2300:21)
+        at jestAdapter (/workspace/backend/node_modules/jest-circus/build/runner.js:111:19)
+        at runTestInternal (/workspace/backend/node_modules/jest-runner/build/index.js:247:16)
+        at runTest (/workspace/backend/node_modules/jest-runner/build/index.js:315:7)
+
+      52 |         console.error("No se pudo deshacer el registro tras fallar el correo:", borrado);
+      53 |       });
+    > 54 |       console.error("Error al enviar el correo de verificación:", error);
+         |               ^
+      55 |       return res.status(500).json({
+      56 |         mensaje: "No se pudo enviar el correo de verificación. Inténtalo de nuevo.",
+      57 |       });
+
+      at error (src/controllers/authController.js:54:15)
+      at Object.<anonymous> (tests/controllers/authController.test.js:131:5)
+
+  console.error
+    Error al validar la sesión: Error: DB caída
+        at Object.<anonymous> (/workspace/backend/tests/middleware/requiereSesion.test.js:69:46)
+        at Promise.finally.completed (/workspace/backend/node_modules/jest-circus/build/jestAdapterInit.js:1834:28)
+        at new Promise (<anonymous>)
+        at callAsyncCircusFn (/workspace/backend/node_modules/jest-circus/build/jestAdapterInit.js:1774:10)
+        at _callCircusTest (/workspace/backend/node_modules/jest-circus/build/jestAdapterInit.js:1167:40)
+        at _runTestInContext (/workspace/backend/node_modules/jest-circus/build/jestAdapterInit.js:1103:3)
+        at runTestWithContext (/workspace/backend/node_modules/jest-circus/build/jestAdapterInit.js:996:5)
+        at _runTestsForDescribeBlockOnce (/workspace/backend/node_modules/jest-circus/build/jestAdapterInit.js:1008:11)
+        at _runTestsForDescribeBlock (/workspace/backend/node_modules/jest-circus/build/jestAdapterInit.js:824:5)
+        at _runTestsForDescribeBlockOnce (/workspace/backend/node_modules/jest-circus/build/jestAdapterInit.js:1003:11)
+        at _runTestsForDescribeBlock (/workspace/backend/node_modules/jest-circus/build/jestAdapterInit.js:824:5)
+        at run (/workspace/backend/node_modules/jest-circus/build/jestAdapterInit.js:789:3)
+        at runAndTransformResultsToJestFormat (/workspace/backend/node_modules/jest-circus/build/jestAdapterInit.js:2300:21)
+        at jestAdapter (/workspace/backend/node_modules/jest-circus/build/runner.js:111:19)
+        at runTestInternal (/workspace/backend/node_modules/jest-runner/build/index.js:247:16)
+        at runTest (/workspace/backend/node_modules/jest-runner/build/index.js:315:7)
+
+      15 |     return next();
+      16 |   } catch (error) {
+    > 17 |     console.error("Error al validar la sesión:", error);
+         |             ^
+      18 |     return res.status(500).json({ mensaje: "No se pudo validar la sesión." });
+      19 |   }
+      20 | }
+
+      at error (src/middleware/requiereSesion.js:17:13)
+      at Object.<anonymous> (tests/middleware/requiereSesion.test.js:74:5)
+
+--------------------|---------|----------|---------|---------|------------------------
+File                | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s      
+--------------------|---------|----------|---------|---------|------------------------
+All files           |   93.85 |     89.7 |   92.59 |   93.82 |                        
+ src                |    87.5 |       80 |     100 |    87.5 |                        
+  app.js            |    87.5 |       80 |     100 |    87.5 | 12                     
+ src/config         |     100 |      100 |     100 |     100 |                        
+  env.js            |     100 |      100 |     100 |     100 |                        
+ src/controllers    |   87.27 |     87.5 |      80 |   87.27 |                        
+  authController.js |   87.27 |     87.5 |      80 |   87.27 | 52,70-71,97-98,138-139 
+ src/middleware     |     100 |      100 |     100 |     100 |                        
+  requiereSesion.js |     100 |      100 |     100 |     100 |                        
+ src/models         |     100 |    91.66 |     100 |     100 |                        
+  sesion.js         |     100 |      100 |     100 |     100 |                        
+  usuario.js        |     100 |       90 |     100 |     100 | 36                     
+ src/routes         |     100 |      100 |     100 |     100 |                        
+  authRoutes.js     |     100 |      100 |     100 |     100 |                        
+ src/services       |   89.47 |       65 |      75 |   89.47 |                        
+  correo.js         |   89.47 |       65 |      75 |   89.47 | 52-59                  
+ src/validation     |   97.77 |    97.56 |     100 |   97.72 |                        
+  registro.js       |   97.77 |    97.56 |     100 |   97.72 | 85                     
+--------------------|---------|----------|---------|---------|------------------------
+
+=============================== Coverage summary ===============================
+Statements   : 93.85% ( 168/179 )
+Branches     : 89.7% ( 122/136 )
+Functions    : 92.59% ( 25/27 )
+Lines        : 93.82% ( 167/178 )
+================================================================================
+Test Suites: 8 passed, 8 total
+Tests:       61 passed, 61 total
+Snapshots:   0 total
+Time:        0.812 s, estimated 1 s
+Ran all test suites.

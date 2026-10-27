@@ -1,0 +1,20 @@
+FAIL tests/controllers/authController.test.js
+  ● authController.iniciarSesion › debería responder 403 si el correo no está verificado
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 403
+    Received: 401
+
+      294 |
+      295 |     // Assert
+    > 296 |     expect(res.statusCode).toBe(403);
+          |                            ^
+      297 |     expect(res.cuerpo.codigo).toBe("EMAIL_NOT_VERIFIED");
+      298 |     expect(crearSesion).not.toHaveBeenCalled();
+      299 |   });
+
+      at Object.<anonymous> (tests/controllers/authController.test.js:296:28)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 15 skipped, 16 total
