@@ -1,0 +1,10 @@
+Caso: CU-19
+Título: Body null en registro no se rechazaba con mensaje claro
+Módulo: validation/registro.js
+Criterio: body null/array → ok=false con error de cuerpo
+Inconformidad: Se omitía la guarda y fallaba de forma opaca
+Ajuste: Rechazar si body === null || no es objeto || es array
+Test file: tests/validation/registro.test.js
+Test: debería rechazar campos vacíos o nulos en el cuerpo
+Exit fallo: 1
+Exit éxito: 0

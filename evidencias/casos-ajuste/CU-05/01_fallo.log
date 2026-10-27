@@ -8,7 +8,7 @@
 
 
 === STDERR ===
-(node:3445) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(node:7223) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
 (Use `node --trace-warnings ...` to show where the warning was created)
 FAIL tests/validation/registro.test.js
   ● validarRegistro › debería normalizar WhatsApp con prefijo 57 a formato +57
@@ -18,18 +18,18 @@ FAIL tests/validation/registro.test.js
     Expected: "+573001234567"
     Received: "3001234567"
 
-      114 |     // Assert
-      115 |     expect(resultado.ok).toBe(true);
-    > 116 |     expect(resultado.datos.whatsapp).toBe("+573001234567");
+      134 |     // Assert
+      135 |     expect(resultado.ok).toBe(true);
+    > 136 |     expect(resultado.datos.whatsapp).toBe("+573001234567");
           |                                      ^
-      117 |   });
-      118 | });
-      119 |
+      137 |   });
+      138 | });
+      139 |
 
-      at Object.<anonymous> (tests/validation/registro.test.js:116:38)
+      at Object.<anonymous> (tests/validation/registro.test.js:136:38)
 
 Test Suites: 1 failed, 1 total
-Tests:       1 failed, 7 skipped, 8 total
+Tests:       1 failed, 9 skipped, 10 total
 Snapshots:   0 total
-Time:        0.097 s, estimated 1 s
+Time:        0.095 s, estimated 1 s
 Ran all test suites matching tests/validation/registro.test.js with tests matching "debería normalizar WhatsApp con prefijo 57 a formato \+57".

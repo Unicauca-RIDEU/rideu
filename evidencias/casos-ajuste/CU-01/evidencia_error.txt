@@ -1,20 +1,4 @@
 FAIL tests/validation/registro.test.js
-  ● validarRegistro › debería rechazar un correo que solo contiene unicauca.edu.co como subcadena
-
-    expect(received).toBe(expected) // Object.is equality
-
-    Expected: false
-    Received: true
-
-      52 |
-      53 |     // Assert
-    > 54 |     expect(resultado.ok).toBe(false);
-         |                          ^
-      55 |     expect(resultado.errores[0].campo).toBe("correo");
-      56 |   });
-      57 |
-
-      at Object.<anonymous> (tests/validation/registro.test.js:54:26)
-
-Test Suites: 1 failed, 1 total
-Tests:       1 failed, 7 skipped, 8 total
+● validarRegistro › debería rechazar un correo que solo contiene unicauca.edu.co como subcadena
+Expected: false
+Received: true

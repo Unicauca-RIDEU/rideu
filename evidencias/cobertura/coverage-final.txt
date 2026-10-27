@@ -2,7 +2,7 @@
 > rideu-backend@0.1.0 test:coverage
 > NODE_OPTIONS=--experimental-vm-modules jest --runInBand --coverage
 
-(node:3703) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(node:8586) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
 (Use `node --trace-warnings ...` to show where the warning was created)
   console.error
     Error al enviar el correo de verificación: Error: SMTP caído
@@ -36,7 +36,7 @@
 
   console.error
     Error al validar la sesión: Error: DB caída
-        at Object.<anonymous> (/workspace/backend/tests/middleware/requiereSesion.test.js:69:46)
+        at Object.<anonymous> (/workspace/backend/tests/middleware/requiereSesion.test.js:92:46)
         at Promise.finally.completed (/workspace/backend/node_modules/jest-circus/build/jestAdapterInit.js:1834:28)
         at new Promise (<anonymous>)
         at callAsyncCircusFn (/workspace/backend/node_modules/jest-circus/build/jestAdapterInit.js:1774:10)
@@ -62,7 +62,7 @@
       20 | }
 
       at error (src/middleware/requiereSesion.js:17:13)
-      at Object.<anonymous> (tests/middleware/requiereSesion.test.js:74:5)
+      at Object.<anonymous> (tests/middleware/requiereSesion.test.js:97:5)
 
 --------------------|---------|----------|---------|---------|------------------------
 File                | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s      
@@ -94,7 +94,7 @@ Functions    : 92.59% ( 25/27 )
 Lines        : 93.82% ( 167/178 )
 ================================================================================
 Test Suites: 8 passed, 8 total
-Tests:       61 passed, 61 total
+Tests:       66 passed, 66 total
 Snapshots:   0 total
-Time:        0.812 s, estimated 1 s
+Time:        0.619 s, estimated 1 s
 Ran all test suites.

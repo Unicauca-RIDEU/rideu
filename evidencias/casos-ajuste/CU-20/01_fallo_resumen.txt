@@ -1,0 +1,10 @@
+FAIL tests/middleware/requiereSesion.test.js
+● middleware requiereSesion › debería rechazar el esquema Basic y exigir Bearer
+Expected: 401
+Received: 0
+expect(received).toBe(expected) // Object.is equality
+expect(res.statusCode).toBe(401);
+expect(buscarUsuarioPorSesion).not.toHaveBeenCalled();
+expect(next).not.toHaveBeenCalled();
+Tests:       1 failed, 4 skipped, 5 total
+Test Suites: 1 failed, 1 total

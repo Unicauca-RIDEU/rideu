@@ -1,0 +1,4 @@
+FAIL tests/controllers/authController.test.js
+● authController.iniciarSesion › debería normalizar el correo a minúsculas antes de buscar credenciales
+Expected: "ana.perez@unicauca.edu.co"
+Received: "Ana.Perez@Unicauca.edu.co"

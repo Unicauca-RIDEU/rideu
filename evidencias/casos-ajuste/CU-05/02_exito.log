@@ -8,10 +8,10 @@
 
 
 === STDERR ===
-(node:3470) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(node:7260) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
 (Use `node --trace-warnings ...` to show where the warning was created)
 Test Suites: 1 passed, 1 total
-Tests:       7 skipped, 1 passed, 8 total
+Tests:       9 skipped, 1 passed, 10 total
 Snapshots:   0 total
-Time:        0.085 s, estimated 1 s
+Time:        0.083 s, estimated 1 s
 Ran all test suites matching tests/validation/registro.test.js with tests matching "debería normalizar WhatsApp con prefijo 57 a formato \+57".
