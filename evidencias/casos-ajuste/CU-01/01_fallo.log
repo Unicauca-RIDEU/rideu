@@ -8,7 +8,7 @@
 
 
 === STDERR ===
-(node:3211) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(node:6910) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
 (Use `node --trace-warnings ...` to show where the warning was created)
 FAIL tests/validation/registro.test.js
   ● validarRegistro › debería rechazar un correo que solo contiene unicauca.edu.co como subcadena
@@ -29,7 +29,7 @@ FAIL tests/validation/registro.test.js
       at Object.<anonymous> (tests/validation/registro.test.js:54:26)
 
 Test Suites: 1 failed, 1 total
-Tests:       1 failed, 7 skipped, 8 total
+Tests:       1 failed, 9 skipped, 10 total
 Snapshots:   0 total
-Time:        0.097 s, estimated 1 s
+Time:        0.093 s, estimated 1 s
 Ran all test suites matching tests/validation/registro.test.js with tests matching "debería rechazar un correo que solo contiene unicauca.edu.co como subcadena".

@@ -5,5 +5,5 @@ Received: true
 expect(received).toBe(expected) // Object.is equality
 expect(resultado.ok).toBe(false);
 expect(resultado.errores[0].campo).toBe("correo");
-Tests:       1 failed, 7 skipped, 8 total
+Tests:       1 failed, 9 skipped, 10 total
 Test Suites: 1 failed, 1 total

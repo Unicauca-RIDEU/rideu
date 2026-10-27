@@ -28,6 +28,29 @@ describe("middleware requiereSesion", () => {
     expect(next).not.toHaveBeenCalled();
   });
 
+  test("debería rechazar el esquema Basic y exigir Bearer", async () => {
+    // Arrange — criterio: solo Authorization: Bearer <token> es válido
+    buscarUsuarioPorSesion.mockResolvedValue({
+      id: "u1",
+      nombre: "Ana",
+      correo: "ana@unicauca.edu.co",
+    });
+    const res = crearRespuestaMock();
+    const next = jest.fn();
+
+    // Act
+    await requiereSesion(
+      crearRequest({}, { Authorization: "Basic token-que-parece-sesion" }),
+      res,
+      next,
+    );
+
+    // Assert
+    expect(res.statusCode).toBe(401);
+    expect(buscarUsuarioPorSesion).not.toHaveBeenCalled();
+    expect(next).not.toHaveBeenCalled();
+  });
+
   test("debería responder 401 si el token de sesión no es válido", async () => {
     // Arrange
     buscarUsuarioPorSesion.mockResolvedValue(null);

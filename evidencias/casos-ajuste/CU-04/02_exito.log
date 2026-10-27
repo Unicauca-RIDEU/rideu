@@ -8,10 +8,10 @@
 
 
 === STDERR ===
-(node:3419) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(node:7185) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
 (Use `node --trace-warnings ...` to show where the warning was created)
 Test Suites: 1 passed, 1 total
-Tests:       3 skipped, 1 passed, 4 total
+Tests:       4 skipped, 1 passed, 5 total
 Snapshots:   0 total
-Time:        0.086 s, estimated 1 s
+Time:        0.083 s, estimated 1 s
 Ran all test suites matching tests/middleware/requiereSesion.test.js with tests matching "debería responder 401 si no hay encabezado Authorization Bearer".

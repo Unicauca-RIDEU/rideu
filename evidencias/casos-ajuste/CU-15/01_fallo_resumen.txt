@@ -1,0 +1,8 @@
+FAIL tests/models/usuario.test.js
+● modelo usuario › debería hashear el token con SHA-256 en hexadecimal
+expect(received).toMatch(expected)
+expect(hash).toMatch(/^[a-f0-9]{64}$/);
+expect(hash).toBe(hashToken("abc"));
+expect(hash).not.toBe(hashToken("abd"));
+Tests:       1 failed, 9 skipped, 10 total
+Test Suites: 1 failed, 1 total

@@ -1,8 +1,10 @@
 Caso: CU-05
 Título: WhatsApp no se normalizaba a +57
 Módulo: validation/registro.js
-Inconformidad: Se guardaba el número local sin prefijo internacional
-Ajuste: Prefijar +57 tras validar celular colombiano de 10 dígitos
+Criterio: Celular CO válido se guarda como +573XXXXXXXXX
+Inconformidad: Se guardaba sin prefijo internacional
+Ajuste: Prefijar +57 tras validar 10 dígitos
+Test file: tests/validation/registro.test.js
 Test: debería normalizar WhatsApp con prefijo 57 a formato \+57
 Exit fallo: 1
 Exit éxito: 0

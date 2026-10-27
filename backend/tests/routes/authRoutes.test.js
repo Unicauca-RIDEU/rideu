@@ -87,6 +87,15 @@ describe("rutas /api/auth (Supertest)", () => {
     expect(respuesta.body.usuario.correo).toBe("ana.perez@unicauca.edu.co");
   });
 
+  test("POST /registro debería usar código 201 y no 200 en el alta exitosa", async () => {
+    // Arrange / Act — criterio CU-13: Created
+    const respuesta = await request(app).post("/api/auth/registro").send(registroValido);
+
+    // Assert
+    expect(respuesta.status).toBe(201);
+    expect(respuesta.status).not.toBe(200);
+  });
+
   test("POST /registro debería responder 400 si el correo no es institucional", async () => {
     // Arrange / Act
     const respuesta = await request(app)

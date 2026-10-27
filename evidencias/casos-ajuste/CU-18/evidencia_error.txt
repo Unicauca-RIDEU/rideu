@@ -1,0 +1,3 @@
+FAIL tests/services/correo.test.js
+● servicio correo › debería rechazar un MAIL_MODE desconocido
+Received promise resolved instead of rejected

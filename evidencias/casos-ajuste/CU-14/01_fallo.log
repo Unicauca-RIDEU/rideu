@@ -1,0 +1,35 @@
+# Caso CU-14 — etapa: 01_fallo
+# exit_code=1
+
+=== STDOUT ===
+
+> rideu-backend@0.1.0 test
+> NODE_OPTIONS=--experimental-vm-modules jest --runInBand --runInBand tests/services/correo.test.js -t debería armar el enlace de verificación sin barra final duplicada
+
+
+=== STDERR ===
+(node:7853) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+FAIL tests/services/correo.test.js
+  ● servicio correo › debería armar el enlace de verificación sin barra final duplicada
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "http://localhost:5173/registro/verificacion?token=abc123"
+    Received: "http://localhost:5173//registro/verificacion?token=abc123"
+
+       8 |
+       9 |     // Assert
+    > 10 |     expect(enlace).toBe("http://localhost:5173/registro/verificacion?token=abc123");
+         |                    ^
+      11 |   });
+      12 |
+      13 |   test("debería codificar caracteres especiales del token en el enlace", () => {
+
+      at Object.<anonymous> (tests/services/correo.test.js:10:20)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 5 skipped, 6 total
+Snapshots:   0 total
+Time:        0.126 s, estimated 1 s
+Ran all test suites matching tests/services/correo.test.js with tests matching "debería armar el enlace de verificación sin barra final duplicada".

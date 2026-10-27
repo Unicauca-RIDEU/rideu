@@ -1,0 +1,10 @@
+Caso: CU-09
+Título: Nombre de 2 caracteres era aceptado
+Módulo: validation/registro.js
+Criterio: Nombre con longitud < 3 → error en campo nombre
+Inconformidad: No se validaba el mínimo de 3 caracteres
+Ajuste: Rechazar si nombre.length < 3 || > 120
+Test file: tests/validation/registro.test.js
+Test: debería rechazar un nombre de exactamente 2 caracteres
+Exit fallo: 1
+Exit éxito: 0

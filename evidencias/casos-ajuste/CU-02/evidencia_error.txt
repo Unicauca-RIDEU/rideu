@@ -1,20 +1,4 @@
 FAIL tests/controllers/authController.test.js
-  ● authController.registrar › debería responder 409 si el correo ya existe
-
-    expect(received).toBe(expected) // Object.is equality
-
-    Expected: 409
-    Received: 400
-
-      104 |
-      105 |     // Assert
-    > 106 |     expect(res.statusCode).toBe(409);
-          |                            ^
-      107 |     expect(res.cuerpo.mensaje).toMatch(/Ya existe/);
-      108 |   });
-      109 |
-
-      at Object.<anonymous> (tests/controllers/authController.test.js:106:28)
-
-Test Suites: 1 failed, 1 total
-Tests:       1 failed, 15 skipped, 16 total
+● authController.registrar › debería responder 409 si el correo ya existe
+Expected: 409
+Received: 400
