@@ -272,6 +272,32 @@ describe("authController.iniciarSesion", () => {
 
     // Assert
     expect(res.statusCode).toBe(401);
+    expect(res.cuerpo.mensaje).toBe("Correo o contraseña incorrectos");
+    expect(crearSesion).not.toHaveBeenCalled();
+  });
+
+  test("debería normalizar el correo a minúsculas antes de buscar credenciales", async () => {
+    // Arrange — criterio CU-16
+    buscarCredencialesPorCorreo.mockResolvedValue({
+      id: "u1",
+      nombre: "Ana",
+      correo: "ana@unicauca.edu.co",
+      estado: "Verificada",
+      contrasena_hash: "hash",
+    });
+    bcryptCompare.mockResolvedValue(true);
+    crearSesion.mockResolvedValue({ token: "t", expira: new Date("2030-01-01") });
+    const res = crearRespuestaMock();
+
+    // Act
+    await iniciarSesion(
+      crearRequest({ correo: "Ana.Perez@Unicauca.edu.co", contrasena: "secreta12" }),
+      res,
+    );
+
+    // Assert
+    expect(buscarCredencialesPorCorreo).toHaveBeenCalledWith("ana.perez@unicauca.edu.co");
+    expect(res.statusCode).toBe(200);
   });
 
   test("debería responder 403 si el correo no está verificado", async () => {

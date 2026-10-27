@@ -1,20 +1,4 @@
 FAIL tests/controllers/authController.test.js
-  ● authController.iniciarSesion › debería responder 400 si faltan correo o contraseña
-
-    expect(received).toBe(expected) // Object.is equality
-
-    Expected: 400
-    Received: 401
-
-      233 |
-      234 |     // Assert
-    > 235 |     expect(res.statusCode).toBe(400);
-          |                            ^
-      236 |   });
-      237 |
-      238 |   test("debería responder 401 con el mismo mensaje si el correo no existe", async () => {
-
-      at Object.<anonymous> (tests/controllers/authController.test.js:235:28)
-
-Test Suites: 1 failed, 1 total
-Tests:       1 failed, 15 skipped, 16 total
+● authController.iniciarSesion › debería responder 400 si faltan correo o contraseña
+Expected: 400
+Received: 401

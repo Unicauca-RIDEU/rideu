@@ -1,0 +1,4 @@
+FAIL tests/models/usuario.test.js
+● modelo usuario › debería hashear el token con SHA-256 en hexadecimal
+Expected pattern: /^[a-f0-9]{64}$/
+Received string:  "a9993e364706816aba3e25717850c26c9cd0d89d"

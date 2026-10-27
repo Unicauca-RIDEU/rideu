@@ -1,0 +1,4 @@
+FAIL tests/routes/authRoutes.test.js
+● rutas /api/auth (Supertest) › POST /registro debería usar código 201 y no 200 en el alta exitosa
+Expected: 201
+Received: 200

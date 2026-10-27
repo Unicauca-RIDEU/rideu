@@ -1,0 +1,4 @@
+FAIL tests/services/correo.test.js
+● servicio correo › debería armar el enlace de verificación sin barra final duplicada
+Expected: "http://localhost:5173/registro/verificacion?token=abc123"
+Received: "http://localhost:5173//registro/verificacion?token=abc123"
