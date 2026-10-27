@@ -1,1 +1,1 @@
-  return local; // BUG CU-05: sin prefijo +57
+  return local; // BUG CU-05

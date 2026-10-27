@@ -8,7 +8,7 @@
 
 
 === STDERR ===
-(node:3338) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(node:7071) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
 (Use `node --trace-warnings ...` to show where the warning was created)
 FAIL tests/controllers/authController.test.js
   ● authController.iniciarSesion › debería responder 403 si el correo no está verificado
@@ -18,18 +18,18 @@ FAIL tests/controllers/authController.test.js
     Expected: 403
     Received: 401
 
-      294 |
-      295 |     // Assert
-    > 296 |     expect(res.statusCode).toBe(403);
+      320 |
+      321 |     // Assert
+    > 322 |     expect(res.statusCode).toBe(403);
           |                            ^
-      297 |     expect(res.cuerpo.codigo).toBe("EMAIL_NOT_VERIFIED");
-      298 |     expect(crearSesion).not.toHaveBeenCalled();
-      299 |   });
+      323 |     expect(res.cuerpo.codigo).toBe("EMAIL_NOT_VERIFIED");
+      324 |     expect(crearSesion).not.toHaveBeenCalled();
+      325 |   });
 
-      at Object.<anonymous> (tests/controllers/authController.test.js:296:28)
+      at Object.<anonymous> (tests/controllers/authController.test.js:322:28)
 
 Test Suites: 1 failed, 1 total
-Tests:       1 failed, 15 skipped, 16 total
+Tests:       1 failed, 16 skipped, 17 total
 Snapshots:   0 total
-Time:        0.095 s, estimated 1 s
+Time:        0.094 s, estimated 1 s
 Ran all test suites matching tests/controllers/authController.test.js with tests matching "debería responder 403 si el correo no está verificado".
