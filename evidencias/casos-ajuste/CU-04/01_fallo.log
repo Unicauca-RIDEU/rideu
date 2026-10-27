@@ -8,7 +8,7 @@
 
 
 === STDERR ===
-(node:3391) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(node:7154) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
 (Use `node --trace-warnings ...` to show where the warning was created)
 FAIL tests/middleware/requiereSesion.test.js
   ● middleware requiereSesion › debería responder 401 si no hay encabezado Authorization Bearer
@@ -29,7 +29,7 @@ FAIL tests/middleware/requiereSesion.test.js
       at Object.<anonymous> (tests/middleware/requiereSesion.test.js:26:28)
 
 Test Suites: 1 failed, 1 total
-Tests:       1 failed, 3 skipped, 4 total
+Tests:       1 failed, 4 skipped, 5 total
 Snapshots:   0 total
-Time:        0.105 s, estimated 1 s
+Time:        0.091 s, estimated 1 s
 Ran all test suites matching tests/middleware/requiereSesion.test.js with tests matching "debería responder 401 si no hay encabezado Authorization Bearer".

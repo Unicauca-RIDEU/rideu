@@ -1,0 +1,4 @@
+FAIL tests/middleware/requiereSesion.test.js
+● middleware requiereSesion › debería rechazar el esquema Basic y exigir Bearer
+Expected: 401
+Received: 0

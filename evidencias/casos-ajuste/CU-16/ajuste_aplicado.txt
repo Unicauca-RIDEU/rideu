@@ -1,0 +1,10 @@
+Caso: CU-16
+Título: Login no normalizaba el correo a minúsculas
+Módulo: controllers/authController.js
+Criterio: El correo se busca siempre en minúsculas
+Inconformidad: Ana@Unicauca.edu.co no coincidía con ana@...
+Ajuste: trim().toLowerCase() antes de buscarCredencialesPorCorreo
+Test file: tests/controllers/authController.test.js
+Test: debería normalizar el correo a minúsculas antes de buscar credenciales
+Exit fallo: 1
+Exit éxito: 0

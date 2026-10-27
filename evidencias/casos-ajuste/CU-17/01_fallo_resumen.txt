@@ -1,0 +1,10 @@
+FAIL tests/validation/registro.test.js
+● validarRegistro › debería rechazar WhatsApp que no sea celular colombiano
+Expected: false
+Received: true
+expect(received).toBe(expected) // Object.is equality
+expect(resultado.ok).toBe(false);
+expect(resultado.errores[0].campo).toBe("whatsapp");
+expect(fijo.ok).toBe(false);
+Tests:       1 failed, 9 skipped, 10 total
+Test Suites: 1 failed, 1 total

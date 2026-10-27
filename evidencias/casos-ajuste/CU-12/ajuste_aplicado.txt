@@ -1,0 +1,10 @@
+Caso: CU-12
+Título: Sesión inválida respondía 403
+Módulo: middleware/requiereSesion.js
+Criterio: Token de sesión inválido/expirado → HTTP 401
+Inconformidad: Respondía 403 Forbidden
+Ajuste: status(401) Tu sesión no es válida o expiró
+Test file: tests/middleware/requiereSesion.test.js
+Test: debería responder 401 si el token de sesión no es válido
+Exit fallo: 1
+Exit éxito: 0
