@@ -1,0 +1,17 @@
+# Caso CU-01 — etapa: 02_exito
+# exit_code=0
+
+=== STDOUT ===
+
+> rideu-backend@0.1.0 test
+> NODE_OPTIONS=--experimental-vm-modules jest --runInBand --runInBand tests/validation/registro.test.js -t debería rechazar un correo que solo contiene unicauca.edu.co como subcadena
+
+
+=== STDERR ===
+(node:3244) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+Test Suites: 1 passed, 1 total
+Tests:       7 skipped, 1 passed, 8 total
+Snapshots:   0 total
+Time:        0.09 s, estimated 1 s
+Ran all test suites matching tests/validation/registro.test.js with tests matching "debería rechazar un correo que solo contiene unicauca.edu.co como subcadena".
