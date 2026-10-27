@@ -1,0 +1,20 @@
+FAIL tests/middleware/requiereSesion.test.js
+  ● middleware requiereSesion › debería responder 401 si no hay encabezado Authorization Bearer
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 401
+    Received: 400
+
+      24 |
+      25 |     // Assert
+    > 26 |     expect(res.statusCode).toBe(401);
+         |                            ^
+      27 |     expect(res.cuerpo.mensaje).toMatch(/iniciar sesión/);
+      28 |     expect(next).not.toHaveBeenCalled();
+      29 |   });
+
+      at Object.<anonymous> (tests/middleware/requiereSesion.test.js:26:28)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 3 skipped, 4 total

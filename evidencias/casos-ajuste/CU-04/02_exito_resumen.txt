@@ -1,0 +1,2 @@
+Tests:       3 skipped, 1 passed, 4 total
+Test Suites: 1 passed, 1 total

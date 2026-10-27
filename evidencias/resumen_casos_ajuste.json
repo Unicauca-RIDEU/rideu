@@ -1,0 +1,93 @@
+[
+  {
+    "id": "CU-01",
+    "titulo": "Regex de correo institucional demasiado permisiva",
+    "modulo": "validation/registro.js",
+    "inconformidad": "Aceptaba correos como ana@unicauca.edu.co.evil.com",
+    "ajuste": "Anclar la regex a ^...@unicauca\\.edu\\.co$",
+    "test_file": "tests/validation/registro.test.js",
+    "test_name": "debería rechazar un correo que solo contiene unicauca.edu.co como subcadena",
+    "exit_fallo": 1,
+    "exit_exito": 0,
+    "fallo_detectado": true,
+    "corregido": true
+  },
+  {
+    "id": "CU-02",
+    "titulo": "Registro duplicado respondía 400 en lugar de 409",
+    "modulo": "controllers/authController.js",
+    "inconformidad": "Conflicto de correo existente devolvía Bad Request",
+    "ajuste": "Usar status 409 Conflict cuando el correo ya existe",
+    "test_file": "tests/controllers/authController.test.js",
+    "test_name": "debería responder 409 si el correo ya existe",
+    "exit_fallo": 1,
+    "exit_exito": 0,
+    "fallo_detectado": true,
+    "corregido": true
+  },
+  {
+    "id": "CU-03",
+    "titulo": "Login con correo sin verificar respondía 401",
+    "modulo": "controllers/authController.js",
+    "inconformidad": "Se confundía con credenciales inválidas (401) en vez de prohibido (403)",
+    "ajuste": "Devolver 403 con codigo EMAIL_NOT_VERIFIED",
+    "test_file": "tests/controllers/authController.test.js",
+    "test_name": "debería responder 403 si el correo no está verificado",
+    "exit_fallo": 1,
+    "exit_exito": 0,
+    "fallo_detectado": true,
+    "corregido": true
+  },
+  {
+    "id": "CU-04",
+    "titulo": "Middleware sin Bearer devolvía 400",
+    "modulo": "middleware/requiereSesion.js",
+    "inconformidad": "Falta de autenticación se reportaba como error de validación",
+    "ajuste": "Responder 401 Unauthorized cuando no hay Bearer token",
+    "test_file": "tests/middleware/requiereSesion.test.js",
+    "test_name": "debería responder 401 si no hay encabezado Authorization Bearer",
+    "exit_fallo": 1,
+    "exit_exito": 0,
+    "fallo_detectado": true,
+    "corregido": true
+  },
+  {
+    "id": "CU-05",
+    "titulo": "WhatsApp no se normalizaba a +57",
+    "modulo": "validation/registro.js",
+    "inconformidad": "Se guardaba el número local sin prefijo internacional",
+    "ajuste": "Prefijar +57 tras validar celular colombiano de 10 dígitos",
+    "test_file": "tests/validation/registro.test.js",
+    "test_name": "debería normalizar WhatsApp con prefijo 57 a formato \\+57",
+    "exit_fallo": 1,
+    "exit_exito": 0,
+    "fallo_detectado": true,
+    "corregido": true
+  },
+  {
+    "id": "CU-06",
+    "titulo": "Enlace de verificación expirado respondía 404",
+    "modulo": "controllers/authController.js",
+    "inconformidad": "Token vencido se trataba como recurso inexistente",
+    "ajuste": "Responder 400 con mensaje de expiración",
+    "test_file": "tests/controllers/authController.test.js",
+    "test_name": "debería responder 400 si el enlace expiró",
+    "exit_fallo": 1,
+    "exit_exito": 0,
+    "fallo_detectado": true,
+    "corregido": true
+  },
+  {
+    "id": "CU-07",
+    "titulo": "Login con campos vacíos respondía 401",
+    "modulo": "controllers/authController.js",
+    "inconformidad": "Campos obligatorios vacíos se interpretaban como credenciales incorrectas",
+    "ajuste": "Validar presencia y responder 400 Bad Request",
+    "test_file": "tests/controllers/authController.test.js",
+    "test_name": "debería responder 400 si faltan correo o contraseña",
+    "exit_fallo": 1,
+    "exit_exito": 0,
+    "fallo_detectado": true,
+    "corregido": true
+  }
+]

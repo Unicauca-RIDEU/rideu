@@ -1,0 +1,8 @@
+Caso: CU-07
+Título: Login con campos vacíos respondía 401
+Módulo: controllers/authController.js
+Inconformidad: Campos obligatorios vacíos se interpretaban como credenciales incorrectas
+Ajuste: Validar presencia y responder 400 Bad Request
+Test: debería responder 400 si faltan correo o contraseña
+Exit fallo: 1
+Exit éxito: 0

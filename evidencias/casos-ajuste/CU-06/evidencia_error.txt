@@ -1,0 +1,20 @@
+FAIL tests/controllers/authController.test.js
+  ● authController.verificar › debería responder 400 si el enlace expiró
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 400
+    Received: 404
+
+      203 |
+      204 |     // Assert
+    > 205 |     expect(res.statusCode).toBe(400);
+          |                            ^
+      206 |     expect(res.cuerpo.mensaje).toMatch(/expiró/);
+      207 |   });
+      208 |
+
+      at Object.<anonymous> (tests/controllers/authController.test.js:205:28)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 15 skipped, 16 total

@@ -1,0 +1,35 @@
+# Caso CU-04 — etapa: 01_fallo
+# exit_code=1
+
+=== STDOUT ===
+
+> rideu-backend@0.1.0 test
+> NODE_OPTIONS=--experimental-vm-modules jest --runInBand --runInBand tests/middleware/requiereSesion.test.js -t debería responder 401 si no hay encabezado Authorization Bearer
+
+
+=== STDERR ===
+(node:3391) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+FAIL tests/middleware/requiereSesion.test.js
+  ● middleware requiereSesion › debería responder 401 si no hay encabezado Authorization Bearer
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 401
+    Received: 400
+
+      24 |
+      25 |     // Assert
+    > 26 |     expect(res.statusCode).toBe(401);
+         |                            ^
+      27 |     expect(res.cuerpo.mensaje).toMatch(/iniciar sesión/);
+      28 |     expect(next).not.toHaveBeenCalled();
+      29 |   });
+
+      at Object.<anonymous> (tests/middleware/requiereSesion.test.js:26:28)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 3 skipped, 4 total
+Snapshots:   0 total
+Time:        0.105 s, estimated 1 s
+Ran all test suites matching tests/middleware/requiereSesion.test.js with tests matching "debería responder 401 si no hay encabezado Authorization Bearer".
