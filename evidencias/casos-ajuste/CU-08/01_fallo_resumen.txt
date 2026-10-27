@@ -1,0 +1,9 @@
+FAIL tests/validation/registro.test.js
+● validarRegistro › debería rechazar una contraseña de exactamente 7 caracteres
+Expected: false
+Received: true
+expect(received).toBe(expected) // Object.is equality
+expect(resultado.ok).toBe(false);
+expect(resultado.errores.some((e) => e.campo === "contrasena")).toBe(true);
+Tests:       1 failed, 9 skipped, 10 total
+Test Suites: 1 failed, 1 total

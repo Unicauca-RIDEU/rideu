@@ -1,0 +1,10 @@
+Caso: CU-15
+Título: hashToken usaba SHA-1 en lugar de SHA-256
+Módulo: models/usuario.js
+Criterio: hashToken produce hex de 64 caracteres (SHA-256)
+Inconformidad: SHA-1 produce 40 caracteres; rompe sesiones/verificación
+Ajuste: createHash('sha256')
+Test file: tests/models/usuario.test.js
+Test: debería hashear el token con SHA-256 en hexadecimal
+Exit fallo: 1
+Exit éxito: 0

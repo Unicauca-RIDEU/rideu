@@ -1,0 +1,4 @@
+FAIL tests/controllers/authController.test.js
+● authController.iniciarSesion › debería responder 403 si el correo no está verificado
+Expected: 403
+Received: 401

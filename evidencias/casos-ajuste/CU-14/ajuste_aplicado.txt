@@ -1,0 +1,10 @@
+Caso: CU-14
+Título: Enlace de verificación duplicaba la barra final
+Módulo: services/correo.js
+Criterio: URL base sin // duplicado antes de /registro/verificacion
+Inconformidad: Quedaba http://host:5173//registro/...
+Ajuste: Quitar barra final con replace(/\/$/, '')
+Test file: tests/services/correo.test.js
+Test: debería armar el enlace de verificación sin barra final duplicada
+Exit fallo: 1
+Exit éxito: 0

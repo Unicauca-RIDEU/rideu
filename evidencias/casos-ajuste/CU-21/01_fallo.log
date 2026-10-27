@@ -1,0 +1,35 @@
+# Caso CU-21 — etapa: 01_fallo
+# exit_code=1
+
+=== STDOUT ===
+
+> rideu-backend@0.1.0 test
+> NODE_OPTIONS=--experimental-vm-modules jest --runInBand --runInBand tests/models/sesion.test.js -t debería crear una sesión con token opaco y expiración a 7 días
+
+
+=== STDERR ===
+(node:8353) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+FAIL tests/models/sesion.test.js
+  ● modelo sesion › debería crear una sesión con token opaco y expiración a 7 días
+
+    expect(received).toBeGreaterThan(expected)
+
+    Expected: > 1793652683731
+    Received:   1793137883731
+
+      25 |     // Assert
+      26 |     expect(token).toMatch(/^[a-f0-9]{64}$/);
+    > 27 |     expect(expira.getTime()).toBeGreaterThan(antes + 6 * 24 * 60 * 60 * 1000);
+         |                              ^
+      28 |     expect(query).toHaveBeenCalledWith(
+      29 |       expect.stringContaining("INSERT INTO sesiones"),
+      30 |       ["usuario-1", hashToken(token), expect.any(Date)],
+
+      at Object.<anonymous> (tests/models/sesion.test.js:27:30)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 2 skipped, 3 total
+Snapshots:   0 total
+Time:        0.09 s, estimated 1 s
+Ran all test suites matching tests/models/sesion.test.js with tests matching "debería crear una sesión con token opaco y expiración a 7 días".

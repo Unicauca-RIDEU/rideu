@@ -1,0 +1,35 @@
+# Caso CU-17 — etapa: 01_fallo
+# exit_code=1
+
+=== STDOUT ===
+
+> rideu-backend@0.1.0 test
+> NODE_OPTIONS=--experimental-vm-modules jest --runInBand --runInBand tests/validation/registro.test.js -t debería rechazar WhatsApp que no sea celular colombiano
+
+
+=== STDERR ===
+(node:8077) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+FAIL tests/validation/registro.test.js
+  ● validarRegistro › debería rechazar WhatsApp que no sea celular colombiano
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: true
+
+      125 |     expect(resultado.ok).toBe(false);
+      126 |     expect(resultado.errores[0].campo).toBe("whatsapp");
+    > 127 |     expect(fijo.ok).toBe(false);
+          |                     ^
+      128 |   });
+      129 |
+      130 |   test("debería normalizar WhatsApp con prefijo 57 a formato +57", () => {
+
+      at Object.<anonymous> (tests/validation/registro.test.js:127:21)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 9 skipped, 10 total
+Snapshots:   0 total
+Time:        0.095 s, estimated 1 s
+Ran all test suites matching tests/validation/registro.test.js with tests matching "debería rechazar WhatsApp que no sea celular colombiano".
