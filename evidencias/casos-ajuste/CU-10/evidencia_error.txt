@@ -1,0 +1,4 @@
+FAIL tests/controllers/authController.test.js
+● authController.verificar › debería responder 409 si el enlace ya fue usado
+Expected: 409
+Received: 400

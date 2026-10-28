@@ -1,0 +1,4 @@
+FAIL tests/middleware/requiereSesion.test.js
+● middleware requiereSesion › debería responder 401 si el token de sesión no es válido
+Expected: 401
+Received: 403

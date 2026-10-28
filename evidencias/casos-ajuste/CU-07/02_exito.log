@@ -8,10 +8,10 @@
 
 
 === STDERR ===
-(node:3578) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(node:7414) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
 (Use `node --trace-warnings ...` to show where the warning was created)
 Test Suites: 1 passed, 1 total
-Tests:       15 skipped, 1 passed, 16 total
+Tests:       16 skipped, 1 passed, 17 total
 Snapshots:   0 total
-Time:        0.084 s, estimated 1 s
+Time:        0.086 s, estimated 1 s
 Ran all test suites matching tests/controllers/authController.test.js with tests matching "debería responder 400 si faltan correo o contraseña".

@@ -1,0 +1,10 @@
+Caso: CU-13
+Título: Esquema Basic era aceptado como si fuera Bearer
+Módulo: middleware/requiereSesion.js
+Criterio: Solo esquema Bearer es válido; Basic → 401
+Inconformidad: Authorization: Basic ... pasaba al buscador de sesión
+Ajuste: Exigir tipo === 'Bearer'
+Test file: tests/middleware/requiereSesion.test.js
+Test: debería rechazar el esquema Basic y exigir Bearer
+Exit fallo: 1
+Exit éxito: 0
