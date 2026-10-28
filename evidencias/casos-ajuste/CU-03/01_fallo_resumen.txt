@@ -6,5 +6,5 @@ expect(received).toBe(expected) // Object.is equality
 expect(res.statusCode).toBe(403);
 expect(res.cuerpo.codigo).toBe("EMAIL_NOT_VERIFIED");
 expect(crearSesion).not.toHaveBeenCalled();
-Tests:       1 failed, 15 skipped, 16 total
+Tests:       1 failed, 16 skipped, 17 total
 Test Suites: 1 failed, 1 total

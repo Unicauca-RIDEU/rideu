@@ -8,7 +8,7 @@
 
 
 === STDERR ===
-(node:3275) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(node:6994) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
 (Use `node --trace-warnings ...` to show where the warning was created)
 FAIL tests/controllers/authController.test.js
   ● authController.registrar › debería responder 409 si el correo ya existe
@@ -29,7 +29,7 @@ FAIL tests/controllers/authController.test.js
       at Object.<anonymous> (tests/controllers/authController.test.js:106:28)
 
 Test Suites: 1 failed, 1 total
-Tests:       1 failed, 15 skipped, 16 total
+Tests:       1 failed, 16 skipped, 17 total
 Snapshots:   0 total
-Time:        0.104 s, estimated 1 s
+Time:        0.092 s, estimated 1 s
 Ran all test suites matching tests/controllers/authController.test.js with tests matching "debería responder 409 si el correo ya existe".

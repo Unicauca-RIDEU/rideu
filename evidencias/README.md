@@ -2,26 +2,34 @@
 
 ## Entregable principal
 
-- **Excel:** [`Pruebas_Unitarias_RideU.xlsx`](./Pruebas_Unitarias_RideU.xlsx)
-  - Hoja *Inventario de pruebas*: qué se probó
-  - Hoja *Casos de ajuste (7)*: inconformidad, error y resolución
-  - Hoja *Cobertura*: % por archivo (umbral ≥ 70% en lógica de negocio)
-  - Hoja *Detalle evidencias*: extractos de Jest (fallo → éxito)
+- **Excel:** [`Pruebas_Unitarias_RideU.xlsx`](./Pruebas_Unitarias_RideU.xlsx) — **13 casos de ajuste**
+- **Mapa de archivos de test:** [`MAPA_PRUEBAS.md`](./MAPA_PRUEBAS.md)
 
-## Casos de ajuste
+### Hojas del Excel
 
-Cada carpeta `casos-ajuste/CU-0X/` contiene:
+| Hoja | Contenido |
+|------|-----------|
+| Portada | Resumen del entregable |
+| Inventario de pruebas | Qué se probó por módulo |
+| Casos de ajuste (13) | Criterio, error, ajuste, evidencias |
+| Criterios vs pruebas | Trazabilidad criterio ↔ test |
+| Detalle evidencias | Extractos Jest fallo/éxito |
+| Cobertura | % por archivo |
+| Ubicación de tests | Dónde están los archivos |
+| Guía de lectura | Cómo presentar |
+
+## Casos de ajuste CU-01 … CU-13
+
+Cada carpeta `casos-ajuste/CU-XX/` contiene:
 
 | Archivo | Contenido |
 |---------|-----------|
-| `01_fallo.log` | Salida Jest con el defecto (test en rojo) |
-| `01_fallo_resumen.txt` | Expected vs Received |
-| `02_exito.log` | Salida Jest tras el ajuste (test en verde) |
-| `02_exito_resumen.txt` | Confirmación PASS |
-| `ajuste_aplicado.txt` | Descripción del defecto y la corrección |
-| `evidencia_error.txt` | Extracto del aserto fallido |
+| `01_fallo.log` | Jest en rojo (con el defecto) |
+| `02_exito.log` | Jest en verde (tras el ajuste) |
+| `evidencia_error.txt` | Expected vs Received |
+| `ajuste_aplicado.txt` | Criterio + inconformidad + corrección |
 
-## Cómo reproducir la suite
+## Cómo reproducir
 
 ```bash
 cd backend

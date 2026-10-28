@@ -1,0 +1,4 @@
+FAIL tests/validation/registro.test.js
+● validarRegistro › debería rechazar una contraseña de exactamente 7 caracteres
+Expected: false
+Received: true
