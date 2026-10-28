@@ -1,0 +1,10 @@
+FAIL tests/controllers/authController.test.js
+● authController.iniciarSesion › debería responder 401 si la contraseña no coincide
+Expected: 401
+Received: 404
+expect(received).toBe(expected) // Object.is equality
+expect(res.statusCode).toBe(401);
+expect(res.cuerpo.mensaje).toBe("Correo o contraseña incorrectos");
+expect(crearSesion).not.toHaveBeenCalled();
+Tests:       1 failed, 16 skipped, 17 total
+Test Suites: 1 failed, 1 total

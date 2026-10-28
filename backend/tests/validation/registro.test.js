@@ -70,7 +70,9 @@ describe("validarRegistro", () => {
       "whatsapp",
     ]);
     expect(nulo.ok).toBe(false);
+    expect(nulo.errores[0].campo).toBe("body");
     expect(arreglo.ok).toBe(false);
+    expect(arreglo.errores[0].campo).toBe("body");
   });
 
   test("debería rechazar nombre fuera de rango 3-120 caracteres", () => {
@@ -94,6 +96,24 @@ describe("validarRegistro", () => {
     expect(corta.errores[0].mensaje).toMatch(/al menos 8/);
     expect(larga.ok).toBe(false);
     expect(larga.errores[0].mensaje).toMatch(/72/);
+  });
+
+  test("debería rechazar una contraseña de exactamente 7 caracteres", () => {
+    // Arrange / Act — criterio CU-08: mínimo 8 caracteres
+    const resultado = validarRegistro({ ...valido, contrasena: "secreta" });
+
+    // Assert
+    expect(resultado.ok).toBe(false);
+    expect(resultado.errores.some((e) => e.campo === "contrasena")).toBe(true);
+  });
+
+  test("debería rechazar un nombre de exactamente 2 caracteres", () => {
+    // Arrange / Act — criterio CU-09: nombre entre 3 y 120
+    const resultado = validarRegistro({ ...valido, nombre: "Al" });
+
+    // Assert
+    expect(resultado.ok).toBe(false);
+    expect(resultado.errores[0].campo).toBe("nombre");
   });
 
   test("debería rechazar WhatsApp que no sea celular colombiano", () => {

@@ -1,0 +1,10 @@
+Caso: CU-10
+Título: Enlace de verificación ya usado respondía 400
+Módulo: controllers/authController.js
+Criterio: motivo usado → HTTP 409 Conflict
+Inconformidad: Respondía 400 en lugar de conflicto
+Ajuste: status(409) cuando motivo === 'usado'
+Test file: tests/controllers/authController.test.js
+Test: debería responder 409 si el enlace ya fue usado
+Exit fallo: 1
+Exit éxito: 0

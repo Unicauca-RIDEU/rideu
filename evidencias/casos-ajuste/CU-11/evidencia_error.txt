@@ -1,0 +1,4 @@
+FAIL tests/controllers/authController.test.js
+● authController.iniciarSesion › debería responder 401 si la contraseña no coincide
+Expected: 401
+Received: 404

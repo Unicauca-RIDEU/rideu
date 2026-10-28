@@ -1,0 +1,10 @@
+Caso: CU-08
+Título: Contraseña de 7 caracteres era aceptada
+Módulo: validation/registro.js
+Criterio: Contraseña con longitud < 8 → ok=false
+Inconformidad: Se omitió la validación de longitud mínima
+Ajuste: Rechazar si contrasena.length < 8
+Test file: tests/validation/registro.test.js
+Test: debería rechazar una contraseña de exactamente 7 caracteres
+Exit fallo: 1
+Exit éxito: 0

@@ -1,8 +1,10 @@
 Caso: CU-01
 Título: Regex de correo institucional demasiado permisiva
 Módulo: validation/registro.js
-Inconformidad: Aceptaba correos como ana@unicauca.edu.co.evil.com
-Ajuste: Anclar la regex a ^...@unicauca\.edu\.co$
+Criterio: Solo correos que terminen exactamente en @unicauca.edu.co
+Inconformidad: Aceptaba ana@unicauca.edu.co.evil.com
+Ajuste: Anclar la regex a ^[^\s@]+@unicauca\.edu\.co$
+Test file: tests/validation/registro.test.js
 Test: debería rechazar un correo que solo contiene unicauca.edu.co como subcadena
 Exit fallo: 1
 Exit éxito: 0
