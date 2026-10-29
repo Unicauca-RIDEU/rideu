@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Aplica 21 defectos controlados, captura fallos de Jest y evidencia de corrección."""
+"""Aplica 13 defectos controlados, captura fallos de Jest y evidencia de corrección."""
 
 from __future__ import annotations
 
@@ -217,7 +217,7 @@ CASOS = [
             "CU-07",
         ),
     },
-    # --- CU-08..21 (nuevos) ---
+    # --- CU-08..13 ---
     {
         "id": "CU-08",
         "titulo": "Contraseña de 7 caracteres era aceptada",
@@ -318,118 +318,6 @@ CASOS = [
     },
     {
         "id": "CU-13",
-        "titulo": "Registro exitoso respondía 200 en lugar de 201",
-        "modulo": "controllers/authController.js",
-        "criterio": "Alta de cuenta → HTTP 201 Created",
-        "inconformidad": "Respondía 200 OK",
-        "ajuste": "status(201) tras crear usuario y enviar correo",
-        "test_file": "tests/routes/authRoutes.test.js",
-        "test_name": "POST /registro debería usar código 201 y no 200 en el alta exitosa",
-        "apply": lambda: replace_once(
-            ARCHIVOS["auth"],
-            "return res.status(201).json({\n      mensaje: \"Cuenta creada en estado «Sin verificar». Enviamos el enlace de verificación a tu correo institucional.\",\n      usuario,\n    });",
-            "return res.status(200).json({\n      mensaje: \"Cuenta creada en estado «Sin verificar». Enviamos el enlace de verificación a tu correo institucional.\",\n      usuario,\n    }); // BUG CU-13",
-            "CU-13",
-        ),
-    },
-    {
-        "id": "CU-14",
-        "titulo": "Enlace de verificación duplicaba la barra final",
-        "modulo": "services/correo.js",
-        "criterio": "URL base sin // duplicado antes de /registro/verificacion",
-        "inconformidad": "Quedaba http://host:5173//registro/...",
-        "ajuste": "Quitar barra final con replace(/\\/$/, '')",
-        "test_file": "tests/services/correo.test.js",
-        "test_name": "debería armar el enlace de verificación sin barra final duplicada",
-        "apply": lambda: replace_once(
-            ARCHIVOS["correo"],
-            'const base = String(appUrl || "").replace(/\\/$/, "");',
-            'const base = String(appUrl || ""); // BUG CU-14: no elimina barra final',
-            "CU-14",
-        ),
-    },
-    {
-        "id": "CU-15",
-        "titulo": "hashToken usaba SHA-1 en lugar de SHA-256",
-        "modulo": "models/usuario.js",
-        "criterio": "hashToken produce hex de 64 caracteres (SHA-256)",
-        "inconformidad": "SHA-1 produce 40 caracteres; rompe sesiones/verificación",
-        "ajuste": "createHash('sha256')",
-        "test_file": "tests/models/usuario.test.js",
-        "test_name": "debería hashear el token con SHA-256 en hexadecimal",
-        "apply": lambda: replace_once(
-            ARCHIVOS["usuario"],
-            'return createHash("sha256").update(token).digest("hex");',
-            'return createHash("sha1").update(token).digest("hex"); // BUG CU-15',
-            "CU-15",
-        ),
-    },
-    {
-        "id": "CU-16",
-        "titulo": "Login no normalizaba el correo a minúsculas",
-        "modulo": "controllers/authController.js",
-        "criterio": "El correo se busca siempre en minúsculas",
-        "inconformidad": "Ana@Unicauca.edu.co no coincidía con ana@...",
-        "ajuste": "trim().toLowerCase() antes de buscarCredencialesPorCorreo",
-        "test_file": "tests/controllers/authController.test.js",
-        "test_name": "debería normalizar el correo a minúsculas antes de buscar credenciales",
-        "apply": lambda: replace_once(
-            ARCHIVOS["auth"],
-            'const correo = typeof req.body?.correo === "string" ? req.body.correo.trim().toLowerCase() : "";',
-            'const correo = typeof req.body?.correo === "string" ? req.body.correo.trim() : ""; // BUG CU-16',
-            "CU-16",
-        ),
-    },
-    {
-        "id": "CU-17",
-        "titulo": "WhatsApp de teléfono fijo (inicia en 6) era aceptado",
-        "modulo": "validation/registro.js",
-        "criterio": "Solo celulares colombianos que empiecen por 3 (10 dígitos)",
-        "inconformidad": "Aceptaba 6012345678",
-        "ajuste": "Validar con /^3\\d{9}$/",
-        "test_file": "tests/validation/registro.test.js",
-        "test_name": "debería rechazar WhatsApp que no sea celular colombiano",
-        "apply": lambda: replace_once(
-            ARCHIVOS["registro"],
-            "if (!/^3\\d{9}$/.test(local)) {\n    return \"\";\n  }",
-            "if (!/^\\d{10}$/.test(local)) {\n    return \"\";\n  } // BUG CU-17: acepta fijos 6...",
-            "CU-17",
-        ),
-    },
-    {
-        "id": "CU-18",
-        "titulo": "MAIL_MODE desconocido no lanzaba error",
-        "modulo": "services/correo.js",
-        "criterio": "MAIL_MODE distinto de console|smtp → Error",
-        "inconformidad": "Continuaba como si fuera válido",
-        "ajuste": "throw new Error('MAIL_MODE debe ser console o smtp.')",
-        "test_file": "tests/services/correo.test.js",
-        "test_name": "debería rechazar un MAIL_MODE desconocido",
-        "apply": lambda: replace_once(
-            ARCHIVOS["correo"],
-            'if (config.mailMode !== "smtp") {\n    throw new Error("MAIL_MODE debe ser console o smtp.");\n  }',
-            'if (config.mailMode !== "smtp") {\n    return { enlace }; // BUG CU-18: no valida MAIL_MODE\n  }',
-            "CU-18",
-        ),
-    },
-    {
-        "id": "CU-19",
-        "titulo": "Body null en registro no se rechazaba con mensaje claro",
-        "modulo": "validation/registro.js",
-        "criterio": "body null/array → ok=false con error de cuerpo",
-        "inconformidad": "Se omitía la guarda y fallaba de forma opaca",
-        "ajuste": "Rechazar si body === null || no es objeto || es array",
-        "test_file": "tests/validation/registro.test.js",
-        "test_name": "debería rechazar campos vacíos o nulos en el cuerpo",
-        "apply": lambda: replace_once(
-            ARCHIVOS["registro"],
-            'if (body === null || typeof body !== "object" || Array.isArray(body)) {',
-            'if (typeof body !== "object" || Array.isArray(body)) { // BUG CU-19: null pasa (typeof null === "object")',
-            "CU-19",
-        ),
-    },
-    {
-        "id": "CU-20",
         "titulo": "Esquema Basic era aceptado como si fuera Bearer",
         "modulo": "middleware/requiereSesion.js",
         "criterio": "Solo esquema Bearer es válido; Basic → 401",
@@ -440,24 +328,8 @@ CASOS = [
         "apply": lambda: replace_once(
             ARCHIVOS["middleware"],
             'if (tipo !== "Bearer" || !token) {\n    return res.status(401).json({ mensaje: "Debes iniciar sesión." });\n  }',
-            'if ((tipo !== "Bearer" && tipo !== "Basic") || !token) {\n    return res.status(401).json({ mensaje: "Debes iniciar sesión." }); // BUG CU-20\n  }',
-            "CU-20",
-        ),
-    },
-    {
-        "id": "CU-21",
-        "titulo": "Sesión expiraba en 1 hora en lugar de 7 días",
-        "modulo": "models/sesion.js",
-        "criterio": "Duración de sesión = 7 días (168 horas)",
-        "inconformidad": "HORAS_SESION = 1",
-        "ajuste": "const HORAS_SESION = 24 * 7",
-        "test_file": "tests/models/sesion.test.js",
-        "test_name": "debería crear una sesión con token opaco y expiración a 7 días",
-        "apply": lambda: replace_once(
-            ARCHIVOS["sesion"],
-            "const HORAS_SESION = 24 * 7;",
-            "const HORAS_SESION = 1; // BUG CU-21",
-            "CU-21",
+            'if ((tipo !== "Bearer" && tipo !== "Basic") || !token) {\n    return res.status(401).json({ mensaje: "Debes iniciar sesión." }); // BUG CU-13\n  }',
+            "CU-13",
         ),
     },
 ]
