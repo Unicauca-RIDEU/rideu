@@ -1,0 +1,145 @@
+import bcrypt from "bcryptjs";
+import { crearSesion } from "../models/sesion.js";
+import {
+  ESTADO_VERIFICADA,
+  buscarCredencialesPorCorreo,
+  crearTokenVerificacion,
+  crearUsuario,
+  buscarPorCorreo,
+  eliminarUsuario,
+  verificarCuenta,
+} from "../models/usuario.js";
+import { enviarCorreoVerificacion } from "../services/correo.js";
+import { validarRegistro } from "../validation/registro.js";
+
+const RONDAS_BCRYPT = 10;
+const MENSAJE_CREDENCIALES_INVALIDAS = "Correo o contraseña incorrectos";
+const HASH_AUSENTE = bcrypt.hashSync("credencial-ausente", RONDAS_BCRYPT);
+
+export async function registrar(req, res) {
+  const validacion = validarRegistro(req.body);
+  if (!validacion.ok) {
+    return res.status(400).json({
+      mensaje: validacion.mensaje,
+      errores: validacion.errores,
+    });
+  }
+
+  try {
+    const { nombre, correo, contrasena, whatsapp } = validacion.datos;
+    const existente = await buscarPorCorreo(correo);
+    if (existente) {
+      return res.status(409).json({
+        mensaje: "Ya existe una cuenta con este correo institucional.",
+      });
+    }
+
+    const contrasenaHash = await bcrypt.hash(contrasena, RONDAS_BCRYPT);
+    const { token, tokenHash, expira } = crearTokenVerificacion();
+    const usuario = await crearUsuario({
+      nombre,
+      correo,
+      contrasenaHash,
+      whatsapp,
+      tokenHash,
+      tokenExpira: expira,
+    });
+
+    try {
+      await enviarCorreoVerificacion({ nombre, correo, token });
+    } catch (error) {
+      await eliminarUsuario(usuario.id).catch((borrado) => {
+        console.error("No se pudo deshacer el registro tras fallar el correo:", borrado);
+      });
+      console.error("Error al enviar el correo de verificación:", error);
+      return res.status(500).json({
+        mensaje: "No se pudo enviar el correo de verificación. Inténtalo de nuevo.",
+      });
+    }
+
+    return res.status(201).json({
+      mensaje: "Cuenta creada en estado «Sin verificar». Enviamos el enlace de verificación a tu correo institucional.",
+      usuario,
+    });
+  } catch (error) {
+    if (error.code === "23505") {
+      return res.status(409).json({
+        mensaje: "Ya existe una cuenta con este correo institucional.",
+      });
+    }
+    console.error("Error al registrar usuario:", error);
+    return res.status(500).json({ mensaje: "No se pudo crear la cuenta." });
+  }
+}
+
+export async function verificar(req, res) {
+  const token = typeof req.body?.token === "string" ? req.body.token.trim() : "";
+  if (!token) {
+    return res.status(400).json({ mensaje: "El token de verificación es obligatorio." });
+  }
+
+  try {
+    const resultado = await verificarCuenta(token);
+    if (resultado.ok) {
+      return res.status(200).json({
+        mensaje: "Tu cuenta quedó en estado «Verificada».",
+        usuario: resultado.usuario,
+      });
+    }
+    if (resultado.motivo === "usado") {
+      return res.status(409).json({ mensaje: "Este enlace de verificación ya fue usado." });
+    }
+    if (resultado.motivo === "expirado") {
+      return res.status(400).json({ mensaje: "El enlace de verificación expiró." });
+    }
+    return res.status(400).json({ mensaje: "El enlace de verificación no es válido." });
+  } catch (error) {
+    console.error("Error al verificar la cuenta:", error);
+    return res.status(500).json({ mensaje: "No se pudo verificar la cuenta." });
+  }
+}
+
+export async function iniciarSesion(req, res) {
+  const correo = typeof req.body?.correo === "string" ? req.body.correo.trim().toLowerCase() : "";
+  const contrasena = typeof req.body?.contrasena === "string" ? req.body.contrasena : "";
+  if (!correo || !contrasena) {
+    return res.status(400).json({
+      mensaje: "Ingresa tu correo institucional y tu contraseña.",
+    });
+  }
+
+  try {
+    const usuario = await buscarCredencialesPorCorreo(correo);
+    const coincide = await bcrypt.compare(contrasena, usuario?.contrasena_hash ?? HASH_AUSENTE);
+    if (!usuario || !coincide) {
+      return res.status(401).json({ mensaje: MENSAJE_CREDENCIALES_INVALIDAS });
+    }
+
+    if (usuario.estado !== ESTADO_VERIFICADA) {
+      return res.status(403).json({
+        codigo: "EMAIL_NOT_VERIFIED",
+        mensaje: "Debes verificar tu correo institucional para acceder",
+      });
+    }
+
+    const { token, expira } = await crearSesion(usuario.id);
+    return res.status(200).json({
+      mensaje: "Sesión iniciada.",
+      token,
+      expira,
+      usuario: {
+        id: usuario.id,
+        nombre: usuario.nombre,
+        correo: usuario.correo,
+        estado: usuario.estado,
+      },
+    });
+  } catch (error) {
+    console.error("Error al iniciar sesión:", error);
+    return res.status(500).json({ mensaje: "No se pudo iniciar sesión." });
+  }
+}
+
+export function sesionActual(req, res) {
+  return res.status(200).json({ usuario: req.usuario });
+}
