@@ -1,7 +1,7 @@
 import { pool } from "../config/database.js";
 
-export async function crearLicencia({ usuarioId, categoria, fechaVencimiento }) {
-  const resultado = await pool.query(
+export async function crearLicencia({ usuarioId, categoria, fechaVencimiento }, db = pool) {
+  const resultado = await db.query(
     `INSERT INTO licencias (
        usuario_id,
        categoria,

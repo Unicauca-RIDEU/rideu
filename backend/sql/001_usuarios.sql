@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
   token_verificacion_expira TIMESTAMPTZ NOT NULL,
   creado_en TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   CONSTRAINT usuarios_correo_unico UNIQUE (correo),
-  CONSTRAINT usuarios_estado_valido CHECK (estado IN ('Sin verificar', 'Verificada')),
+  CONSTRAINT usuarios_estado_valido CHECK (estado IN ('Sin verificar', 'Verificada', 'Habilitado')),
   CONSTRAINT usuarios_correo_institucional CHECK (
     correo ~ '^[^@[:space:]]+@unicauca\.edu\.co$'
   ),
