@@ -1,10 +1,10 @@
 Caso: CU-13
-Título: Registro exitoso respondía 200 en lugar de 201
-Módulo: controllers/authController.js
-Criterio: Alta de cuenta → HTTP 201 Created
-Inconformidad: Respondía 200 OK
-Ajuste: status(201) tras crear usuario y enviar correo
-Test file: tests/routes/authRoutes.test.js
-Test: POST /registro debería usar código 201 y no 200 en el alta exitosa
+Título: Esquema Basic era aceptado como si fuera Bearer
+Módulo: middleware/requiereSesion.js
+Criterio: Solo esquema Bearer es válido; Basic → 401
+Inconformidad: Authorization: Basic ... pasaba al buscador de sesión
+Ajuste: Exigir tipo === 'Bearer'
+Test file: tests/middleware/requiereSesion.test.js
+Test: debería rechazar el esquema Basic y exigir Bearer
 Exit fallo: 1
 Exit éxito: 0

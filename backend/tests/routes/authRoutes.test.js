@@ -88,7 +88,7 @@ describe("rutas /api/auth (Supertest)", () => {
   });
 
   test("POST /registro debería usar código 201 y no 200 en el alta exitosa", async () => {
-    // Arrange / Act — criterio CU-13: Created
+    // Arrange / Act — el alta debe responder 201 Created, no 200
     const respuesta = await request(app).post("/api/auth/registro").send(registroValido);
 
     // Assert
