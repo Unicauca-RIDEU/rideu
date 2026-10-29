@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Genera el Excel de evidencias de pruebas unitarias RideU (21 casos de ajuste)."""
+"""Genera el Excel de evidencias de pruebas unitarias RideU (13 casos de ajuste)."""
 
 from __future__ import annotations
 
@@ -86,15 +86,7 @@ AJUSTES_EXTRA = {
     "CU-10": {"esperado": "HTTP 409 enlace usado", "obtenido": "HTTP 400"},
     "CU-11": {"esperado": "HTTP 401 credenciales", "obtenido": "HTTP 404"},
     "CU-12": {"esperado": "HTTP 401 sesión inválida", "obtenido": "HTTP 403"},
-    "CU-13": {"esperado": "HTTP 201 Created", "obtenido": "HTTP 200 OK"},
-    "CU-14": {"esperado": "URL sin // duplicado", "obtenido": "…5173//registro…"},
-    "CU-15": {"esperado": "hash hex 64 (SHA-256)", "obtenido": "hash hex 40 (SHA-1)"},
-    "CU-16": {"esperado": "búsqueda en minúsculas", "obtenido": "correo sin toLowerCase"},
-    "CU-17": {"esperado": "rechazar fijo 6…", "obtenido": "6012345678 aceptado"},
-    "CU-18": {"esperado": "Error MAIL_MODE", "obtenido": "no lanzaba error"},
-    "CU-19": {"esperado": "null → error campo body", "obtenido": "TypeError / sin guarda"},
-    "CU-20": {"esperado": "Basic → 401 sin consultar", "obtenido": "Basic aceptado como sesión"},
-    "CU-21": {"esperado": "expira ≥ 6 días", "obtenido": "expira en 1 hora"},
+    "CU-13": {"esperado": "Basic → 401 sin consultar", "obtenido": "Basic aceptado como sesión"},
 }
 
 
@@ -149,7 +141,7 @@ def main():
 
     ws = wb.active
     ws.title = "Portada"
-    ws["A1"] = "RideU — Evidencia de Pruebas Unitarias (21 casos de ajuste)"
+    ws["A1"] = "RideU — Evidencia de Pruebas Unitarias (13 casos de ajuste)"
     ws["A1"].font = TITLE_FONT
     bogota = timezone(timedelta(hours=-5))
     cov_rows, cov_total = parse_coverage()
@@ -170,7 +162,7 @@ def main():
     ws["A13"] = "Notas"
     ws["B13"] = (
         "Las pruebas unitarias NO tocan PostgreSQL real ni red. "
-        "Los 21 casos de ajuste muestran el ciclo defecto → fallo del test → corrección → test en verde. "
+        "Los 13 casos de ajuste muestran el ciclo defecto → fallo del test → corrección → test en verde. "
         "Evidencias en evidencias/casos-ajuste/CU-XX/. "
         "Las funciones de test están en backend/tests/ (ver MAPA_PRUEBAS.md)."
     )
@@ -187,7 +179,7 @@ def main():
     apply_borders(ws)
     autosize(ws)
 
-    ws = wb.create_sheet("Casos de ajuste (21)")
+    ws = wb.create_sheet("Casos de ajuste (13)")
     ws.append(
         [
             "ID caso",
@@ -315,7 +307,7 @@ def main():
     for i, line in enumerate(
         [
             "1. Hoja 'Inventario de pruebas': qué se probó en auth.",
-            "2. Hoja 'Casos de ajuste (21)': cada fila = defecto + criterio + test + evidencias.",
+            "2. Hoja 'Casos de ajuste (13)': cada fila = defecto + criterio + test + evidencias.",
             "3. Hoja 'Criterios vs pruebas': trazabilidad criterio ↔ test.",
             "4. Por cada CU-XX abrir evidencias/casos-ajuste/CU-XX/01_fallo.log y 02_exito.log.",
             "5. Hoja 'Ubicación de tests' o MAPA_PRUEBAS.md: dónde están los archivos.",

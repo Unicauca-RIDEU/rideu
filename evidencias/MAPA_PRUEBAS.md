@@ -29,12 +29,12 @@ Todo vive bajo **`backend/tests/`** (réplica de la estructura de `backend/src/`
 
 - **`crearRespuestaMock()`** / **`crearRequest()`** → `backend/tests/helpers/http.js`
 
-## Evidencias de los 21 casos de ajuste
+## Evidencias de los 13 casos de ajuste
 
 | Qué | Dónde |
 |-----|--------|
 | Excel de presentación | `evidencias/Pruebas_Unitarias_RideU.xlsx` |
-| Logs fallo→éxito por caso | `evidencias/casos-ajuste/CU-01` … `CU-21` |
+| Logs fallo→éxito por caso | `evidencias/casos-ajuste/CU-01` … `CU-13` |
 | Resumen JSON | `evidencias/resumen_casos_ajuste.json` |
 | Script que regenera evidencias | `evidencias/generar_casos_ajuste.py` |
 | Script que regenera el Excel | `evidencias/generar_excel.py` |
