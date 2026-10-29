@@ -320,7 +320,7 @@ function marcarHabilitado(usuario, setUsuario) {
 
 function validar(datos) {
   const errores = {};
-  const placa = datos.placa.trim();
+  const placa = datos.placa.trim().replace(/\s+/g, " ");
   const marca = datos.marca.trim();
   const modelo = datos.modelo.trim();
   const color = datos.color.trim();
@@ -329,6 +329,9 @@ function validar(datos) {
   const capacidad = Number(datos.capacidadPasajeros);
 
   if (!placa) errores.placa = "La placa es obligatoria.";
+  else if (!/^[A-Za-z]{3} ?\d{3}$/.test(placa)) {
+    errores.placa = "Formato inválido. Usa 3 letras y 3 números (ejemplo ABC 123).";
+  }
   if (!marca) errores.marca = "La marca es obligatoria.";
   if (!modelo) errores.modelo = "El modelo es obligatorio.";
   if (!color) errores.color = "El color es obligatorio.";

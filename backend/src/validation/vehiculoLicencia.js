@@ -1,5 +1,7 @@
 const UUID =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const PLACA = /^[A-Za-z]{3} ?\d{3}$/;
+const MENSAJE_PLACA = "Formato inválido. Usa 3 letras y 3 números (ejemplo ABC 123).";
 
 export function validarVehiculoYLicencia(body) {
   if (body === null || typeof body !== "object" || Array.isArray(body)) {
@@ -28,6 +30,8 @@ export function validarVehiculoYLicencia(body) {
 
   if (!placa) {
     errores.push({ campo: "placa", mensaje: "La placa es obligatoria." });
+  } else if (!PLACA.test(placa)) {
+    errores.push({ campo: "placa", mensaje: MENSAJE_PLACA });
   }
   if (!marca) {
     errores.push({ campo: "marca", mensaje: "La marca es obligatoria." });
