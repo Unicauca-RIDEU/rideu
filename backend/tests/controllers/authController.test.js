@@ -277,7 +277,7 @@ describe("authController.iniciarSesion", () => {
   });
 
   test("debería normalizar el correo a minúsculas antes de buscar credenciales", async () => {
-    // Arrange — criterio CU-16
+    // Arrange
     buscarCredencialesPorCorreo.mockResolvedValue({
       id: "u1",
       nombre: "Ana",
