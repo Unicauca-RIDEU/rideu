@@ -1,4 +1,6 @@
 import { pool } from "../config/database.js";
+import { crearLicencia } from "./licencia.js";
+import { ESTADO_VERIFICADA, habilitarUsuario } from "./usuario.js";
 
 export async function crearVehiculo({
   usuarioId,
@@ -7,8 +9,8 @@ export async function crearVehiculo({
   modelo,
   color,
   capacidadPasajeros,
-}) {
-  const resultado = await pool.query(
+}, db = pool) {
+  const resultado = await db.query(
     `INSERT INTO vehiculos (
        usuario_id,
        placa,
@@ -36,4 +38,62 @@ export async function buscarVehiculosPorUsuario(usuarioId) {
 
 export async function eliminarVehiculo(id) {
   await pool.query("DELETE FROM vehiculos WHERE id = $1", [id]);
+}
+
+export async function guardarVehiculoYLicencia({
+  usuarioId,
+  placa,
+  marca,
+  modelo,
+  color,
+  capacidadPasajeros,
+  categoriaLicencia,
+  fechaVencimientoLicencia,
+}) {
+  const cliente = await pool.connect();
+  try {
+    await cliente.query("BEGIN");
+    const bloqueado = await cliente.query(
+      `SELECT id, estado
+       FROM usuarios
+       WHERE id = $1
+       FOR UPDATE`,
+      [usuarioId],
+    );
+    const fila = bloqueado.rows[0];
+    if (!fila) {
+      await cliente.query("ROLLBACK");
+      return { ok: false, motivo: "usuario_inexistente" };
+    }
+    if (fila.estado !== ESTADO_VERIFICADA) {
+      await cliente.query("ROLLBACK");
+      return { ok: false, motivo: "no_verificada", estado: fila.estado };
+    }
+
+    const vehiculo = await crearVehiculo(
+      { usuarioId, placa, marca, modelo, color, capacidadPasajeros },
+      cliente,
+    );
+    const licencia = await crearLicencia(
+      {
+        usuarioId,
+        categoria: categoriaLicencia,
+        fechaVencimiento: fechaVencimientoLicencia,
+      },
+      cliente,
+    );
+    const usuario = await habilitarUsuario(usuarioId, cliente);
+    if (!usuario) {
+      await cliente.query("ROLLBACK");
+      return { ok: false, motivo: "no_verificada", estado: fila.estado };
+    }
+
+    await cliente.query("COMMIT");
+    return { ok: true, usuario, vehiculo, licencia };
+  } catch (error) {
+    await cliente.query("ROLLBACK");
+    throw error;
+  } finally {
+    cliente.release();
+  }
 }
