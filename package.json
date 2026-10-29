@@ -1,0 +1,21 @@
+{
+  "name": "rideu",
+  "version": "1.0.0",
+  "description": "Página web de Ride U. El stack es React (Vite) en el frontend, Node.js con Express en el backend y PostgreSQL como base de datos.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Unicauca-RIDEU/rideu.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Unicauca-RIDEU/rideu/issues"
+  },
+  "homepage": "https://github.com/Unicauca-RIDEU/rideu#readme"
+}

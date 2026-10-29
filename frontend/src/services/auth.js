@@ -1,4 +1,27 @@
+const CLAVE_USUARIO = "rideu.usuario";
 const verificaciones = new Map();
+
+export function usuarioLocal() {
+  try {
+    const valor = localStorage.getItem(CLAVE_USUARIO);
+    return valor ? JSON.parse(valor) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function guardarUsuarioLocal(usuario) {
+  if (!usuario?.id) return;
+  localStorage.setItem(
+    CLAVE_USUARIO,
+    JSON.stringify({
+      id: usuario.id,
+      nombre: usuario.nombre ?? "",
+      correo: usuario.correo ?? "",
+      estado: usuario.estado ?? "",
+    }),
+  );
+}
 
 export async function registrarUsuario(datos) {
   const respuesta = await fetch("/api/auth/registro", {
@@ -19,7 +42,9 @@ export function verificarCorreo(token) {
     })
       .then(async (respuesta) => {
         const cuerpo = await leerJson(respuesta);
-        return { ok: respuesta.ok, status: respuesta.status, ...cuerpo };
+        const resultado = { ok: respuesta.ok, status: respuesta.status, ...cuerpo };
+        if (resultado.ok) guardarUsuarioLocal(resultado.usuario);
+        return resultado;
       })
       .catch((error) => {
         verificaciones.delete(token);
