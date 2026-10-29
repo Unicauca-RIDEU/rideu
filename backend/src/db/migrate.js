@@ -4,7 +4,11 @@ import { fileURLToPath } from "node:url";
 import { pool } from "../config/database.js";
 
 const dbDir = path.dirname(fileURLToPath(import.meta.url));
-const archivos = ["001_usuarios.sql", "002_vehiculos_licencias.sql"];
+const archivos = [
+  "001_usuarios.sql",
+  "002_vehiculos_licencias.sql",
+  "003_estado_habilitado.sql",
+];
 
 try {
   for (const archivo of archivos) {
@@ -12,7 +16,7 @@ try {
     const sql = fs.readFileSync(sqlPath, "utf8");
     await pool.query(sql);
   }
-  console.log("Tablas usuarios, vehiculos y licencias listas.");
+  console.log("Migraciones de usuarios, vehiculos y licencias listas.");
 } finally {
   await pool.end();
 }

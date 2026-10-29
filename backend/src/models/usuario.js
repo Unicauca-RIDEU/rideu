@@ -3,6 +3,7 @@ import { pool } from "../config/database.js";
 
 export const ESTADO_SIN_VERIFICAR = "Sin verificar";
 export const ESTADO_VERIFICADA = "Verificada";
+export const ESTADO_HABILITADO = "Habilitado";
 
 const HORAS_TOKEN = 24;
 
@@ -61,6 +62,18 @@ export async function crearUsuario({
 
 export async function eliminarUsuario(id) {
   await pool.query("DELETE FROM usuarios WHERE id = $1", [id]);
+}
+
+export async function habilitarUsuario(id, db = pool) {
+  const resultado = await db.query(
+    `UPDATE usuarios
+     SET estado = $2
+     WHERE id = $1
+       AND estado = $3
+     RETURNING id, nombre, correo, estado`,
+    [id, ESTADO_HABILITADO, ESTADO_VERIFICADA],
+  );
+  return resultado.rows[0] ?? null;
 }
 
 export async function verificarCuenta(token) {
