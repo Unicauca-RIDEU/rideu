@@ -1,0 +1,10 @@
+Caso: CU-21
+Título: Sesión expiraba en 1 hora en lugar de 7 días
+Módulo: models/sesion.js
+Criterio: Duración de sesión = 7 días (168 horas)
+Inconformidad: HORAS_SESION = 1
+Ajuste: const HORAS_SESION = 24 * 7
+Test file: tests/models/sesion.test.js
+Test: debería crear una sesión con token opaco y expiración a 7 días
+Exit fallo: 1
+Exit éxito: 0

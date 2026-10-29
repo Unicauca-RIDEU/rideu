@@ -1,0 +1,10 @@
+Caso: CU-03
+Título: Login con correo sin verificar respondía 401
+Módulo: controllers/authController.js
+Criterio: Cuenta Sin verificar → HTTP 403 + EMAIL_NOT_VERIFIED
+Inconformidad: Se confundía con credenciales inválidas (401)
+Ajuste: Devolver 403 Forbidden
+Test file: tests/controllers/authController.test.js
+Test: debería responder 403 si el correo no está verificado
+Exit fallo: 1
+Exit éxito: 0

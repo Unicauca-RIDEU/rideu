@@ -1,0 +1,21 @@
+# Dependencias
+node_modules/
+
+# Builds
+dist/
+build/
+.vite/
+
+# Entorno
+.env
+.env.local
+.env.*.local
+
+# Logs y cobertura
+*.log
+npm-debug.log*
+coverage/
+
+# Sistema
+.DS_Store
+Thumbs.db

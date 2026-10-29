@@ -1,0 +1,10 @@
+FAIL tests/middleware/requiereSesion.test.js
+● middleware requiereSesion › debería responder 401 si el token de sesión no es válido
+Expected: 401
+Received: 403
+expect(received).toBe(expected) // Object.is equality
+expect(res.statusCode).toBe(401);
+expect(res.cuerpo.mensaje).toMatch(/no es válida|expiró/);
+expect(next).not.toHaveBeenCalled();
+Tests:       1 failed, 4 skipped, 5 total
+Test Suites: 1 failed, 1 total

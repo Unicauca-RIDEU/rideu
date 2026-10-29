@@ -1,0 +1,35 @@
+# Caso CU-11 — etapa: 01_fallo
+# exit_code=1
+
+=== STDOUT ===
+
+> rideu-backend@0.1.0 test
+> NODE_OPTIONS=--experimental-vm-modules jest --runInBand --runInBand tests/controllers/authController.test.js -t debería responder 401 si la contraseña no coincide
+
+
+=== STDERR ===
+(node:7660) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+FAIL tests/controllers/authController.test.js
+  ● authController.iniciarSesion › debería responder 401 si la contraseña no coincide
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 401
+    Received: 404
+
+      272 |
+      273 |     // Assert
+    > 274 |     expect(res.statusCode).toBe(401);
+          |                            ^
+      275 |     expect(res.cuerpo.mensaje).toBe("Correo o contraseña incorrectos");
+      276 |     expect(crearSesion).not.toHaveBeenCalled();
+      277 |   });
+
+      at Object.<anonymous> (tests/controllers/authController.test.js:274:28)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 16 skipped, 17 total
+Snapshots:   0 total
+Time:        0.099 s, estimated 1 s
+Ran all test suites matching tests/controllers/authController.test.js with tests matching "debería responder 401 si la contraseña no coincide".

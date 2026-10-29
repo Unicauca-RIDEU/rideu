@@ -1,0 +1,36 @@
+# Caso CU-18 — etapa: 01_fallo
+# exit_code=1
+
+=== STDOUT ===
+
+> rideu-backend@0.1.0 test
+> NODE_OPTIONS=--experimental-vm-modules jest --runInBand --runInBand tests/services/correo.test.js -t debería rechazar un MAIL_MODE desconocido
+
+
+=== STDERR ===
+(node:8150) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+FAIL tests/services/correo.test.js
+  ● servicio correo › debería rechazar un MAIL_MODE desconocido
+
+    expect(received).rejects.toThrow()
+
+    Received promise resolved instead of rejected
+    Resolved to value: {"enlace": "http://localhost:5173/registro/verificacion?token=tok-en"}
+
+      64 |   test("debería rechazar un MAIL_MODE desconocido", async () => {
+      65 |     // Arrange / Act / Assert
+    > 66 |     await expect(
+         |           ^
+      67 |       enviarCorreoVerificacion(
+      68 |         { nombre: "Ana", correo: "ana.perez@unicauca.edu.co", token: "tok-en" },
+      69 |         {
+
+      at expect (node_modules/expect/build/index.js:2116:15)
+      at Object.<anonymous> (tests/services/correo.test.js:66:11)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 5 skipped, 6 total
+Snapshots:   0 total
+Time:        0.113 s, estimated 1 s
+Ran all test suites matching tests/services/correo.test.js with tests matching "debería rechazar un MAIL_MODE desconocido".

@@ -1,0 +1,37 @@
+# Caso CU-16 — etapa: 01_fallo
+# exit_code=1
+
+=== STDOUT ===
+
+> rideu-backend@0.1.0 test
+> NODE_OPTIONS=--experimental-vm-modules jest --runInBand --runInBand tests/controllers/authController.test.js -t debería normalizar el correo a minúsculas antes de buscar credenciales
+
+
+=== STDERR ===
+(node:7995) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+FAIL tests/controllers/authController.test.js
+  ● authController.iniciarSesion › debería normalizar el correo a minúsculas antes de buscar credenciales
+
+    expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+    Expected: "ana.perez@unicauca.edu.co"
+    Received: "Ana.Perez@Unicauca.edu.co"
+
+    Number of calls: 1
+
+      297 |
+      298 |     // Assert
+    > 299 |     expect(buscarCredencialesPorCorreo).toHaveBeenCalledWith("ana.perez@unicauca.edu.co");
+          |                                         ^
+      300 |     expect(res.statusCode).toBe(200);
+      301 |   });
+      302 |
+
+      at Object.<anonymous> (tests/controllers/authController.test.js:299:41)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 16 skipped, 17 total
+Snapshots:   0 total
+Time:        0.096 s, estimated 1 s
+Ran all test suites matching tests/controllers/authController.test.js with tests matching "debería normalizar el correo a minúsculas antes de buscar credenciales".

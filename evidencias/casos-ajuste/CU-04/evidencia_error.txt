@@ -1,0 +1,4 @@
+FAIL tests/middleware/requiereSesion.test.js
+● middleware requiereSesion › debería responder 401 si no hay encabezado Authorization Bearer
+Expected: 401
+Received: 400

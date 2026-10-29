@@ -1,0 +1,4 @@
+FAIL tests/validation/registro.test.js
+● validarRegistro › debería rechazar un nombre de exactamente 2 caracteres
+Expected: false
+Received: true

@@ -1,0 +1,4 @@
+FAIL tests/validation/registro.test.js
+● validarRegistro › debería rechazar campos vacíos o nulos en el cuerpo
+Tests:       1 failed, 9 skipped, 10 total
+Test Suites: 1 failed, 1 total
