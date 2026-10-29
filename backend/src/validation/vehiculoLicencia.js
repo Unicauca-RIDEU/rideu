@@ -54,6 +54,11 @@ export function validarVehiculoYLicencia(body) {
       campo: "fechaVencimientoLicencia",
       mensaje: "La fecha de vencimiento debe tener el formato AAAA-MM-DD.",
     });
+  } else if (esAnteriorAHoy(fechaVencimientoLicencia)) {
+    errores.push({
+      campo: "fechaVencimientoLicencia",
+      mensaje: "La licencia no está vigente",
+    });
   }
 
   const capacidadPasajeros = body.capacidadPasajeros;
@@ -90,6 +95,16 @@ export function validarVehiculoYLicencia(body) {
 
 function texto(valor) {
   return typeof valor === "string" ? valor.trim().replace(/\s+/g, " ") : "";
+}
+
+function esAnteriorAHoy(iso) {
+  const hoy = new Date();
+  const actual = [
+    hoy.getFullYear(),
+    String(hoy.getMonth() + 1).padStart(2, "0"),
+    String(hoy.getDate()).padStart(2, "0"),
+  ].join("-");
+  return iso < actual;
 }
 
 function esFechaIso(valor) {
