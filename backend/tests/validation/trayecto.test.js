@@ -4,6 +4,8 @@ import {
   RUTA_PERFIL_VEHICULO,
   cuposPermitidos,
   fechaEnColombia,
+  momentoEnColombia,
+  validarBusqueda,
   validarTrayecto,
   verificarConductorHabilitado,
 } from "../../src/validation/trayecto.js";
@@ -257,5 +259,70 @@ describe("verificarConductorHabilitado", () => {
 
   test("debería dirigir a la pantalla de registro de vehículo", () => {
     expect(RUTA_PERFIL_VEHICULO).toBe("/perfil/vehiculo");
+  });
+});
+
+describe("momentoEnColombia", () => {
+  test("debería dar la fecha y hora de Colombia (UTC-5) como AAAA-MM-DD HH:MM", () => {
+    expect(momentoEnColombia(new Date("2026-11-04T12:30:00Z"))).toBe("2026-11-04 07:30");
+    expect(momentoEnColombia(new Date("2026-11-04T03:15:00Z"))).toBe("2026-11-03 22:15");
+  });
+});
+
+describe("validarBusqueda (HU06)", () => {
+  const filtros = { sedeDestinoId: "1", fecha: "2026-11-05", horaDesde: "06:30" };
+
+  test("debería aceptar filtros válidos y convertir la sede a número", () => {
+    expect(validarBusqueda(filtros)).toEqual({
+      ok: true,
+      datos: { sedeDestinoId: 1, fecha: "2026-11-05", horaDesde: "06:30" },
+    });
+  });
+
+  test("debería exigir los tres filtros", () => {
+    // Act
+    const resultado = validarBusqueda({});
+
+    // Assert
+    expect(resultado.ok).toBe(false);
+    expect(resultado.mensaje).toBe("Selecciona la sede, la fecha y la hora.");
+    expect(resultado.errores.map((error) => error.campo)).toEqual(["sedeDestinoId", "fecha", "horaDesde"]);
+  });
+
+  test.each([
+    ["sedeDestinoId", "", "La sede de destino es obligatoria."],
+    ["fecha", "", "La fecha es obligatoria."],
+    ["horaDesde", "", "La hora es obligatoria."],
+  ])("debería exigir %s", (campo, valor, mensaje) => {
+    const resultado = validarBusqueda({ ...filtros, [campo]: valor });
+    expect(resultado.errores).toEqual([{ campo, mensaje }]);
+  });
+
+  test.each(["0", "-1", "abc", "1.5"])("debería rechazar una sede inválida (%p)", (sedeDestinoId) => {
+    const resultado = validarBusqueda({ ...filtros, sedeDestinoId });
+    expect(resultado.errores).toEqual([
+      { campo: "sedeDestinoId", mensaje: "La sede de destino no es válida." },
+    ]);
+  });
+
+  test.each(["05/11/2026", "2026-02-30"])("debería rechazar una fecha inválida (%p)", (fecha) => {
+    const resultado = validarBusqueda({ ...filtros, fecha });
+    expect(resultado.errores[0].campo).toBe("fecha");
+  });
+
+  test.each(["6:30", "25:00", "06:30 a. m."])("debería rechazar una hora inválida (%p)", (horaDesde) => {
+    const resultado = validarBusqueda({ ...filtros, horaDesde });
+    expect(resultado.errores).toEqual([
+      { campo: "horaDesde", mensaje: "La hora debe tener el formato HH:MM (24 horas)." },
+    ]);
+  });
+
+  test("debería rechazar filtros repetidos en la URL (llegan como lista)", () => {
+    const resultado = validarBusqueda({ ...filtros, sedeDestinoId: ["1", "2"] });
+    expect(resultado.ok).toBe(false);
+  });
+
+  test("debería tolerar que no lleguen filtros", () => {
+    expect(validarBusqueda(undefined).ok).toBe(false);
   });
 });
