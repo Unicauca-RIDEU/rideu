@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import { crearSesion } from "../models/sesion.js";
 import {
+  ESTADO_HABILITADO,
   ESTADO_VERIFICADA,
   buscarCredencialesPorCorreo,
   crearTokenVerificacion,
@@ -115,7 +116,8 @@ export async function iniciarSesion(req, res) {
       return res.status(401).json({ mensaje: MENSAJE_CREDENCIALES_INVALIDAS });
     }
 
-    if (usuario.estado !== ESTADO_VERIFICADA) {
+    // «Habilitado» (HU03) es una cuenta verificada que además registró vehículo y licencia.
+    if (usuario.estado !== ESTADO_VERIFICADA && usuario.estado !== ESTADO_HABILITADO) {
       return res.status(403).json({
         codigo: "EMAIL_NOT_VERIFIED",
         mensaje: "Debes verificar tu correo institucional para acceder",

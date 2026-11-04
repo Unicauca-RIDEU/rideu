@@ -26,7 +26,11 @@ export default function Panel() {
       <main className="panel-principal">
         <p className="kicker">Panel principal</p>
         <h2>Hola, {primerNombre}</h2>
-        <p className="ayuda">Pronto podrás publicar y encontrar trayectos desde aquí.</p>
+        <p className="ayuda">¿Compartimos el camino a la U?</p>
+        <Link className="acceso-publicar" to="/trayectos/publicar">
+          <strong>Publicar trayecto</strong>
+          <small>Comparte tus cupos</small>
+        </Link>
       </main>
 
       <footer className="pie">
