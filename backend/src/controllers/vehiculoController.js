@@ -2,6 +2,9 @@ import { guardarVehiculoYLicencia } from "../models/vehiculo.js";
 import { ESTADO_HABILITADO, ESTADO_SIN_VERIFICAR } from "../models/usuario.js";
 import { validarVehiculoYLicencia } from "../validation/vehiculoLicencia.js";
 
+// Registro de vehículo y licencia (E02-HU03).
+// El conductor es siempre el usuario de la sesión (req.usuario), nunca un dato del cuerpo.
+
 export async function registrarVehiculoYLicencia(req, res) {
   const validacion = validarVehiculoYLicencia(req.body);
   if (!validacion.ok) {
@@ -12,7 +15,10 @@ export async function registrarVehiculoYLicencia(req, res) {
   }
 
   try {
-    const resultado = await guardarVehiculoYLicencia(validacion.datos);
+    const resultado = await guardarVehiculoYLicencia({
+      ...validacion.datos,
+      usuarioId: req.usuario.id,
+    });
     if (!resultado.ok && resultado.motivo === "usuario_inexistente") {
       return res.status(404).json({ mensaje: "No existe una cuenta con ese usuario." });
     }

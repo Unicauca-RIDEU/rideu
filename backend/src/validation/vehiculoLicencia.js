@@ -1,5 +1,4 @@
-const UUID =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+// El usuario no viaja en el cuerpo: el controlador lo toma de la sesión (req.usuario).
 const PLACA = /^[A-Za-z]{3} ?\d{3}$/;
 const MENSAJE_PLACA = "Formato inválido. Usa 3 letras y 3 números (ejemplo ABC 123).";
 
@@ -14,19 +13,12 @@ export function validarVehiculoYLicencia(body) {
   }
 
   const errores = [];
-  const usuarioId = texto(body.usuarioId);
   const placa = texto(body.placa);
   const marca = texto(body.marca);
   const modelo = texto(body.modelo);
   const color = texto(body.color);
   const categoriaLicencia = texto(body.categoriaLicencia);
   const fechaVencimientoLicencia = texto(body.fechaVencimientoLicencia);
-
-  if (!usuarioId) {
-    errores.push({ campo: "usuarioId", mensaje: "El usuario es obligatorio." });
-  } else if (!UUID.test(usuarioId)) {
-    errores.push({ campo: "usuarioId", mensaje: "El usuario no es válido." });
-  }
 
   if (!placa) {
     errores.push({ campo: "placa", mensaje: "La placa es obligatoria." });
@@ -85,7 +77,6 @@ export function validarVehiculoYLicencia(body) {
   return {
     ok: true,
     datos: {
-      usuarioId,
       placa,
       marca,
       modelo,
