@@ -15,9 +15,9 @@ export default function App() {
         <Route path="/registro" element={<Registro />} />
         <Route path="/registro/verificacion" element={<Verificacion />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/perfil/vehiculo" element={<Vehiculo />} />
         <Route element={<RutaProtegida />}>
           <Route path="/panel" element={<Panel />} />
+          <Route path="/perfil/vehiculo" element={<Vehiculo />} />
           <Route path="/trayectos/publicar" element={<PublicarTrayecto />} />
         </Route>
       </Routes>
