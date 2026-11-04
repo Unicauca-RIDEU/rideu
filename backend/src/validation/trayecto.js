@@ -14,6 +14,40 @@ export function cuposPermitidos(capacidadVehiculo) {
   return Math.min(capacidadVehiculo, CUPOS_MAXIMOS);
 }
 
+export const RUTA_PERFIL_VEHICULO = "/perfil/vehiculo";
+const ESTADO_HABILITADO = "Habilitado";
+
+// Un conductor puede publicar si su cuenta está «Habilitado», tiene vehículo
+// registrado y su licencia vence hoy o después (fecha de Colombia).
+export function verificarConductorHabilitado(perfil, { ahora = new Date() } = {}) {
+  if (
+    !perfil ||
+    perfil.estado !== ESTADO_HABILITADO ||
+    !perfil.vehiculo_id ||
+    !perfil.licencia_vencimiento
+  ) {
+    return {
+      ok: false,
+      motivo: "sin_vehiculo_o_licencia",
+      mensaje:
+        "Registra tu vehículo y una licencia vigente para habilitar tu perfil de conductor y poder publicar.",
+    };
+  }
+  if (perfil.licencia_vencimiento < fechaEnColombia(ahora)) {
+    return {
+      ok: false,
+      motivo: "licencia_vencida",
+      mensaje: "La licencia no está vigente. Actualízala para habilitar tu perfil de conductor.",
+    };
+  }
+  return { ok: true };
+}
+
+export function fechaEnColombia(ahora = new Date()) {
+  const enColombia = new Date(ahora.getTime() - DESFASE_COLOMBIA_HORAS * 60 * 60 * 1000);
+  return enColombia.toISOString().slice(0, 10);
+}
+
 export function validarTrayecto(body, { cuposMaximos = CUPOS_MAXIMOS, ahora = new Date() } = {}) {
   if (body === null || typeof body !== "object" || Array.isArray(body)) {
     const mensaje = "El cuerpo de la solicitud debe incluir los datos del trayecto.";
