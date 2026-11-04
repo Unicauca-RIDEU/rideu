@@ -973,6 +973,120 @@ button, input, a { font: inherit; }
   .publicar-grid, .campos-fila { grid-template-columns: 1fr; }
 }
 
+/* E03-HU06 · Buscar trayecto (/trayectos/buscar) */
+
+.panel-accesos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+}
+
+.buscar-filtros {
+  margin-bottom: 1.25rem;
+}
+
+.buscar-campos {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: start;
+  margin-top: 1rem;
+}
+
+.boton-buscar {
+  align-self: start;
+  min-width: 9rem;
+  margin-top: 1.75rem;
+}
+
+.boton-buscar svg,
+.acciones-trayecto .boton svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.buscar-total {
+  margin: 0;
+  font-size: 1.35rem;
+  letter-spacing: -0.03em;
+}
+
+.buscar-subtitulo {
+  margin: 0.4rem 0 1rem;
+  color: var(--texto-suave);
+  font-size: 0.92rem;
+}
+
+.buscar-resultados {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.buscar-resultados li {
+  display: grid;
+  gap: 0.75rem;
+  align-content: start;
+}
+
+.acciones-trayecto {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+
+.acciones-trayecto .boton {
+  margin-top: 0;
+  min-height: 3.1rem;
+}
+
+.acciones-trayecto button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.buscar-vacio {
+  display: grid;
+  justify-items: center;
+  gap: 0.4rem;
+  padding: 2.2rem 1.5rem;
+  text-align: center;
+}
+
+.buscar-vacio h3 {
+  margin: 0.6rem 0 0;
+  font-size: 1.3rem;
+}
+
+.buscar-vacio p {
+  margin: 0;
+  color: var(--texto-suave);
+}
+
+.buscar-ilustracion {
+  width: min(240px, 80%);
+  height: auto;
+}
+
+.boton-cambiar {
+  width: auto;
+  padding: 0 1.6rem;
+  margin-top: 1rem;
+}
+
+.antes-reservar p {
+  margin: 0.8rem 0 0;
+  color: #475467;
+}
+
+@media (max-width: 900px) {
+  .buscar-campos, .buscar-resultados { grid-template-columns: 1fr; }
+  .boton-buscar { margin-top: 0; width: 100%; }
+}
+
 @media (max-width: 900px) {
   .barra, .pie, .relato, .panel, .panel-principal { padding-left: 1.2rem; padding-right: 1.2rem; }
   .barra, .pie { align-items: flex-start; flex-direction: column; }
