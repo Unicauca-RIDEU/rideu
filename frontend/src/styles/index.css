@@ -751,6 +751,27 @@ button, input, a { font: inherit; }
 
 /* E02-HU04 · Publicar trayecto (/trayectos/publicar) */
 
+.acceso-publicar {
+  display: grid;
+  gap: 0.2rem;
+  width: min(100%, 16rem);
+  padding: 1.1rem 1.2rem;
+  border: 1px solid #d5e4ff;
+  border-radius: 1.15rem;
+  background: white;
+  color: #1f2a44;
+  text-decoration: none;
+}
+
+.acceso-publicar:hover {
+  border-color: var(--azul);
+}
+
+.acceso-publicar small {
+  color: var(--texto-suave);
+}
+
+
 .nav-activo {
   color: var(--azul);
 }

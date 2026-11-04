@@ -21,6 +21,8 @@ jest.unstable_mockModule("../../src/config/database.js", () => ({
 jest.unstable_mockModule("../../src/models/usuario.js", () => ({
   ESTADO_VERIFICADA: "Verificada",
   ESTADO_SIN_VERIFICAR: "Sin verificar",
+  ESTADO_HABILITADO: "Habilitado",
+  habilitarUsuario: jest.fn(),
   buscarPorCorreo,
   crearUsuario,
   eliminarUsuario,

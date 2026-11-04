@@ -21,6 +21,7 @@ jest.unstable_mockModule("../../src/validation/registro.js", () => ({
 jest.unstable_mockModule("../../src/models/usuario.js", () => ({
   ESTADO_VERIFICADA: "Verificada",
   ESTADO_SIN_VERIFICAR: "Sin verificar",
+  ESTADO_HABILITADO: "Habilitado",
   buscarPorCorreo,
   crearUsuario,
   eliminarUsuario,
@@ -322,6 +323,31 @@ describe("authController.iniciarSesion", () => {
     expect(res.statusCode).toBe(403);
     expect(res.cuerpo.codigo).toBe("EMAIL_NOT_VERIFIED");
     expect(crearSesion).not.toHaveBeenCalled();
+  });
+
+  test("debería permitir el acceso a una cuenta «Habilitado» (conductor de HU03)", async () => {
+    // Arrange
+    buscarCredencialesPorCorreo.mockResolvedValue({
+      id: "u1",
+      nombre: "Ana",
+      correo: "ana@unicauca.edu.co",
+      estado: "Habilitado",
+      contrasena_hash: "hash",
+    });
+    bcryptCompare.mockResolvedValue(true);
+    crearSesion.mockResolvedValue({ token: "token-sesion", expira: new Date() });
+    const res = crearRespuestaMock();
+
+    // Act
+    await iniciarSesion(
+      crearRequest({ correo: "ana@unicauca.edu.co", contrasena: "secreta12" }),
+      res,
+    );
+
+    // Assert
+    expect(res.statusCode).toBe(200);
+    expect(res.cuerpo.token).toBe("token-sesion");
+    expect(res.cuerpo.usuario.estado).toBe("Habilitado");
   });
 
   test("debería responder 200 y devolver token en el caso feliz", async () => {
