@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import { IconoAuto, IconoCheck } from "../components/Iconos.jsx";
-import { guardarUsuarioLocal, usuarioLocal } from "../services/auth.js";
 import { registrarVehiculo } from "../services/vehiculo.js";
 
 const NAV = ["Inicio", "Buscar", "Publicar", "Historial"];
@@ -17,13 +16,15 @@ const vacio = {
 };
 
 export default function Vehiculo() {
-  const [usuario, setUsuario] = useState(() => usuarioLocal());
+  const navigate = useNavigate();
+  const { usuario: usuarioSesion } = useOutletContext();
+  const [usuario, setUsuario] = useState(usuarioSesion);
   const [datos, setDatos] = useState(vacio);
   const [errores, setErrores] = useState({});
   const [mensaje, setMensaje] = useState("");
   const [exito, setExito] = useState(false);
   const [enviando, setEnviando] = useState(false);
-  const [guardado, setGuardado] = useState(usuarioLocal()?.estado === "Habilitado");
+  const [guardado, setGuardado] = useState(usuarioSesion?.estado === "Habilitado");
 
   const nombre = usuario?.nombre?.trim() || "Tu perfil";
   const siglas = iniciales(usuario?.nombre);
@@ -48,19 +49,14 @@ export default function Vehiculo() {
       setExito(false);
       return;
     }
-    if (!usuario?.id) {
-      setMensaje("Verifica tu cuenta en este navegador antes de guardar el vehículo.");
-      setExito(false);
-      return;
-    }
-
     setEnviando(true);
     setMensaje("");
     try {
-      const respuesta = await registrarVehiculo({
-        usuarioId: usuario.id,
-        ...validacion.datos,
-      });
+      const respuesta = await registrarVehiculo(validacion.datos);
+      if (respuesta.status === 401) {
+        navigate("/login", { replace: true });
+        return;
+      }
       if (!respuesta.ok) {
         setErrores(erroresPorCampo(respuesta.errores));
         setMensaje(respuesta.mensaje || "No se pudo guardar el vehículo.");
@@ -150,7 +146,11 @@ export default function Vehiculo() {
                   </span>
                   Vehículo guardado. Ya puedes publicar trayectos.
                 </p>
-                <button className="boton-contorno" type="button">
+                <button
+                  className="boton-contorno"
+                  type="button"
+                  onClick={() => navigate("/trayectos/publicar")}
+                >
                   Ir a publicar trayecto
                 </button>
               </>
@@ -313,9 +313,7 @@ function resumenVehiculo(datos) {
 }
 
 function marcarHabilitado(usuario, setUsuario) {
-  const siguiente = { ...usuario, estado: "Habilitado" };
-  guardarUsuarioLocal(siguiente);
-  setUsuario(siguiente);
+  setUsuario({ ...usuario, estado: "Habilitado" });
 }
 
 function validar(datos) {
