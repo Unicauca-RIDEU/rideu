@@ -1,8 +1,14 @@
 import { buscarSedePorId, listarSedes } from "../models/sede.js";
-import { buscarPerfilConductor, crearTrayecto } from "../models/trayecto.js";
+import {
+  buscarPerfilConductor,
+  buscarTrayectosDisponibles,
+  crearTrayecto,
+} from "../models/trayecto.js";
 import {
   RUTA_PERFIL_VEHICULO,
   cuposPermitidos,
+  momentoEnColombia,
+  validarBusqueda,
   validarTrayecto,
   verificarConductorHabilitado,
 } from "../validation/trayecto.js";
@@ -89,5 +95,39 @@ export async function datosPublicacion(req, res) {
   } catch (error) {
     console.error("Error al consultar los datos de publicación:", error);
     return res.status(500).json({ mensaje: "No se pudieron cargar los datos para publicar." });
+  }
+}
+
+export const MENSAJE_SIN_RESULTADOS = "No hay resultados disponibles";
+
+// Búsqueda de trayectos (E03-HU06): GET /api/trayectos?sedeDestinoId=&fecha=&horaDesde=
+// Devuelve los trayectos activos con cupos, ordenados por hora de salida.
+export async function buscarTrayectos(req, res) {
+  const validacion = validarBusqueda(req.query);
+  if (!validacion.ok) {
+    return res.status(400).json({ mensaje: validacion.mensaje, errores: validacion.errores });
+  }
+
+  try {
+    const sede = await buscarSedePorId(validacion.datos.sedeDestinoId);
+    if (!sede) {
+      const mensaje = "La sede de destino no existe.";
+      return res.status(400).json({ mensaje, errores: [{ campo: "sedeDestinoId", mensaje }] });
+    }
+
+    const trayectos = await buscarTrayectosDisponibles({
+      ...validacion.datos,
+      ahoraColombia: momentoEnColombia(),
+    });
+
+    return res.status(200).json({
+      mensaje: trayectos.length === 0 ? MENSAJE_SIN_RESULTADOS : null,
+      total: trayectos.length,
+      filtros: { ...validacion.datos, sedeDestino: sede.nombre },
+      trayectos,
+    });
+  } catch (error) {
+    console.error("Error al buscar trayectos:", error);
+    return res.status(500).json({ mensaje: "No se pudieron buscar los trayectos." });
   }
 }
