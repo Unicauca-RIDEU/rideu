@@ -1,8 +1,11 @@
 import { describe, test, expect } from "@jest/globals";
 import {
   CUPOS_MAXIMOS,
+  RUTA_PERFIL_VEHICULO,
   cuposPermitidos,
+  fechaEnColombia,
   validarTrayecto,
+  verificarConductorHabilitado,
 } from "../../src/validation/trayecto.js";
 
 // 4 nov 2026, 07:00 en Colombia (12:00 UTC).
@@ -190,5 +193,69 @@ describe("validarTrayecto", () => {
   test("debería aceptar una salida del mismo día posterior a la hora actual de Colombia", () => {
     // 07:01 en Colombia aún es futuro, aunque en UTC ya sean más de las 12:00.
     expect(validar({ fecha: "2026-11-04", hora: "07:01" }).ok).toBe(true);
+  });
+});
+
+describe("fechaEnColombia", () => {
+  test("debería usar la fecha de Colombia (UTC-5) y no la de UTC", () => {
+    // 4 nov 2026 a las 03:00 UTC todavía es 3 nov en Colombia.
+    expect(fechaEnColombia(new Date("2026-11-04T03:00:00Z"))).toBe("2026-11-03");
+    expect(fechaEnColombia(new Date("2026-11-04T05:00:00Z"))).toBe("2026-11-04");
+  });
+});
+
+describe("verificarConductorHabilitado", () => {
+  const perfilHabilitado = {
+    id: "u1",
+    estado: "Habilitado",
+    vehiculo_id: "v1",
+    capacidad_pasajeros: 4,
+    licencia_vencimiento: "2029-09-15",
+  };
+
+  test("debería permitir publicar a un conductor habilitado con licencia vigente", () => {
+    expect(verificarConductorHabilitado(perfilHabilitado, { ahora: AHORA })).toEqual({ ok: true });
+  });
+
+  test("debería permitir publicar si la licencia vence el mismo día", () => {
+    const perfil = { ...perfilHabilitado, licencia_vencimiento: "2026-11-04" };
+    expect(verificarConductorHabilitado(perfil, { ahora: AHORA }).ok).toBe(true);
+  });
+
+  test.each([
+    ["no existe el perfil", null],
+    ["la cuenta está «Verificada» pero no «Habilitado»", { estado: "Verificada" }],
+    ["no tiene vehículo", { vehiculo_id: null }],
+    ["no tiene licencia", { licencia_vencimiento: null }],
+  ])("debería bloquear y pedir registrar el vehículo si %s", (_caso, cambios) => {
+    // Arrange
+    const perfil = cambios === null ? null : { ...perfilHabilitado, ...cambios };
+
+    // Act
+    const resultado = verificarConductorHabilitado(perfil, { ahora: AHORA });
+
+    // Assert
+    expect(resultado.ok).toBe(false);
+    expect(resultado.motivo).toBe("sin_vehiculo_o_licencia");
+    expect(resultado.mensaje).toMatch(/Registra tu vehículo y una licencia vigente/);
+  });
+
+  test("debería bloquear si la licencia venció", () => {
+    // Arrange
+    const perfil = { ...perfilHabilitado, licencia_vencimiento: "2026-11-03" };
+
+    // Act
+    const resultado = verificarConductorHabilitado(perfil, { ahora: AHORA });
+
+    // Assert
+    expect(resultado).toEqual({
+      ok: false,
+      motivo: "licencia_vencida",
+      mensaje: "La licencia no está vigente. Actualízala para habilitar tu perfil de conductor.",
+    });
+  });
+
+  test("debería dirigir a la pantalla de registro de vehículo", () => {
+    expect(RUTA_PERFIL_VEHICULO).toBe("/perfil/vehiculo");
   });
 });
