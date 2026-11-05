@@ -1,4 +1,0 @@
-FAIL tests/controllers/authController.test.js
-● authController.iniciarSesion › debería responder 400 si faltan correo o contraseña
-Expected: 400
-Received: 401
