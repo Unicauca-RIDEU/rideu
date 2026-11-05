@@ -67,10 +67,4 @@ npm install
 npm test
 ```
 
-En Windows (PowerShell) el script `npm test` no funciona porque usa la sintaxis `NODE_OPTIONS=…` de Linux y Mac. Usar:
-
-```powershell
-cd backend
-$env:NODE_OPTIONS="--experimental-vm-modules"
-npx jest --runInBand
-```
+`npm test` funciona también en Windows: el script usa `cross-env` para definir `NODE_OPTIONS`.
