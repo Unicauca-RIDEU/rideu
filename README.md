@@ -4,6 +4,14 @@ Página web de Ride U. El stack es React (Vite) en el frontend, Node.js con Expr
 
 El registro está en `/registro` y la verificación del enlace en `/registro/verificacion`. Con `MAIL_MODE=console` el enlace se imprime en la terminal del backend.
 
+## Sprint 2
+
+Esta rama corresponde al **Sprint 2**: **E02-HU03 Registrar vehículo y licencia** (`/perfil/vehiculo`) y **E03-HU06 Buscar trayectos disponibles** (`/trayectos/buscar`).
+
+**E02-HU04 Publicar trayecto** (`/trayectos/publicar`) **no pertenece a este sprint**: está implementada como base técnica de HU06, que necesita trayectos publicados y reutiliza sus tablas y modelos. Detalle en [`documentacion/sprint-2`](documentacion/sprint-2/).
+
+Las pruebas unitarias del sprint (casos de ajuste CU-14 a CU-19) están en [`evidencias/`](evidencias/).
+
 ## Requisitos
 
 - Node.js 20 o superior
