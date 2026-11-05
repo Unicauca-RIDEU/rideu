@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import RutaProtegida from "./components/RutaProtegida.jsx";
+import BuscarTrayecto from "./pages/BuscarTrayecto.jsx";
 import Login from "./pages/Login.jsx";
 import Panel from "./pages/Panel.jsx";
 import PublicarTrayecto from "./pages/PublicarTrayecto.jsx";
@@ -19,6 +20,7 @@ export default function App() {
           <Route path="/panel" element={<Panel />} />
           <Route path="/perfil/vehiculo" element={<Vehiculo />} />
           <Route path="/trayectos/publicar" element={<PublicarTrayecto />} />
+          <Route path="/trayectos/buscar" element={<BuscarTrayecto />} />
         </Route>
       </Routes>
     </BrowserRouter>

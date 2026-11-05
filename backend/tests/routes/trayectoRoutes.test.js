@@ -4,6 +4,7 @@ import request from "supertest";
 const buscarUsuarioPorSesion = jest.fn();
 const buscarPerfilConductor = jest.fn();
 const crearTrayecto = jest.fn();
+const buscarTrayectosDisponibles = jest.fn();
 const buscarSedePorId = jest.fn();
 const listarSedes = jest.fn();
 
@@ -20,6 +21,7 @@ jest.unstable_mockModule("../../src/models/trayecto.js", () => ({
   ESTADO_DISPONIBLE: "Disponible",
   buscarPerfilConductor,
   crearTrayecto,
+  buscarTrayectosDisponibles,
 }));
 
 jest.unstable_mockModule("../../src/models/sede.js", () => ({
@@ -76,6 +78,7 @@ describe("rutas /api/trayectos (Supertest)", () => {
     buscarUsuarioPorSesion.mockReset();
     buscarPerfilConductor.mockReset();
     crearTrayecto.mockReset();
+    buscarTrayectosDisponibles.mockReset();
     buscarSedePorId.mockReset();
     listarSedes.mockReset();
 
@@ -360,6 +363,135 @@ describe("rutas /api/trayectos (Supertest)", () => {
       listarSedes.mockRejectedValue(new Error("caída"));
 
       const res = await request(app).get("/api/trayectos/publicacion").set(SESION);
+
+      expect(res.status).toBe(500);
+    });
+  });
+
+  describe("GET /api/trayectos (HU06 · buscar)", () => {
+    const filtros = { sedeDestinoId: "1", fecha: manana, horaDesde: "06:30" };
+    const resultados = [
+      { id: "t2", hora: "06:45", origen: "Centro · Parque Caldas", cupos_disponibles: 2, cupos_reservados: 2, conductor_nombre: "Sofía López" },
+      { id: "t1", hora: "07:00", origen: "Bello Horizonte", cupos_disponibles: 1, cupos_reservados: 3, conductor_nombre: "Camilo Rojas" },
+    ];
+
+    test("debería exigir sesión iniciada", async () => {
+      const res = await request(app).get("/api/trayectos").query(filtros);
+
+      expect(res.status).toBe(401);
+      expect(buscarTrayectosDisponibles).not.toHaveBeenCalled();
+    });
+
+    test("criterio 1: debería devolver los trayectos coincidentes en el orden de la consulta", async () => {
+      // Arrange
+      buscarTrayectosDisponibles.mockResolvedValue(resultados);
+
+      // Act
+      const res = await request(app).get("/api/trayectos").set(SESION).query(filtros);
+
+      // Assert
+      expect(res.status).toBe(200);
+      expect(res.body.total).toBe(2);
+      expect(res.body.mensaje).toBeNull();
+      expect(res.body.trayectos.map((t) => t.hora)).toEqual(["06:45", "07:00"]);
+      expect(res.body.filtros).toEqual({
+        sedeDestinoId: 1,
+        fecha: manana,
+        horaDesde: "06:30",
+        sedeDestino: "Facultad de Ingeniería Civil",
+      });
+    });
+
+    test("debería consultar con los filtros validados y la hora actual de Colombia", async () => {
+      buscarTrayectosDisponibles.mockResolvedValue([]);
+
+      await request(app).get("/api/trayectos").set(SESION).query(filtros);
+
+      expect(buscarTrayectosDisponibles).toHaveBeenCalledWith({
+        sedeDestinoId: 1,
+        fecha: manana,
+        horaDesde: "06:30",
+        ahoraColombia: expect.stringMatching(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/),
+      });
+    });
+
+    test("criterio 2: debería responder «No hay resultados disponibles» si no hay coincidencias", async () => {
+      // Arrange
+      buscarTrayectosDisponibles.mockResolvedValue([]);
+
+      // Act
+      const res = await request(app).get("/api/trayectos").set(SESION).query(filtros);
+
+      // Assert
+      expect(res.status).toBe(200);
+      expect(res.body).toMatchObject({
+        mensaje: "No hay resultados disponibles",
+        total: 0,
+        trayectos: [],
+      });
+    });
+
+    test("debería exigir los tres filtros", async () => {
+      const res = await request(app).get("/api/trayectos").set(SESION);
+
+      expect(res.status).toBe(400);
+      expect(res.body.mensaje).toBe("Selecciona la sede, la fecha y la hora.");
+      expect(res.body.errores.map((e) => e.campo)).toEqual(["sedeDestinoId", "fecha", "horaDesde"]);
+      expect(buscarTrayectosDisponibles).not.toHaveBeenCalled();
+    });
+
+    test("debería rechazar una hora con formato inválido", async () => {
+      const res = await request(app)
+        .get("/api/trayectos")
+        .set(SESION)
+        .query({ ...filtros, horaDesde: "6:30" });
+
+      expect(res.status).toBe(400);
+      expect(res.body.errores[0].campo).toBe("horaDesde");
+    });
+
+    test("debería rechazar una sede que no existe", async () => {
+      buscarSedePorId.mockResolvedValue(null);
+
+      const res = await request(app)
+        .get("/api/trayectos")
+        .set(SESION)
+        .query({ ...filtros, sedeDestinoId: "99" });
+
+      expect(res.status).toBe(400);
+      expect(res.body.mensaje).toBe("La sede de destino no existe.");
+      expect(buscarTrayectosDisponibles).not.toHaveBeenCalled();
+    });
+
+    test("debería responder 500 si falla la base de datos", async () => {
+      jest.spyOn(console, "error").mockImplementation(() => {});
+      buscarTrayectosDisponibles.mockRejectedValue(new Error("caída"));
+
+      const res = await request(app).get("/api/trayectos").set(SESION).query(filtros);
+
+      expect(res.status).toBe(500);
+      expect(res.body.mensaje).toBe("No se pudieron buscar los trayectos.");
+    });
+  });
+
+  describe("GET /api/sedes (HU06)", () => {
+    test("debería exigir sesión iniciada", async () => {
+      const res = await request(app).get("/api/sedes");
+      expect(res.status).toBe(401);
+    });
+
+    test("debería listar las sedes de destino", async () => {
+      const res = await request(app).get("/api/sedes").set(SESION);
+
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual({ sedes: [sede] });
+    });
+
+    test("debería responder 500 si falla la base de datos", async () => {
+      jest.spyOn(console, "error").mockImplementation(() => {});
+      listarSedes.mockRejectedValue(new Error("caída"));
+
+      const res = await request(app).get("/api/sedes").set(SESION);
 
       expect(res.status).toBe(500);
     });

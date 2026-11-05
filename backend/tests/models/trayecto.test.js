@@ -6,7 +6,7 @@ jest.unstable_mockModule("../../src/config/database.js", () => ({
   pool: { query },
 }));
 
-const { crearTrayecto, buscarPerfilConductor, ESTADO_DISPONIBLE } = await import(
+const { crearTrayecto, buscarPerfilConductor, buscarTrayectosDisponibles, ESTADO_DISPONIBLE } = await import(
   "../../src/models/trayecto.js"
 );
 
@@ -50,6 +50,19 @@ describe("modelo trayecto", () => {
     ]);
   });
 
+  test("debería iniciar los cupos disponibles iguales a los cupos ofrecidos (HU06)", async () => {
+    // Arrange
+    query.mockResolvedValueOnce({ rows: [{ id: "t1" }] });
+
+    // Act
+    await crearTrayecto(datos);
+
+    // Assert: la columna cupos_disponibles reutiliza el parámetro $7 (cupos)
+    const sql = query.mock.calls[0][0];
+    expect(sql).toMatch(/estado,\s*cupos_disponibles\s*\)/);
+    expect(sql).toContain("VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $7)");
+  });
+
   test("debería usar el cliente de base de datos recibido (transacción)", async () => {
     // Arrange
     const cliente = { query: jest.fn().mockResolvedValueOnce({ rows: [{ id: "t1" }] }) };
@@ -88,5 +101,63 @@ describe("modelo trayecto", () => {
   test("debería devolver null si el usuario no existe", async () => {
     query.mockResolvedValueOnce({ rows: [] });
     expect(await buscarPerfilConductor("no-existe")).toBeNull();
+  });
+
+  describe("buscarTrayectosDisponibles (HU06)", () => {
+    const filtros = {
+      sedeDestinoId: 1,
+      fecha: "2026-11-05",
+      horaDesde: "06:30",
+      ahoraColombia: "2026-11-04 07:00",
+    };
+
+    test("debería devolver las filas de la consulta", async () => {
+      const fila = { id: "t1", hora: "06:45", cupos_disponibles: 2, conductor_nombre: "Sofía López" };
+      query.mockResolvedValueOnce({ rows: [fila] });
+
+      expect(await buscarTrayectosDisponibles(filtros)).toEqual([fila]);
+    });
+
+    test("debería filtrar por estado, sede, fecha, hora desde y momento actual", async () => {
+      // Arrange
+      query.mockResolvedValueOnce({ rows: [] });
+
+      // Act
+      await buscarTrayectosDisponibles(filtros);
+
+      // Assert
+      const [, parametros] = query.mock.calls[0];
+      expect(parametros).toEqual(["Disponible", 1, "2026-11-05", "06:30", "2026-11-04 07:00"]);
+    });
+
+    test("criterio 3: debería excluir los trayectos sin cupos disponibles", async () => {
+      query.mockResolvedValueOnce({ rows: [] });
+
+      await buscarTrayectosDisponibles(filtros);
+
+      expect(query.mock.calls[0][0]).toContain("t.cupos_disponibles > 0");
+    });
+
+    test("criterio 1: debería ordenar por hora de salida", async () => {
+      query.mockResolvedValueOnce({ rows: [] });
+
+      await buscarTrayectosDisponibles(filtros);
+
+      expect(query.mock.calls[0][0]).toMatch(/ORDER BY t\.hora/);
+    });
+
+    test("debería ocultar los trayectos que ya salieron", async () => {
+      query.mockResolvedValueOnce({ rows: [] });
+
+      await buscarTrayectosDisponibles(filtros);
+
+      expect(query.mock.calls[0][0]).toContain("(t.fecha + t.hora) > $5::timestamp");
+    });
+
+    test("debería devolver una lista vacía si no hay coincidencias", async () => {
+      query.mockResolvedValueOnce({ rows: [] });
+
+      expect(await buscarTrayectosDisponibles(filtros)).toEqual([]);
+    });
   });
 });

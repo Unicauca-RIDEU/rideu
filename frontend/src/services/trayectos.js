@@ -14,6 +14,17 @@ export async function publicarTrayecto(datos) {
   });
 }
 
+// Búsqueda de trayectos (E03-HU06).
+
+export async function obtenerSedes() {
+  return llamar("/api/sedes");
+}
+
+export async function buscarTrayectos({ sedeDestinoId, fecha, horaDesde }) {
+  const parametros = new URLSearchParams({ sedeDestinoId, fecha, horaDesde });
+  return llamar(`/api/trayectos?${parametros}`);
+}
+
 async function llamar(ruta, opciones = {}) {
   const respuesta = await fetch(ruta, {
     ...opciones,

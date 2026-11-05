@@ -27,10 +27,16 @@ export default function Panel() {
         <p className="kicker">Panel principal</p>
         <h2>Hola, {primerNombre}</h2>
         <p className="ayuda">¿Compartimos el camino a la U?</p>
-        <Link className="acceso-publicar" to="/trayectos/publicar">
-          <strong>Publicar trayecto</strong>
-          <small>Comparte tus cupos</small>
-        </Link>
+        <div className="panel-accesos">
+          <Link className="acceso-publicar" to="/trayectos/buscar">
+            <strong>Buscar trayecto</strong>
+            <small>Encuentra tu camino</small>
+          </Link>
+          <Link className="acceso-publicar" to="/trayectos/publicar">
+            <strong>Publicar trayecto</strong>
+            <small>Comparte tus cupos</small>
+          </Link>
+        </div>
       </main>
 
       <footer className="pie">

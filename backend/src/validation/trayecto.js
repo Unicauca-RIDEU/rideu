@@ -44,8 +44,43 @@ export function verificarConductorHabilitado(perfil, { ahora = new Date() } = {}
 }
 
 export function fechaEnColombia(ahora = new Date()) {
+  return momentoEnColombia(ahora).slice(0, 10);
+}
+
+// Fecha y hora actual de Colombia como 'AAAA-MM-DD HH:MM'.
+export function momentoEnColombia(ahora = new Date()) {
   const enColombia = new Date(ahora.getTime() - DESFASE_COLOMBIA_HORAS * 60 * 60 * 1000);
-  return enColombia.toISOString().slice(0, 10);
+  return enColombia.toISOString().slice(0, 16).replace("T", " ");
+}
+
+// Filtros de la búsqueda de trayectos (E03-HU06). Llegan como texto en la URL
+// (?sedeDestinoId=1&fecha=AAAA-MM-DD&horaDesde=HH:MM) y los tres son obligatorios.
+export function validarBusqueda(filtros) {
+  const datos = filtros && typeof filtros === "object" ? filtros : {};
+  const errores = [];
+  const sede = texto(datos.sedeDestinoId);
+  const fecha = texto(datos.fecha);
+  const horaDesde = texto(datos.horaDesde);
+
+  if (!sede) {
+    errores.push({ campo: "sedeDestinoId", mensaje: "La sede de destino es obligatoria." });
+  } else if (!/^[1-9]\d*$/.test(sede)) {
+    errores.push({ campo: "sedeDestinoId", mensaje: "La sede de destino no es válida." });
+  }
+  validarFecha(fecha, errores);
+  if (!horaDesde) {
+    errores.push({ campo: "horaDesde", mensaje: "La hora es obligatoria." });
+  } else if (!HORA.test(horaDesde)) {
+    errores.push({ campo: "horaDesde", mensaje: "La hora debe tener el formato HH:MM (24 horas)." });
+  }
+
+  if (errores.length > 0) {
+    return rechazar(
+      errores.length === 1 ? errores[0].mensaje : "Selecciona la sede, la fecha y la hora.",
+      errores,
+    );
+  }
+  return { ok: true, datos: { sedeDestinoId: Number(sede), fecha, horaDesde } };
 }
 
 export function validarTrayecto(body, { cuposMaximos = CUPOS_MAXIMOS, ahora = new Date() } = {}) {
