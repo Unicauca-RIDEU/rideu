@@ -1,0 +1,7 @@
+(node:1189) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+Test Suites: 1 passed, 1 total
+Tests:       25 skipped, 2 passed, 27 total
+Snapshots:   0 total
+Time:        0.114 s, estimated 1 s
+Ran all test suites matching tests/validation/vehiculoLicencia.test.js with tests matching "fecha de Colombia".

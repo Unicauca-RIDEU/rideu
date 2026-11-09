@@ -1,8 +1,10 @@
+import { fechaEnColombia } from "./trayecto.js";
+
 // El usuario no viaja en el cuerpo: el controlador lo toma de la sesión (req.usuario).
 const PLACA = /^[A-Za-z]{3} ?\d{3}$/;
 const MENSAJE_PLACA = "Formato inválido. Usa 3 letras y 3 números (ejemplo ABC 123).";
 
-export function validarVehiculoYLicencia(body) {
+export function validarVehiculoYLicencia(body, { ahora = new Date() } = {}) {
   if (body === null || typeof body !== "object" || Array.isArray(body)) {
     return rechazar("El cuerpo de la solicitud debe incluir el vehículo y la licencia.", [
       {
@@ -13,16 +15,16 @@ export function validarVehiculoYLicencia(body) {
   }
 
   const errores = [];
-  const placa = texto(body.placa);
+  const placaEntrada = texto(body.placa);
   const marca = texto(body.marca);
   const modelo = texto(body.modelo);
   const color = texto(body.color);
   const categoriaLicencia = texto(body.categoriaLicencia);
   const fechaVencimientoLicencia = texto(body.fechaVencimientoLicencia);
 
-  if (!placa) {
+  if (!placaEntrada) {
     errores.push({ campo: "placa", mensaje: "La placa es obligatoria." });
-  } else if (!PLACA.test(placa)) {
+  } else if (!PLACA.test(placaEntrada)) {
     errores.push({ campo: "placa", mensaje: MENSAJE_PLACA });
   }
   if (!marca) {
@@ -50,7 +52,7 @@ export function validarVehiculoYLicencia(body) {
       campo: "fechaVencimientoLicencia",
       mensaje: "La fecha de vencimiento debe tener el formato AAAA-MM-DD.",
     });
-  } else if (esAnteriorAHoy(fechaVencimientoLicencia)) {
+  } else if (fechaVencimientoLicencia < fechaEnColombia(ahora)) {
     errores.push({
       campo: "fechaVencimientoLicencia",
       mensaje: "La licencia no está vigente",
@@ -77,7 +79,7 @@ export function validarVehiculoYLicencia(body) {
   return {
     ok: true,
     datos: {
-      placa,
+      placa: normalizarPlaca(placaEntrada),
       marca,
       modelo,
       color,
@@ -92,14 +94,11 @@ function texto(valor) {
   return typeof valor === "string" ? valor.trim().replace(/\s+/g, " ") : "";
 }
 
-function esAnteriorAHoy(iso) {
-  const hoy = new Date();
-  const actual = [
-    hoy.getFullYear(),
-    String(hoy.getMonth() + 1).padStart(2, "0"),
-    String(hoy.getDate()).padStart(2, "0"),
-  ].join("-");
-  return iso < actual;
+// Formato único «ABC 123»: así la restricción de placa única detecta la misma placa
+// aunque se escriba en minúsculas o sin espacio.
+function normalizarPlaca(placa) {
+  const compacta = placa.replace(" ", "").toUpperCase();
+  return `${compacta.slice(0, 3)} ${compacta.slice(3)}`;
 }
 
 function esFechaIso(valor) {
