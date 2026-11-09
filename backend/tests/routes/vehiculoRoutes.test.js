@@ -143,10 +143,6 @@ describe("rutas /api/vehiculos (Supertest)", () => {
 
   test.each([
     ["Sin verificar", "Debes verificar tu cuenta antes de registrar el vehículo y la licencia."],
-    [
-      "Habilitado",
-      "Tu cuenta ya está habilitada. Este registro solo aplica a cuentas en estado «Verificada».",
-    ],
     ["Otro", "Solo una cuenta en estado «Verificada» puede registrar el vehículo y la licencia."],
   ])("debería responder 403 para una cuenta en estado %p", async (estado, mensaje) => {
     guardarVehiculoYLicencia.mockResolvedValueOnce({ ok: false, motivo: "no_verificada", estado });
@@ -155,6 +151,24 @@ describe("rutas /api/vehiculos (Supertest)", () => {
 
     expect(res.status).toBe(403);
     expect(res.body.mensaje).toBe(mensaje);
+  });
+
+  test("debería responder 200 al actualizar el vehículo y la licencia de una cuenta «Habilitado»", async () => {
+    guardarVehiculoYLicencia.mockResolvedValueOnce({
+      ok: true,
+      actualizado: true,
+      usuario: { ...usuarioSesion, estado: "Habilitado" },
+      vehiculo: { id: "v1", placa: "FKU 284" },
+      licencia: { id: "l1", categoria: "B1" },
+    });
+
+    const res = await request(app).post("/api/vehiculos").set(SESION).send(vehiculoValido);
+
+    expect(res.status).toBe(200);
+    expect(res.body.mensaje).toBe(
+      "Vehículo y licencia actualizados. Tu cuenta sigue en estado «Habilitado».",
+    );
+    expect(res.body.usuario.estado).toBe("Habilitado");
   });
 
   test("debería responder 409 si la placa ya está registrada", async () => {

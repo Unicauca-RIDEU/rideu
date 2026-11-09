@@ -1,0 +1,59 @@
+(node:980) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+FAIL tests/validation/vehiculoLicencia.test.js
+  ● validarVehiculoYLicencia (E02-HU03) › debería guardar la placa "abc 123" con el formato único "ABC 123"
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "ABC 123"
+    Received: "abc 123"
+
+      116 |
+      117 |     expect(resultado.ok).toBe(true);
+    > 118 |     expect(resultado.datos.placa).toBe(esperada);
+          |                                   ^
+      119 |   });
+      120 |
+      121 |   describe("vigencia de la licencia con la fecha de Colombia", () => {
+
+      at tests/validation/vehiculoLicencia.test.js:118:35
+
+  ● validarVehiculoYLicencia (E02-HU03) › debería guardar la placa "ABC123" con el formato único "ABC 123"
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "ABC 123"
+    Received: "ABC123"
+
+      116 |
+      117 |     expect(resultado.ok).toBe(true);
+    > 118 |     expect(resultado.datos.placa).toBe(esperada);
+          |                                   ^
+      119 |   });
+      120 |
+      121 |   describe("vigencia de la licencia con la fecha de Colombia", () => {
+
+      at tests/validation/vehiculoLicencia.test.js:118:35
+
+  ● validarVehiculoYLicencia (E02-HU03) › debería guardar la placa "aBc  123" con el formato único "ABC 123"
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "ABC 123"
+    Received: "aBc 123"
+
+      116 |
+      117 |     expect(resultado.ok).toBe(true);
+    > 118 |     expect(resultado.datos.placa).toBe(esperada);
+          |                                   ^
+      119 |   });
+      120 |
+      121 |   describe("vigencia de la licencia con la fecha de Colombia", () => {
+
+      at tests/validation/vehiculoLicencia.test.js:118:35
+
+Test Suites: 1 failed, 1 total
+Tests:       3 failed, 24 skipped, 27 total
+Snapshots:   0 total
+Time:        0.143 s, estimated 1 s
+Ran all test suites matching tests/validation/vehiculoLicencia.test.js with tests matching "formato único".

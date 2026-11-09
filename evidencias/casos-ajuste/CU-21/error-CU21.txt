@@ -1,0 +1,84 @@
+(node:948) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+FAIL tests/routes/vehiculoRoutes.test.js
+  ● rutas /api/vehiculos (Supertest) › debería responder 200 al actualizar el vehículo y la licencia de una cuenta «Habilitado»
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 201
+
+      165 |     const res = await request(app).post("/api/vehiculos").set(SESION).send(vehiculoValido);
+      166 |
+    > 167 |     expect(res.status).toBe(200);
+          |                        ^
+      168 |     expect(res.body.mensaje).toBe(
+      169 |       "Vehículo y licencia actualizados. Tu cuenta sigue en estado «Habilitado».",
+      170 |     );
+
+      at Object.<anonymous> (tests/routes/vehiculoRoutes.test.js:167:24)
+
+FAIL tests/models/vehiculo.test.js
+  ● modelo vehiculo: guardarVehiculoYLicencia › debería actualizar el vehículo y la licencia de una cuenta «Habilitado»
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 18
+    + Received  +  2
+
+      Object {
+    -   "actualizado": true,
+    -   "licencia": Object {
+    -     "categoria": "B1",
+    -     "fecha_vencimiento": "2099-09-15",
+    -     "id": "l1",
+    -     "usuario_id": "11111111-1111-4111-8111-111111111111",
+    -   },
+    -   "ok": true,
+    -   "usuario": Object {
+    -     "correo": "mariana@unicauca.edu.co",
+        "estado": "Habilitado",
+    -     "id": "11111111-1111-4111-8111-111111111111",
+    -     "nombre": "Mariana Gómez",
+    -   },
+    -   "vehiculo": Object {
+    -     "id": "v1",
+    -     "placa": "ABC 123",
+    -     "usuario_id": "11111111-1111-4111-8111-111111111111",
+    -   },
+    +   "motivo": "no_verificada",
+    +   "ok": false,
+      }
+
+      118 |     const resultado = await guardarVehiculoYLicencia({ ...datos, placa: "ABC 123" });
+      119 |
+    > 120 |     expect(resultado).toEqual({
+          |                       ^
+      121 |       ok: true,
+      122 |       actualizado: true,
+      123 |       usuario: {
+
+      at Object.<anonymous> (tests/models/vehiculo.test.js:120:23)
+
+  ● modelo vehiculo: guardarVehiculoYLicencia › debería crear el vehículo y la licencia si una cuenta «Habilitado» no los tiene
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      144 |     const resultado = await guardarVehiculoYLicencia(datos);
+      145 |
+    > 146 |     expect(resultado.ok).toBe(true);
+          |                          ^
+      147 |     expect(resultado.actualizado).toBe(true);
+      148 |     expect(resultado.vehiculo).toEqual(vehiculo);
+      149 |     expect(resultado.licencia).toEqual(licencia);
+
+      at Object.<anonymous> (tests/models/vehiculo.test.js:146:26)
+
+Test Suites: 2 failed, 2 total
+Tests:       3 failed, 17 skipped, 1 passed, 21 total
+Snapshots:   0 total
+Time:        0.441 s, estimated 1 s
+Ran all test suites matching tests/models/vehiculo.test.js|tests/routes/vehiculoRoutes.test.js with tests matching "Habilitado".

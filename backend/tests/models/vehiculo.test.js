@@ -103,6 +103,53 @@ describe("modelo vehiculo: guardarVehiculoYLicencia", () => {
     expect(sentencias().at(-1)).toBe("ROLLBACK");
   });
 
+  test("debería actualizar el vehículo y la licencia de una cuenta «Habilitado»", async () => {
+    const vehiculoActualizado = { ...vehiculo, placa: "ABC 123" };
+    const licenciaActualizada = { ...licencia, fecha_vencimiento: "2099-09-15" };
+    clienteQuery.mockImplementation(async (sql) => {
+      if (sql.includes("FOR UPDATE")) {
+        return { rows: [{ ...habilitado, nombre: "Mariana Gómez", correo: "mariana@unicauca.edu.co" }] };
+      }
+      if (sql.includes("UPDATE vehiculos")) return { rows: [vehiculoActualizado] };
+      if (sql.includes("UPDATE licencias")) return { rows: [licenciaActualizada] };
+      return { rows: [] };
+    });
+
+    const resultado = await guardarVehiculoYLicencia({ ...datos, placa: "ABC 123" });
+
+    expect(resultado).toEqual({
+      ok: true,
+      actualizado: true,
+      usuario: {
+        id: USUARIO_ID,
+        nombre: "Mariana Gómez",
+        correo: "mariana@unicauca.edu.co",
+        estado: "Habilitado",
+      },
+      vehiculo: vehiculoActualizado,
+      licencia: licenciaActualizada,
+    });
+    expect(sentencias()).toEqual(["BEGIN", "SELECT", "UPDATE", "UPDATE", "COMMIT"]);
+    expect(release).toHaveBeenCalledTimes(1);
+  });
+
+  test("debería crear el vehículo y la licencia si una cuenta «Habilitado» no los tiene", async () => {
+    clienteQuery.mockImplementation(async (sql) => {
+      if (sql.includes("FOR UPDATE")) return { rows: [habilitado] };
+      if (sql.includes("INSERT INTO vehiculos")) return { rows: [vehiculo] };
+      if (sql.includes("INSERT INTO licencias")) return { rows: [licencia] };
+      return { rows: [] };
+    });
+
+    const resultado = await guardarVehiculoYLicencia(datos);
+
+    expect(resultado.ok).toBe(true);
+    expect(resultado.actualizado).toBe(true);
+    expect(resultado.vehiculo).toEqual(vehiculo);
+    expect(resultado.licencia).toEqual(licencia);
+    expect(sentencias()).toEqual(["BEGIN", "SELECT", "UPDATE", "INSERT", "UPDATE", "INSERT", "COMMIT"]);
+  });
+
   test("debería deshacer y relanzar el error si falla un INSERT", async () => {
     const duplicada = Object.assign(new Error("duplicada"), { code: "23505" });
     transaccion();
