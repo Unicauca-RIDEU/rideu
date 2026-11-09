@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { crearSesion } from "../models/sesion.js";
+import { crearSesion, eliminarSesion } from "../models/sesion.js";
 import {
   ESTADO_HABILITADO,
   ESTADO_VERIFICADA,
@@ -139,6 +139,17 @@ export async function iniciarSesion(req, res) {
   } catch (error) {
     console.error("Error al iniciar sesión:", error);
     return res.status(500).json({ mensaje: "No se pudo iniciar sesión." });
+  }
+}
+
+// Cierra la sesión del token con el que llegó la petición; las demás sesiones del usuario siguen abiertas.
+export async function cerrarSesion(req, res) {
+  try {
+    await eliminarSesion(req.tokenSesion);
+    return res.status(200).json({ mensaje: "Sesión cerrada." });
+  } catch (error) {
+    console.error("Error al cerrar la sesión:", error);
+    return res.status(500).json({ mensaje: "No se pudo cerrar la sesión." });
   }
 }
 

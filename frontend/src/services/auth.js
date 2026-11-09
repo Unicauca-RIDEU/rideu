@@ -23,6 +23,23 @@ export function olvidarSesion() {
   localStorage.removeItem(CLAVE_SESION);
 }
 
+// Cierra la sesión en el servidor y la olvida en el navegador, aunque el servidor no responda.
+export async function cerrarSesion() {
+  const token = tokenSesion();
+  try {
+    if (token) {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    }
+  } catch {
+    // Sin conexión: igual se olvida la sesión local.
+  } finally {
+    olvidarSesion();
+  }
+}
+
 export async function obtenerSesion() {
   const token = tokenSesion();
   if (!token) return { ok: false, status: 401 };

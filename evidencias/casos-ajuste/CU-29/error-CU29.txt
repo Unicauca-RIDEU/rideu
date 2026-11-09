@@ -1,0 +1,25 @@
+(node:836) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+FAIL tests/routes/authRoutes.test.js
+  ● rutas /api/auth (Supertest) › debería responder 404 en JSON para una ruta de /api que no existe
+
+    expect(received).toMatch(expected)
+
+    Expected pattern: /application\/json/
+    Received string:  "text/html; charset=utf-8"
+
+      259 |
+      260 |     expect(respuesta.status).toBe(404);
+    > 261 |     expect(respuesta.headers["content-type"]).toMatch(/application\/json/);
+          |                                               ^
+      262 |     expect(respuesta.body).toEqual({ mensaje: "La ruta solicitada no existe." });
+      263 |   });
+      264 |
+
+      at Object.<anonymous> (tests/routes/authRoutes.test.js:261:47)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 14 skipped, 15 total
+Snapshots:   0 total
+Time:        0.244 s, estimated 1 s
+Ran all test suites matching tests/routes/authRoutes.test.js with tests matching "404 en JSON".

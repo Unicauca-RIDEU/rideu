@@ -6,7 +6,9 @@ jest.unstable_mockModule("../../src/config/database.js", () => ({
   pool: { query },
 }));
 
-const { crearSesion, buscarUsuarioPorSesion } = await import("../../src/models/sesion.js");
+const { crearSesion, buscarUsuarioPorSesion, eliminarSesion } = await import(
+  "../../src/models/sesion.js"
+);
 const { hashToken } = await import("../../src/models/usuario.js");
 
 describe("modelo sesion", () => {
@@ -29,6 +31,28 @@ describe("modelo sesion", () => {
       expect.stringContaining("INSERT INTO sesiones"),
       ["usuario-1", hashToken(token), expect.any(Date)],
     );
+  });
+
+  test("debería borrar las sesiones vencidas del usuario al crear una nueva", async () => {
+    query.mockResolvedValue({ rows: [] });
+
+    await crearSesion("usuario-1");
+
+    expect(query).toHaveBeenCalledWith(
+      expect.stringContaining("DELETE FROM sesiones"),
+      ["usuario-1"],
+    );
+    expect(query.mock.calls[0][0]).toContain("expira <= NOW()");
+  });
+
+  test("debería eliminar la sesión por el hash de su token", async () => {
+    query.mockResolvedValueOnce({ rows: [] });
+
+    await eliminarSesion("token-sesion");
+
+    expect(query).toHaveBeenCalledWith(expect.stringContaining("DELETE FROM sesiones"), [
+      hashToken("token-sesion"),
+    ]);
   });
 
   test("debería devolver el usuario si el token de sesión es válido", async () => {

@@ -14,6 +14,7 @@ jest.unstable_mockModule("../../src/config/database.js", () => ({
 }));
 
 jest.unstable_mockModule("../../src/models/sesion.js", () => ({
+  eliminarSesion: jest.fn(),
   crearSesion: jest.fn(),
   buscarUsuarioPorSesion,
 }));

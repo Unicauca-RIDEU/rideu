@@ -1,0 +1,102 @@
+(node:803) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+FAIL tests/routes/authRoutes.test.js
+  ● rutas /api/auth (Supertest) › POST /logout debería exigir sesión iniciada
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 401
+    Received: 404
+
+      226 |     const respuesta = await request(app).post("/api/auth/logout");
+      227 |
+    > 228 |     expect(respuesta.status).toBe(401);
+          |                              ^
+      229 |     expect(eliminarSesion).not.toHaveBeenCalled();
+      230 |   });
+      231 |
+
+      at Object.<anonymous> (tests/routes/authRoutes.test.js:228:30)
+
+  ● rutas /api/auth (Supertest) › POST /logout debería eliminar la sesión del token recibido
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 404
+
+      238 |       .set("Authorization", "Bearer sesion-ok");
+      239 |
+    > 240 |     expect(respuesta.status).toBe(200);
+          |                              ^
+      241 |     expect(respuesta.body.mensaje).toBe("Sesión cerrada.");
+      242 |     expect(eliminarSesion).toHaveBeenCalledWith("sesion-ok");
+      243 |   });
+
+      at Object.<anonymous> (tests/routes/authRoutes.test.js:240:30)
+
+  ● rutas /api/auth (Supertest) › POST /logout debería responder 500 si falla la base de datos
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 500
+    Received: 404
+
+      251 |       .set("Authorization", "Bearer sesion-ok");
+      252 |
+    > 253 |     expect(respuesta.status).toBe(500);
+          |                              ^
+      254 |     expect(respuesta.body.mensaje).toBe("No se pudo cerrar la sesión.");
+      255 |   });
+      256 |
+
+      at Object.<anonymous> (tests/routes/authRoutes.test.js:253:30)
+
+FAIL tests/models/sesion.test.js
+  ● modelo sesion › debería borrar las sesiones vencidas del usuario al crear una nueva
+
+    expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+    - Expected
+    + Received
+
+    - StringContaining "DELETE FROM sesiones",
+    + "INSERT INTO sesiones (usuario_id, token_hash, expira)
+         VALUES ($1, $2, $3)",
+      Array [
+        "usuario-1",
+    +   "8b1ba241028e565332435d026c36e9e5e17353470f727781c325652338bf4f52",
+    +   2026-11-16T21:50:28.098Z,
+      ],
+
+    Number of calls: 1
+
+      39 |     await crearSesion("usuario-1");
+      40 |
+    > 41 |     expect(query).toHaveBeenCalledWith(
+         |                   ^
+      42 |       expect.stringContaining("DELETE FROM sesiones"),
+      43 |       ["usuario-1"],
+      44 |     );
+
+      at Object.<anonymous> (tests/models/sesion.test.js:41:19)
+
+  ● modelo sesion › debería eliminar la sesión por el hash de su token
+
+    TypeError: eliminarSesion is not a function
+
+      49 |     query.mockResolvedValueOnce({ rows: [] });
+      50 |
+    > 51 |     await eliminarSesion("token-sesion");
+         |           ^
+      52 |
+      53 |     expect(query).toHaveBeenCalledWith(expect.stringContaining("DELETE FROM sesiones"), [
+      54 |       hashToken("token-sesion"),
+
+      at Object.<anonymous> (tests/models/sesion.test.js:51:11)
+
+Test Suites: 2 failed, 2 total
+Tests:       5 failed, 15 skipped, 20 total
+Snapshots:   0 total
+Time:        0.344 s, estimated 1 s
+Ran all test suites matching tests/models/sesion.test.js|tests/routes/authRoutes.test.js with tests matching "(logout|sesiones vencidas|eliminar la sesión)".

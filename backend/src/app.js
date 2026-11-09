@@ -11,6 +11,9 @@ export function createApp() {
   app.use("/api/vehiculos", vehiculoRouter);
   app.use("/api/trayectos", trayectoRouter);
   app.use("/api/sedes", sedeRouter);
+  app.use("/api", (_req, res) => {
+    res.status(404).json({ mensaje: "La ruta solicitada no existe." });
+  });
   app.use((error, _req, res, next) => {
     if (error instanceof SyntaxError && error.status === 400 && "body" in error) {
       return res.status(400).json({ mensaje: "El cuerpo de la solicitud no es JSON válido." });
