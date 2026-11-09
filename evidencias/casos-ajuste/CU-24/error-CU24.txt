@@ -1,0 +1,246 @@
+(node:246) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+FAIL tests/routes/vehiculoRoutes.test.js
+  ● rutas /api/vehiculos (Supertest) › criterio 2: debería rechazar una licencia vencida sin guardar nada
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "La licencia de conducción no está vigente."
+    Received: "La licencia no está vigente"
+
+      128 |
+      129 |     expect(res.status).toBe(400);
+    > 130 |     expect(res.body.mensaje).toBe("La licencia de conducción no está vigente.");
+          |                              ^
+      131 |     expect(guardarVehiculoYLicencia).not.toHaveBeenCalled();
+      132 |   });
+      133 |
+
+      at Object.<anonymous> (tests/routes/vehiculoRoutes.test.js:130:30)
+
+FAIL tests/validation/vehiculoLicencia.test.js
+  ● validarVehiculoYLicencia (E02-HU03) › criterio 3: debería señalar todos los campos obligatorios vacíos
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 7
+
+      Set {
+    -   "Este campo es obligatorio.",
+    +   "El color es obligatorio.",
+    +   "El modelo es obligatorio.",
+    +   "La capacidad de pasajeros es obligatoria.",
+    +   "La categoría de la licencia es obligatoria.",
+    +   "La fecha de vencimiento de la licencia es obligatoria.",
+    +   "La marca es obligatoria.",
+    +   "La placa es obligatoria.",
+      }
+
+      63 |       ].sort(),
+      64 |     );
+    > 65 |     expect(new Set(resultado.errores.map((error) => error.mensaje))).toEqual(
+         |                                                                      ^
+      66 |       new Set(["Este campo es obligatorio."]),
+      67 |     );
+      68 |   });
+
+      at Object.<anonymous> (tests/validation/vehiculoLicencia.test.js:65:70)
+
+  ● validarVehiculoYLicencia (E02-HU03) › criterio 3: debería devolver el mensaje del campo cuando solo falta uno
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "Este campo es obligatorio."
+    Received: "El color es obligatorio."
+
+      72 |
+      73 |     expect(resultado.ok).toBe(false);
+    > 74 |     expect(resultado.mensaje).toBe("Este campo es obligatorio.");
+         |                               ^
+      75 |     expect(campos(resultado)).toEqual(["color"]);
+      76 |   });
+      77 |
+
+      at Object.<anonymous> (tests/validation/vehiculoLicencia.test.js:74:31)
+
+  ● validarVehiculoYLicencia (E02-HU03) › criterio 3: debería rechazar la placa con formato inválido "AB 123"
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 1
+
+      Array [
+        Object {
+          "campo": "placa",
+    -     "mensaje": "La placa debe tener tres letras y tres números.",
+    +     "mensaje": "Formato inválido. Usa 3 letras y 3 números (ejemplo ABC 123).",
+        },
+      ]
+
+      82 |
+      83 |       expect(resultado.ok).toBe(false);
+    > 84 |       expect(resultado.errores).toEqual([
+         |                                 ^
+      85 |         {
+      86 |           campo: "placa",
+      87 |           mensaje: "La placa debe tener tres letras y tres números.",
+
+      at tests/validation/vehiculoLicencia.test.js:84:33
+
+  ● validarVehiculoYLicencia (E02-HU03) › criterio 3: debería rechazar la placa con formato inválido "ABCD 123"
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 1
+
+      Array [
+        Object {
+          "campo": "placa",
+    -     "mensaje": "La placa debe tener tres letras y tres números.",
+    +     "mensaje": "Formato inválido. Usa 3 letras y 3 números (ejemplo ABC 123).",
+        },
+      ]
+
+      82 |
+      83 |       expect(resultado.ok).toBe(false);
+    > 84 |       expect(resultado.errores).toEqual([
+         |                                 ^
+      85 |         {
+      86 |           campo: "placa",
+      87 |           mensaje: "La placa debe tener tres letras y tres números.",
+
+      at tests/validation/vehiculoLicencia.test.js:84:33
+
+  ● validarVehiculoYLicencia (E02-HU03) › criterio 3: debería rechazar la placa con formato inválido "ABC 12"
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 1
+
+      Array [
+        Object {
+          "campo": "placa",
+    -     "mensaje": "La placa debe tener tres letras y tres números.",
+    +     "mensaje": "Formato inválido. Usa 3 letras y 3 números (ejemplo ABC 123).",
+        },
+      ]
+
+      82 |
+      83 |       expect(resultado.ok).toBe(false);
+    > 84 |       expect(resultado.errores).toEqual([
+         |                                 ^
+      85 |         {
+      86 |           campo: "placa",
+      87 |           mensaje: "La placa debe tener tres letras y tres números.",
+
+      at tests/validation/vehiculoLicencia.test.js:84:33
+
+  ● validarVehiculoYLicencia (E02-HU03) › criterio 3: debería rechazar la placa con formato inválido "123 ABC"
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 1
+
+      Array [
+        Object {
+          "campo": "placa",
+    -     "mensaje": "La placa debe tener tres letras y tres números.",
+    +     "mensaje": "Formato inválido. Usa 3 letras y 3 números (ejemplo ABC 123).",
+        },
+      ]
+
+      82 |
+      83 |       expect(resultado.ok).toBe(false);
+    > 84 |       expect(resultado.errores).toEqual([
+         |                                 ^
+      85 |         {
+      86 |           campo: "placa",
+      87 |           mensaje: "La placa debe tener tres letras y tres números.",
+
+      at tests/validation/vehiculoLicencia.test.js:84:33
+
+  ● validarVehiculoYLicencia (E02-HU03) › criterio 3: debería rechazar la placa con formato inválido "ABC-123"
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 1
+
+      Array [
+        Object {
+          "campo": "placa",
+    -     "mensaje": "La placa debe tener tres letras y tres números.",
+    +     "mensaje": "Formato inválido. Usa 3 letras y 3 números (ejemplo ABC 123).",
+        },
+      ]
+
+      82 |
+      83 |       expect(resultado.ok).toBe(false);
+    > 84 |       expect(resultado.errores).toEqual([
+         |                                 ^
+      85 |         {
+      86 |           campo: "placa",
+      87 |           mensaje: "La placa debe tener tres letras y tres números.",
+
+      at tests/validation/vehiculoLicencia.test.js:84:33
+
+  ● validarVehiculoYLicencia (E02-HU03) › vigencia de la licencia con la fecha de Colombia › criterio 2: debería rechazar una licencia que venció ayer en Colombia
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 1
+
+      Array [
+        Object {
+          "campo": "fechaVencimientoLicencia",
+    -     "mensaje": "La licencia de conducción no está vigente.",
+    +     "mensaje": "La licencia no está vigente",
+        },
+      ]
+
+      150 |
+      151 |       expect(resultado.ok).toBe(false);
+    > 152 |       expect(resultado.errores).toEqual([
+          |                                 ^
+      153 |         { campo: "fechaVencimientoLicencia", mensaje: "La licencia de conducción no está vigente." },
+      154 |       ]);
+      155 |     });
+
+      at Object.<anonymous> (tests/validation/vehiculoLicencia.test.js:152:33)
+
+  ● validarVehiculoYLicencia (E02-HU03) › criterio 2: debería rechazar una licencia vencida
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 1
+
+      Array [
+        Object {
+          "campo": "fechaVencimientoLicencia",
+    -     "mensaje": "La licencia de conducción no está vigente.",
+    +     "mensaje": "La licencia no está vigente",
+        },
+      ]
+
+      163 |
+      164 |     expect(resultado.ok).toBe(false);
+    > 165 |     expect(resultado.errores).toEqual([
+          |                               ^
+      166 |       { campo: "fechaVencimientoLicencia", mensaje: "La licencia de conducción no está vigente." },
+      167 |     ]);
+      168 |   });
+
+      at Object.<anonymous> (tests/validation/vehiculoLicencia.test.js:165:31)
+
+Test Suites: 2 failed, 2 total
+Tests:       10 failed, 33 skipped, 1 passed, 44 total
+Snapshots:   0 total
+Time:        0.894 s, estimated 1 s
+Ran all test suites matching tests/validation/vehiculoLicencia.test.js|tests/routes/vehiculoRoutes.test.js with tests matching "criterio (2|3)".

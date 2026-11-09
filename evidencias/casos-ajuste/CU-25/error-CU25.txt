@@ -1,0 +1,111 @@
+(node:284) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+FAIL tests/routes/vehiculoRoutes.test.js
+  ● rutas /api/vehiculos (Supertest) › debería responder 409 si la nueva capacidad no alcanza para un trayecto ya publicado
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 409
+    Received: 201
+
+      193 |       .send({ ...vehiculoValido, capacidadPasajeros: 2 });
+      194 |
+    > 195 |     expect(res.status).toBe(409);
+          |                        ^
+      196 |     expect(res.body.mensaje).toBe(
+      197 |       "Tienes un trayecto publicado con 4 cupos. La capacidad del vehículo no puede ser menor.",
+      198 |     );
+
+      at Object.<anonymous> (tests/routes/vehiculoRoutes.test.js:195:24)
+
+FAIL tests/models/vehiculo.test.js
+  ● modelo vehiculo: guardarVehiculoYLicencia › debería actualizar el vehículo y la licencia de una cuenta «Habilitado»
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 0
+
+      Array [
+        "BEGIN",
+        "SELECT",
+    -   "SELECT",
+        "UPDATE",
+        "UPDATE",
+        "COMMIT",
+      ]
+
+      130 |       licencia: licenciaActualizada,
+      131 |     });
+    > 132 |     expect(sentencias()).toEqual(["BEGIN", "SELECT", "SELECT", "UPDATE", "UPDATE", "COMMIT"]);
+          |                          ^
+      133 |     // Los dos UPDATE se limitan al usuario de la sesión.
+      134 |     expect(clienteQuery).toHaveBeenCalledWith(expect.stringContaining("UPDATE vehiculos"), [
+      135 |       USUARIO_ID,
+
+      at Object.<anonymous> (tests/models/vehiculo.test.js:132:26)
+
+  ● modelo vehiculo: guardarVehiculoYLicencia › debería crear el vehículo y la licencia si una cuenta «Habilitado» no los tiene
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 0
+
+    @@ -1,9 +1,8 @@
+      Array [
+        "BEGIN",
+        "SELECT",
+    -   "SELECT",
+        "UPDATE",
+        "INSERT",
+        "UPDATE",
+        "INSERT",
+        "COMMIT",
+
+      162 |     expect(resultado.vehiculo).toEqual(vehiculo);
+      163 |     expect(resultado.licencia).toEqual(licencia);
+    > 164 |     expect(sentencias()).toEqual([
+          |                          ^
+      165 |       "BEGIN",
+      166 |       "SELECT",
+      167 |       "SELECT",
+
+      at Object.<anonymous> (tests/models/vehiculo.test.js:164:26)
+
+  ● modelo vehiculo: guardarVehiculoYLicencia › debería rechazar una capacidad menor que los cupos de un trayecto publicado
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 3
+    + Received  + 8
+
+      Object {
+    -   "cuposPublicados": 4,
+    -   "motivo": "capacidad_insuficiente",
+    -   "ok": false,
+    +   "actualizado": true,
+    +   "licencia": undefined,
+    +   "ok": true,
+    +   "usuario": Object {
+    +     "estado": "Habilitado",
+    +     "id": "11111111-1111-4111-8111-111111111111",
+    +   },
+    +   "vehiculo": undefined,
+      }
+
+      183 |     const resultado = await guardarVehiculoYLicencia({ ...datos, capacidadPasajeros: 2 });
+      184 |
+    > 185 |     expect(resultado).toEqual({ ok: false, motivo: "capacidad_insuficiente", cuposPublicados: 4 });
+          |                       ^
+      186 |     expect(sentencias()).toEqual(["BEGIN", "SELECT", "SELECT", "ROLLBACK"]);
+      187 |     expect(clienteQuery).toHaveBeenCalledWith(expect.stringContaining("MAX(t.cupos)"), [USUARIO_ID]);
+      188 |     expect(release).toHaveBeenCalledTimes(1);
+
+      at Object.<anonymous> (tests/models/vehiculo.test.js:185:23)
+
+Test Suites: 2 failed, 2 total
+Tests:       4 failed, 22 skipped, 2 passed, 28 total
+Snapshots:   0 total
+Time:        0.433 s, estimated 1 s
+Ran all test suites matching tests/models/vehiculo.test.js|tests/routes/vehiculoRoutes.test.js with tests matching "(capacidad|«Habilitado»)".

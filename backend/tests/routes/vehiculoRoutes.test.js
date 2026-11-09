@@ -3,6 +3,7 @@ import request from "supertest";
 
 const buscarUsuarioPorSesion = jest.fn();
 const guardarVehiculoYLicencia = jest.fn();
+const buscarPerfilConductor = jest.fn();
 
 jest.unstable_mockModule("../../src/config/database.js", () => ({
   pool: { query: jest.fn(), connect: jest.fn() },
@@ -15,6 +16,14 @@ jest.unstable_mockModule("../../src/models/sesion.js", () => ({
 
 jest.unstable_mockModule("../../src/models/vehiculo.js", () => ({
   guardarVehiculoYLicencia,
+}));
+
+jest.unstable_mockModule("../../src/models/trayecto.js", () => ({
+  ESTADO_DISPONIBLE: "Disponible",
+  buscarPerfilConductor,
+  buscarTrayectosDisponibles: jest.fn(),
+  crearTrayecto: jest.fn(),
+  existeTrayectoEnHorario: jest.fn(),
 }));
 
 const { createApp } = await import("../../src/app.js");
@@ -118,7 +127,7 @@ describe("rutas /api/vehiculos (Supertest)", () => {
       .send({ ...vehiculoValido, fechaVencimientoLicencia: "2000-01-01" });
 
     expect(res.status).toBe(400);
-    expect(res.body.mensaje).toBe("La licencia no está vigente");
+    expect(res.body.mensaje).toBe("La licencia de conducción no está vigente.");
     expect(guardarVehiculoYLicencia).not.toHaveBeenCalled();
   });
 
@@ -169,6 +178,92 @@ describe("rutas /api/vehiculos (Supertest)", () => {
       "Vehículo y licencia actualizados. Tu cuenta sigue en estado «Habilitado».",
     );
     expect(res.body.usuario.estado).toBe("Habilitado");
+  });
+
+  test("debería responder 409 si la nueva capacidad no alcanza para un trayecto ya publicado", async () => {
+    guardarVehiculoYLicencia.mockResolvedValueOnce({
+      ok: false,
+      motivo: "capacidad_insuficiente",
+      cuposPublicados: 4,
+    });
+
+    const res = await request(app)
+      .post("/api/vehiculos")
+      .set(SESION)
+      .send({ ...vehiculoValido, capacidadPasajeros: 2 });
+
+    expect(res.status).toBe(409);
+    expect(res.body.mensaje).toBe(
+      "Tienes un trayecto publicado con 4 cupos. La capacidad del vehículo no puede ser menor.",
+    );
+    expect(res.body.errores).toEqual([
+      {
+        campo: "capacidadPasajeros",
+        mensaje: "Tienes un trayecto publicado con 4 cupos. La capacidad del vehículo no puede ser menor.",
+      },
+    ]);
+  });
+
+  describe("GET /api/vehiculos", () => {
+    test("debería exigir sesión iniciada", async () => {
+      const res = await request(app).get("/api/vehiculos");
+
+      expect(res.status).toBe(401);
+      expect(buscarPerfilConductor).not.toHaveBeenCalled();
+    });
+
+    test("debería devolver el vehículo y la licencia del usuario de la sesión", async () => {
+      buscarPerfilConductor.mockResolvedValueOnce({
+        id: usuarioSesion.id,
+        estado: "Habilitado",
+        vehiculo_id: "v1",
+        placa: "FKU 284",
+        marca: "Chevrolet",
+        modelo: "Onix 2022",
+        color: "Blanco",
+        capacidad_pasajeros: 4,
+        licencia_categoria: "B1",
+        licencia_vencimiento: "2099-09-15",
+      });
+
+      const res = await request(app).get("/api/vehiculos").set(SESION);
+
+      expect(res.status).toBe(200);
+      expect(buscarPerfilConductor).toHaveBeenCalledWith(usuarioSesion.id);
+      expect(res.body).toEqual({
+        vehiculo: {
+          placa: "FKU 284",
+          marca: "Chevrolet",
+          modelo: "Onix 2022",
+          color: "Blanco",
+          capacidadPasajeros: 4,
+        },
+        licencia: { categoria: "B1", fechaVencimiento: "2099-09-15" },
+      });
+    });
+
+    test("debería devolver vehículo y licencia nulos si el usuario no los ha registrado", async () => {
+      buscarPerfilConductor.mockResolvedValueOnce({
+        id: usuarioSesion.id,
+        estado: "Verificada",
+        vehiculo_id: null,
+        licencia_vencimiento: null,
+      });
+
+      const res = await request(app).get("/api/vehiculos").set(SESION);
+
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual({ vehiculo: null, licencia: null });
+    });
+
+    test("debería responder 500 si falla la base de datos", async () => {
+      buscarPerfilConductor.mockRejectedValueOnce(new Error("sin conexión"));
+
+      const res = await request(app).get("/api/vehiculos").set(SESION);
+
+      expect(res.status).toBe(500);
+      expect(res.body.mensaje).toBe("No se pudieron cargar el vehículo y la licencia.");
+    });
   });
 
   test("debería responder 409 si la placa ya está registrada", async () => {

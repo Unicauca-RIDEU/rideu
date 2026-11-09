@@ -129,7 +129,7 @@ describe("modelo vehiculo: guardarVehiculoYLicencia", () => {
       vehiculo: vehiculoActualizado,
       licencia: licenciaActualizada,
     });
-    expect(sentencias()).toEqual(["BEGIN", "SELECT", "UPDATE", "UPDATE", "COMMIT"]);
+    expect(sentencias()).toEqual(["BEGIN", "SELECT", "SELECT", "UPDATE", "UPDATE", "COMMIT"]);
     // Los dos UPDATE se limitan al usuario de la sesión.
     expect(clienteQuery).toHaveBeenCalledWith(expect.stringContaining("UPDATE vehiculos"), [
       USUARIO_ID,
@@ -161,7 +161,31 @@ describe("modelo vehiculo: guardarVehiculoYLicencia", () => {
     expect(resultado.actualizado).toBe(true);
     expect(resultado.vehiculo).toEqual(vehiculo);
     expect(resultado.licencia).toEqual(licencia);
-    expect(sentencias()).toEqual(["BEGIN", "SELECT", "UPDATE", "INSERT", "UPDATE", "INSERT", "COMMIT"]);
+    expect(sentencias()).toEqual([
+      "BEGIN",
+      "SELECT",
+      "SELECT",
+      "UPDATE",
+      "INSERT",
+      "UPDATE",
+      "INSERT",
+      "COMMIT",
+    ]);
+  });
+
+  test("debería rechazar una capacidad menor que los cupos de un trayecto publicado", async () => {
+    clienteQuery.mockImplementation(async (sql) => {
+      if (sql.includes("FOR UPDATE")) return { rows: [habilitado] };
+      if (sql.includes("MAX(t.cupos)")) return { rows: [{ cupos: 4 }] };
+      return { rows: [] };
+    });
+
+    const resultado = await guardarVehiculoYLicencia({ ...datos, capacidadPasajeros: 2 });
+
+    expect(resultado).toEqual({ ok: false, motivo: "capacidad_insuficiente", cuposPublicados: 4 });
+    expect(sentencias()).toEqual(["BEGIN", "SELECT", "SELECT", "ROLLBACK"]);
+    expect(clienteQuery).toHaveBeenCalledWith(expect.stringContaining("MAX(t.cupos)"), [USUARIO_ID]);
+    expect(release).toHaveBeenCalledTimes(1);
   });
 
   test("debería deshacer y relanzar el error si la placa actualizada ya es de otro vehículo", async () => {

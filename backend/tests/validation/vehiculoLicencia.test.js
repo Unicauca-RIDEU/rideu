@@ -62,13 +62,16 @@ describe("validarVehiculoYLicencia (E02-HU03)", () => {
         "fechaVencimientoLicencia",
       ].sort(),
     );
+    expect(new Set(resultado.errores.map((error) => error.mensaje))).toEqual(
+      new Set(["Este campo es obligatorio."]),
+    );
   });
 
   test("criterio 3: debería devolver el mensaje del campo cuando solo falta uno", () => {
     const resultado = validarVehiculoYLicencia({ ...valido, color: "   " });
 
     expect(resultado.ok).toBe(false);
-    expect(resultado.mensaje).toBe("El color es obligatorio.");
+    expect(resultado.mensaje).toBe("Este campo es obligatorio.");
     expect(campos(resultado)).toEqual(["color"]);
   });
 
@@ -81,7 +84,7 @@ describe("validarVehiculoYLicencia (E02-HU03)", () => {
       expect(resultado.errores).toEqual([
         {
           campo: "placa",
-          mensaje: "Formato inválido. Usa 3 letras y 3 números (ejemplo ABC 123).",
+          mensaje: "La placa debe tener tres letras y tres números.",
         },
       ]);
     },
@@ -147,7 +150,7 @@ describe("validarVehiculoYLicencia (E02-HU03)", () => {
 
       expect(resultado.ok).toBe(false);
       expect(resultado.errores).toEqual([
-        { campo: "fechaVencimientoLicencia", mensaje: "La licencia no está vigente" },
+        { campo: "fechaVencimientoLicencia", mensaje: "La licencia de conducción no está vigente." },
       ]);
     });
   });
@@ -160,7 +163,7 @@ describe("validarVehiculoYLicencia (E02-HU03)", () => {
 
     expect(resultado.ok).toBe(false);
     expect(resultado.errores).toEqual([
-      { campo: "fechaVencimientoLicencia", mensaje: "La licencia no está vigente" },
+      { campo: "fechaVencimientoLicencia", mensaje: "La licencia de conducción no está vigente." },
     ]);
   });
 });
