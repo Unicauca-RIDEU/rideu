@@ -111,7 +111,8 @@ export async function verificarCuenta(token) {
   if (!fila) {
     return { ok: false, motivo: "invalido" };
   }
-  if (fila.estado === ESTADO_VERIFICADA) {
+  // El enlace ya se usó si la cuenta dejó de estar «Sin verificar» («Verificada» o «Habilitado»).
+  if (fila.estado !== ESTADO_SIN_VERIFICAR) {
     return { ok: false, motivo: "usado" };
   }
   return { ok: false, motivo: "expirado" };

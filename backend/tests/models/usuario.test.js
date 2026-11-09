@@ -161,6 +161,25 @@ describe("modelo usuario", () => {
     expect(resultado).toEqual({ ok: false, motivo: "usado" });
   });
 
+  test("debería reportar motivo usado si la cuenta ya pasó a «Habilitado»", async () => {
+    // Arrange: la cuenta se verificó con este enlace y después registró su vehículo.
+    query.mockResolvedValueOnce({ rows: [] });
+    query.mockResolvedValueOnce({
+      rows: [
+        {
+          estado: "Habilitado",
+          token_verificacion_expira: new Date(Date.now() + 60 * 60 * 1000),
+        },
+      ],
+    });
+
+    // Act
+    const resultado = await verificarCuenta("token-usado-habilitado");
+
+    // Assert
+    expect(resultado).toEqual({ ok: false, motivo: "usado" });
+  });
+
   test("debería reportar motivo expirado si el token venció", async () => {
     // Arrange
     query.mockResolvedValueOnce({ rows: [] });
