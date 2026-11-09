@@ -1,0 +1,31 @@
+(node:775) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+FAIL tests/models/usuario.test.js
+  ● modelo usuario › debería reportar motivo usado si la cuenta ya pasó a «Habilitado»
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 1
+
+      Object {
+    -   "motivo": "usado",
+    +   "motivo": "expirado",
+        "ok": false,
+      }
+
+      178 |
+      179 |     // Assert
+    > 180 |     expect(resultado).toEqual({ ok: false, motivo: "usado" });
+          |                       ^
+      181 |   });
+      182 |
+      183 |   test("debería reportar motivo expirado si el token venció", async () => {
+
+      at Object.<anonymous> (tests/models/usuario.test.js:180:23)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 10 passed, 11 total
+Snapshots:   0 total
+Time:        0.114 s, estimated 1 s
+Ran all test suites matching tests/models/usuario.test.js.
