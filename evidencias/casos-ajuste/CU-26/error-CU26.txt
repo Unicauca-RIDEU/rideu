@@ -1,0 +1,76 @@
+(node:317) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+FAIL tests/routes/vehiculoRoutes.test.js
+  ● rutas /api/vehiculos (Supertest) › GET /api/vehiculos › debería exigir sesión iniciada
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 401
+    Received: 404
+
+      209 |       const res = await request(app).get("/api/vehiculos");
+      210 |
+    > 211 |       expect(res.status).toBe(401);
+          |                          ^
+      212 |       expect(buscarPerfilConductor).not.toHaveBeenCalled();
+      213 |     });
+      214 |
+
+      at Object.<anonymous> (tests/routes/vehiculoRoutes.test.js:211:26)
+
+  ● rutas /api/vehiculos (Supertest) › GET /api/vehiculos › debería devolver el vehículo y la licencia del usuario de la sesión
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 404
+
+      229 |       const res = await request(app).get("/api/vehiculos").set(SESION);
+      230 |
+    > 231 |       expect(res.status).toBe(200);
+          |                          ^
+      232 |       expect(buscarPerfilConductor).toHaveBeenCalledWith(usuarioSesion.id);
+      233 |       expect(res.body).toEqual({
+      234 |         vehiculo: {
+
+      at Object.<anonymous> (tests/routes/vehiculoRoutes.test.js:231:26)
+
+  ● rutas /api/vehiculos (Supertest) › GET /api/vehiculos › debería devolver vehículo y licencia nulos si el usuario no los ha registrado
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 404
+
+      253 |       const res = await request(app).get("/api/vehiculos").set(SESION);
+      254 |
+    > 255 |       expect(res.status).toBe(200);
+          |                          ^
+      256 |       expect(res.body).toEqual({ vehiculo: null, licencia: null });
+      257 |     });
+      258 |
+
+      at Object.<anonymous> (tests/routes/vehiculoRoutes.test.js:255:26)
+
+  ● rutas /api/vehiculos (Supertest) › GET /api/vehiculos › debería responder 500 si falla la base de datos
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 500
+    Received: 404
+
+      262 |       const res = await request(app).get("/api/vehiculos").set(SESION);
+      263 |
+    > 264 |       expect(res.status).toBe(500);
+          |                          ^
+      265 |       expect(res.body.mensaje).toBe("No se pudieron cargar el vehículo y la licencia.");
+      266 |     });
+      267 |   });
+
+      at Object.<anonymous> (tests/routes/vehiculoRoutes.test.js:264:26)
+
+Test Suites: 1 failed, 1 total
+Tests:       4 failed, 13 skipped, 17 total
+Snapshots:   0 total
+Time:        0.336 s, estimated 1 s
+Ran all test suites matching tests/routes/vehiculoRoutes.test.js with tests matching "GET /api/vehiculos".

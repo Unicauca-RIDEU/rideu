@@ -2,7 +2,9 @@ import { fechaEnColombia } from "./trayecto.js";
 
 // El usuario no viaja en el cuerpo: el controlador lo toma de la sesión (req.usuario).
 const PLACA = /^[A-Za-z]{3} ?\d{3}$/;
-const MENSAJE_PLACA = "Formato inválido. Usa 3 letras y 3 números (ejemplo ABC 123).";
+const MENSAJE_PLACA = "La placa debe tener tres letras y tres números.";
+const MENSAJE_OBLIGATORIO = "Este campo es obligatorio.";
+const MENSAJE_LICENCIA_VENCIDA = "La licencia de conducción no está vigente.";
 
 export function validarVehiculoYLicencia(body, { ahora = new Date() } = {}) {
   if (body === null || typeof body !== "object" || Array.isArray(body)) {
@@ -23,29 +25,29 @@ export function validarVehiculoYLicencia(body, { ahora = new Date() } = {}) {
   const fechaVencimientoLicencia = texto(body.fechaVencimientoLicencia);
 
   if (!placaEntrada) {
-    errores.push({ campo: "placa", mensaje: "La placa es obligatoria." });
+    errores.push({ campo: "placa", mensaje: MENSAJE_OBLIGATORIO });
   } else if (!PLACA.test(placaEntrada)) {
     errores.push({ campo: "placa", mensaje: MENSAJE_PLACA });
   }
   if (!marca) {
-    errores.push({ campo: "marca", mensaje: "La marca es obligatoria." });
+    errores.push({ campo: "marca", mensaje: MENSAJE_OBLIGATORIO });
   }
   if (!modelo) {
-    errores.push({ campo: "modelo", mensaje: "El modelo es obligatorio." });
+    errores.push({ campo: "modelo", mensaje: MENSAJE_OBLIGATORIO });
   }
   if (!color) {
-    errores.push({ campo: "color", mensaje: "El color es obligatorio." });
+    errores.push({ campo: "color", mensaje: MENSAJE_OBLIGATORIO });
   }
   if (!categoriaLicencia) {
     errores.push({
       campo: "categoriaLicencia",
-      mensaje: "La categoría de la licencia es obligatoria.",
+      mensaje: MENSAJE_OBLIGATORIO,
     });
   }
   if (!fechaVencimientoLicencia) {
     errores.push({
       campo: "fechaVencimientoLicencia",
-      mensaje: "La fecha de vencimiento de la licencia es obligatoria.",
+      mensaje: MENSAJE_OBLIGATORIO,
     });
   } else if (!esFechaIso(fechaVencimientoLicencia)) {
     errores.push({
@@ -55,7 +57,7 @@ export function validarVehiculoYLicencia(body, { ahora = new Date() } = {}) {
   } else if (fechaVencimientoLicencia < fechaEnColombia(ahora)) {
     errores.push({
       campo: "fechaVencimientoLicencia",
-      mensaje: "La licencia no está vigente",
+      mensaje: MENSAJE_LICENCIA_VENCIDA,
     });
   }
 
@@ -63,7 +65,7 @@ export function validarVehiculoYLicencia(body, { ahora = new Date() } = {}) {
   if (capacidadPasajeros === undefined || capacidadPasajeros === null || capacidadPasajeros === "") {
     errores.push({
       campo: "capacidadPasajeros",
-      mensaje: "La capacidad de pasajeros es obligatoria.",
+      mensaje: MENSAJE_OBLIGATORIO,
     });
   } else if (!Number.isInteger(capacidadPasajeros) || capacidadPasajeros <= 0) {
     errores.push({
