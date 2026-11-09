@@ -1,0 +1,39 @@
+(node:481) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+  console.error
+    Error al consultar vehículo y licencia: Error: sin conexión
+        at Object.<anonymous> (/home/user/rideu/backend/tests/routes/vehiculoRoutes.test.js:260:51)
+        at Promise.finally.completed (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1834:28)
+        at new Promise (<anonymous>)
+        at callAsyncCircusFn (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1774:10)
+        at _callCircusTest (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1167:40)
+        at processTicksAndRejections (node:internal/process/task_queues:103:5)
+        at _runTestInContext (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1103:3)
+        at runTestWithContext (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:996:5)
+        at _runTestsForDescribeBlockOnce (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1008:11)
+        at _runTestsForDescribeBlock (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:824:5)
+        at _runTestsForDescribeBlockOnce (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1003:11)
+        at _runTestsForDescribeBlock (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:824:5)
+        at _runTestsForDescribeBlockOnce (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1003:11)
+        at _runTestsForDescribeBlock (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:824:5)
+        at run (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:789:3)
+        at runAndTransformResultsToJestFormat (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:2300:21)
+        at jestAdapter (/home/user/rideu/backend/node_modules/jest-circus/build/runner.js:111:19)
+        at runTestInternal (/home/user/rideu/backend/node_modules/jest-runner/build/index.js:247:16)
+        at runTest (/home/user/rideu/backend/node_modules/jest-runner/build/index.js:315:7)
+
+      77 |     });
+      78 |   } catch (error) {
+    > 79 |     console.error("Error al consultar vehículo y licencia:", error);
+         |             ^
+      80 |     return res.status(500).json({ mensaje: "No se pudieron cargar el vehículo y la licencia." });
+      81 |   }
+      82 | }
+
+      at obtenerVehiculoYLicencia (src/controllers/vehiculoController.js:79:13)
+
+Test Suites: 1 passed, 1 total
+Tests:       13 skipped, 4 passed, 17 total
+Snapshots:   0 total
+Time:        0.37 s, estimated 1 s
+Ran all test suites matching tests/routes/vehiculoRoutes.test.js with tests matching "GET /api/vehiculos".

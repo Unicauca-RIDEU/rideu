@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import { IconoAuto, IconoCheck } from "../components/Iconos.jsx";
-import { registrarVehiculo } from "../services/vehiculo.js";
+import { obtenerVehiculo, registrarVehiculo } from "../services/vehiculo.js";
 
 const NAV = ["Inicio", "Buscar", "Publicar", "Historial"];
+const OBLIGATORIO = "Este campo es obligatorio.";
 
 const vacio = {
   placa: "",
@@ -25,6 +26,29 @@ export default function Vehiculo() {
   const [exito, setExito] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const [guardado, setGuardado] = useState(usuarioSesion?.estado === "Habilitado");
+
+  // Una cuenta «Habilitado» ve sus datos actuales para poder actualizarlos.
+  useEffect(() => {
+    if (usuarioSesion?.estado !== "Habilitado") return undefined;
+    let activo = true;
+    obtenerVehiculo()
+      .then((respuesta) => {
+        if (!activo || !respuesta.ok || !respuesta.vehiculo) return;
+        setDatos({
+          placa: respuesta.vehiculo.placa ?? "",
+          marca: respuesta.vehiculo.marca ?? "",
+          modelo: respuesta.vehiculo.modelo ?? "",
+          color: respuesta.vehiculo.color ?? "",
+          capacidadPasajeros: String(respuesta.vehiculo.capacidadPasajeros ?? ""),
+          categoriaLicencia: respuesta.licencia?.categoria ?? "",
+          fechaVencimientoLicencia: fechaLatina(respuesta.licencia?.fechaVencimiento),
+        });
+      })
+      .catch(() => {});
+    return () => {
+      activo = false;
+    };
+  }, [usuarioSesion?.estado]);
 
   const nombre = usuario?.nombre?.trim() || "Tu perfil";
   const siglas = iniciales(usuario?.nombre);
@@ -330,21 +354,21 @@ function validar(datos) {
   const fecha = fechaIso(datos.fechaVencimientoLicencia);
   const capacidad = Number(datos.capacidadPasajeros);
 
-  if (!placa) errores.placa = "La placa es obligatoria.";
+  if (!placa) errores.placa = OBLIGATORIO;
   else if (!/^[A-Za-z]{3} ?\d{3}$/.test(placa)) {
-    errores.placa = "Formato inválido. Usa 3 letras y 3 números (ejemplo ABC 123).";
+    errores.placa = "La placa debe tener tres letras y tres números.";
   }
-  if (!marca) errores.marca = "La marca es obligatoria.";
-  if (!modelo) errores.modelo = "El modelo es obligatorio.";
-  if (!color) errores.color = "El color es obligatorio.";
+  if (!marca) errores.marca = OBLIGATORIO;
+  if (!modelo) errores.modelo = OBLIGATORIO;
+  if (!color) errores.color = OBLIGATORIO;
   if (!datos.capacidadPasajeros.trim()) {
-    errores.capacidadPasajeros = "La capacidad de pasajeros es obligatoria.";
+    errores.capacidadPasajeros = OBLIGATORIO;
   } else if (!Number.isInteger(capacidad) || capacidad <= 0) {
     errores.capacidadPasajeros = "La capacidad de pasajeros debe ser un entero mayor que 0.";
   }
-  if (!categoriaLicencia) errores.categoriaLicencia = "La categoría de la licencia es obligatoria.";
+  if (!categoriaLicencia) errores.categoriaLicencia = OBLIGATORIO;
   if (!datos.fechaVencimientoLicencia.trim()) {
-    errores.fechaVencimientoLicencia = "La fecha de vencimiento de la licencia es obligatoria.";
+    errores.fechaVencimientoLicencia = OBLIGATORIO;
   } else if (!fecha) {
     errores.fechaVencimientoLicencia = "Usa el formato dd / mm / aaaa.";
   }
@@ -364,6 +388,12 @@ function validar(datos) {
       fechaVencimientoLicencia: fecha,
     },
   };
+}
+
+// 'AAAA-MM-DD' → 'dd / mm / aaaa', el formato que muestra el formulario.
+function fechaLatina(iso) {
+  const partes = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso ?? "");
+  return partes ? `${partes[3]} / ${partes[2]} / ${partes[1]}` : "";
 }
 
 function fechaIso(valor) {

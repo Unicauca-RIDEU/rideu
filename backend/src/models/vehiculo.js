@@ -97,6 +97,21 @@ export async function guardarVehiculoYLicencia({
     }
     if (fila.estado === ESTADO_HABILITADO) {
       // La cuenta ya está habilitada: se actualizan sus datos (por ejemplo, al renovar la licencia).
+      // La capacidad no puede quedar por debajo de los cupos de un trayecto que aún no ha salido.
+      const publicados = await cliente.query(
+        `SELECT MAX(t.cupos) AS cupos
+         FROM trayectos t
+         JOIN vehiculos v ON v.id = t.vehiculo_id
+         WHERE v.usuario_id = $1
+           AND t.estado = 'Disponible'
+           AND (t.fecha + t.hora) > (NOW() AT TIME ZONE 'America/Bogota')`,
+        [usuarioId],
+      );
+      const cuposPublicados = publicados.rows[0]?.cupos ?? 0;
+      if (cuposPublicados > capacidadPasajeros) {
+        await cliente.query("ROLLBACK");
+        return { ok: false, motivo: "capacidad_insuficiente", cuposPublicados };
+      }
       const datosVehiculo = { usuarioId, placa, marca, modelo, color, capacidadPasajeros };
       const datosLicencia = {
         usuarioId,
