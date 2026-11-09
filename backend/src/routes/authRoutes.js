@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  cerrarSesion,
   iniciarSesion,
   registrar,
   sesionActual,
@@ -12,4 +13,5 @@ export const authRouter = Router();
 authRouter.post("/registro", registrar);
 authRouter.post("/verificacion", verificar);
 authRouter.post("/login", iniciarSesion);
+authRouter.post("/logout", requiereSesion, cerrarSesion);
 authRouter.get("/sesion", requiereSesion, sesionActual);

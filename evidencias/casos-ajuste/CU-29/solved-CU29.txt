@@ -1,0 +1,7 @@
+(node:950) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+Test Suites: 1 passed, 1 total
+Tests:       14 skipped, 1 passed, 15 total
+Snapshots:   0 total
+Time:        0.232 s, estimated 1 s
+Ran all test suites matching tests/routes/authRoutes.test.js with tests matching "404 en JSON".

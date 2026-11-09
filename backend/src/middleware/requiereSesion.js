@@ -12,6 +12,7 @@ export async function requiereSesion(req, res, next) {
       return res.status(401).json({ mensaje: "Tu sesión no es válida o expiró." });
     }
     req.usuario = usuario;
+    req.tokenSesion = token;
     return next();
   } catch (error) {
     console.error("Error al validar la sesión:", error);
