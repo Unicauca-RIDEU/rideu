@@ -130,6 +130,20 @@ describe("modelo vehiculo: guardarVehiculoYLicencia", () => {
       licencia: licenciaActualizada,
     });
     expect(sentencias()).toEqual(["BEGIN", "SELECT", "UPDATE", "UPDATE", "COMMIT"]);
+    // Los dos UPDATE se limitan al usuario de la sesión.
+    expect(clienteQuery).toHaveBeenCalledWith(expect.stringContaining("UPDATE vehiculos"), [
+      USUARIO_ID,
+      "ABC 123",
+      "Chevrolet",
+      "Onix 2022",
+      "Blanco",
+      4,
+    ]);
+    expect(clienteQuery).toHaveBeenCalledWith(expect.stringContaining("UPDATE licencias"), [
+      USUARIO_ID,
+      "B1",
+      "2099-09-15",
+    ]);
     expect(release).toHaveBeenCalledTimes(1);
   });
 
@@ -148,6 +162,19 @@ describe("modelo vehiculo: guardarVehiculoYLicencia", () => {
     expect(resultado.vehiculo).toEqual(vehiculo);
     expect(resultado.licencia).toEqual(licencia);
     expect(sentencias()).toEqual(["BEGIN", "SELECT", "UPDATE", "INSERT", "UPDATE", "INSERT", "COMMIT"]);
+  });
+
+  test("debería deshacer y relanzar el error si la placa actualizada ya es de otro vehículo", async () => {
+    const duplicada = Object.assign(new Error("duplicada"), { code: "23505" });
+    clienteQuery.mockImplementation(async (sql) => {
+      if (sql.includes("FOR UPDATE")) return { rows: [habilitado] };
+      if (sql.includes("UPDATE vehiculos")) throw duplicada;
+      return { rows: [] };
+    });
+
+    await expect(guardarVehiculoYLicencia(datos)).rejects.toBe(duplicada);
+    expect(sentencias().at(-1)).toBe("ROLLBACK");
+    expect(release).toHaveBeenCalledTimes(1);
   });
 
   test("debería deshacer y relanzar el error si falla un INSERT", async () => {

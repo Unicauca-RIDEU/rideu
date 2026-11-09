@@ -35,7 +35,7 @@ export default function Vehiculo() {
     const { name, value } = evento.target;
     setDatos((actual) => ({ ...actual, [name]: value }));
     setErrores((actual) => ({ ...actual, [name]: "" }));
-    if (!guardado) setMensaje("");
+    setMensaje("");
   }
 
   async function enviar(evento) {
@@ -64,7 +64,11 @@ export default function Vehiculo() {
       }
       marcarHabilitado(respuesta.usuario ?? usuario, setUsuario);
       setErrores({});
-      setMensaje("Vehículo guardado. Ya puedes publicar trayectos.");
+      setMensaje(
+        guardado
+          ? "Vehículo y licencia actualizados."
+          : "Vehículo guardado. Ya puedes publicar trayectos.",
+      );
       setExito(true);
       setGuardado(true);
     } catch {
@@ -159,6 +163,11 @@ export default function Vehiculo() {
           <form className="perfil-form" onSubmit={enviar} noValidate>
             {mensaje && !exito ? (
               <p className="aviso aviso-error" role="alert">
+                {mensaje}
+              </p>
+            ) : null}
+            {mensaje && exito ? (
+              <p className="aviso aviso-exito" role="status">
                 {mensaje}
               </p>
             ) : null}
