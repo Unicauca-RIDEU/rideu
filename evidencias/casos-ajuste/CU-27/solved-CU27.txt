@@ -1,0 +1,7 @@
+(node:695) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+Test Suites: 2 passed, 2 total
+Tests:       44 skipped, 3 passed, 47 total
+Snapshots:   0 total
+Time:        0.426 s, estimated 1 s
+Ran all test suites matching tests/models/trayecto.test.js|tests/routes/trayectoRoutes.test.js with tests matching "(misma fecha y hora|en ese horario)".

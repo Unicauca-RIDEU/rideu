@@ -55,6 +55,22 @@ export async function crearTrayecto({
   return resultado.rows[0];
 }
 
+// Un conductor no puede tener dos trayectos «Disponible» que salgan en la misma fecha y hora.
+export async function existeTrayectoEnHorario({ conductorId, fecha, hora }) {
+  const resultado = await pool.query(
+    `SELECT EXISTS (
+       SELECT 1
+       FROM trayectos
+       WHERE conductor_id = $1
+         AND fecha = $2
+         AND hora = $3
+         AND estado = $4
+     ) AS existe`,
+    [conductorId, fecha, hora, ESTADO_DISPONIBLE],
+  );
+  return resultado.rows[0]?.existe === true;
+}
+
 // Búsqueda de trayectos (E03-HU06): activos («Disponible», con cupos y que aún no han salido)
 // hacia una sede, en una fecha y desde una hora, ordenados por hora de salida.
 // ahoraColombia es la fecha y hora actual de Colombia como 'AAAA-MM-DD HH:MM'.

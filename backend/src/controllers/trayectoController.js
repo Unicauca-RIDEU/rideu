@@ -3,6 +3,7 @@ import {
   buscarPerfilConductor,
   buscarTrayectosDisponibles,
   crearTrayecto,
+  existeTrayectoEnHorario,
 } from "../models/trayecto.js";
 import {
   RUTA_PERFIL_VEHICULO,
@@ -44,6 +45,20 @@ export async function publicarTrayecto(req, res) {
       return res.status(400).json({
         mensaje,
         errores: [{ campo: "sedeDestinoId", mensaje }],
+        cuposMaximos,
+      });
+    }
+
+    const duplicado = await existeTrayectoEnHorario({
+      conductorId: req.usuario.id,
+      fecha: validacion.datos.fecha,
+      hora: validacion.datos.hora,
+    });
+    if (duplicado) {
+      const mensaje = "Ya tienes un trayecto publicado para esa fecha y hora.";
+      return res.status(409).json({
+        mensaje,
+        errores: [{ campo: "hora", mensaje }],
         cuposMaximos,
       });
     }
