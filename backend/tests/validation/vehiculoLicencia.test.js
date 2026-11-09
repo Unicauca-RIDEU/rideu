@@ -1,4 +1,4 @@
-import { describe, test, expect } from "@jest/globals";
+import { describe, test, expect, jest, afterEach } from "@jest/globals";
 import { validarVehiculoYLicencia } from "../../src/validation/vehiculoLicencia.js";
 
 const valido = {
@@ -106,6 +106,51 @@ describe("validarVehiculoYLicencia (E02-HU03)", () => {
       expect(resultado.mensaje).toBe("La fecha de vencimiento debe tener el formato AAAA-MM-DD.");
     },
   );
+
+  test.each([
+    ["abc 123", "ABC 123"],
+    ["ABC123", "ABC 123"],
+    ["aBc  123", "ABC 123"],
+  ])("debería guardar la placa %p con el formato único %p", (placa, esperada) => {
+    const resultado = validarVehiculoYLicencia({ ...valido, placa });
+
+    expect(resultado.ok).toBe(true);
+    expect(resultado.datos.placa).toBe(esperada);
+  });
+
+  describe("vigencia de la licencia con la fecha de Colombia", () => {
+    // 10 de marzo de 2030, 02:00 UTC: en Colombia (UTC-5) todavía es 9 de marzo, 21:00.
+    const ahora = new Date("2030-03-10T02:00:00Z");
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    test("criterio 1: debería aceptar una licencia que vence hoy en Colombia", () => {
+      jest.useFakeTimers({ now: ahora });
+
+      const resultado = validarVehiculoYLicencia(
+        { ...valido, fechaVencimientoLicencia: "2030-03-09" },
+        { ahora },
+      );
+
+      expect(resultado.ok).toBe(true);
+    });
+
+    test("criterio 2: debería rechazar una licencia que venció ayer en Colombia", () => {
+      jest.useFakeTimers({ now: ahora });
+
+      const resultado = validarVehiculoYLicencia(
+        { ...valido, fechaVencimientoLicencia: "2030-03-08" },
+        { ahora },
+      );
+
+      expect(resultado.ok).toBe(false);
+      expect(resultado.errores).toEqual([
+        { campo: "fechaVencimientoLicencia", mensaje: "La licencia no está vigente" },
+      ]);
+    });
+  });
 
   test("criterio 2: debería rechazar una licencia vencida", () => {
     const resultado = validarVehiculoYLicencia({

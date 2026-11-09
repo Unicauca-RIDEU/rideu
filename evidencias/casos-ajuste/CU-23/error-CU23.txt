@@ -1,0 +1,25 @@
+(node:1012) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+FAIL tests/validation/vehiculoLicencia.test.js
+  ● validarVehiculoYLicencia (E02-HU03) › vigencia de la licencia con la fecha de Colombia › criterio 1: debería aceptar una licencia que vence hoy en Colombia
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      135 |       );
+      136 |
+    > 137 |       expect(resultado.ok).toBe(true);
+          |                            ^
+      138 |     });
+      139 |
+      140 |     test("criterio 2: debería rechazar una licencia que venció ayer en Colombia", () => {
+
+      at Object.<anonymous> (tests/validation/vehiculoLicencia.test.js:137:28)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 25 skipped, 1 passed, 27 total
+Snapshots:   0 total
+Time:        0.172 s, estimated 1 s
+Ran all test suites matching tests/validation/vehiculoLicencia.test.js with tests matching "fecha de Colombia".

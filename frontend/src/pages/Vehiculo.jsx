@@ -40,7 +40,6 @@ export default function Vehiculo() {
 
   async function enviar(evento) {
     evento.preventDefault();
-    if (guardado) return;
 
     const validacion = validar(datos);
     if (!validacion.ok) {
@@ -61,10 +60,6 @@ export default function Vehiculo() {
         setErrores(erroresPorCampo(respuesta.errores));
         setMensaje(respuesta.mensaje || "No se pudo guardar el vehículo.");
         setExito(false);
-        if (respuesta.status === 403 && respuesta.mensaje?.includes("habilitada")) {
-          marcarHabilitado(usuario, setUsuario);
-          setGuardado(true);
-        }
         return;
       }
       marcarHabilitado(respuesta.usuario ?? usuario, setUsuario);
@@ -246,7 +241,7 @@ export default function Vehiculo() {
               </p>
             </section>
 
-            <button className="boton boton-guardar" type="submit" disabled={enviando || guardado}>
+            <button className="boton boton-guardar" type="submit" disabled={enviando}>
               <IconoCheck />
               {enviando ? "Guardando…" : "Guardar vehículo"}
             </button>

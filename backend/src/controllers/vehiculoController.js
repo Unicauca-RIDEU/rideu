@@ -1,8 +1,8 @@
 import { guardarVehiculoYLicencia } from "../models/vehiculo.js";
-import { ESTADO_HABILITADO, ESTADO_SIN_VERIFICAR } from "../models/usuario.js";
+import { ESTADO_SIN_VERIFICAR } from "../models/usuario.js";
 import { validarVehiculoYLicencia } from "../validation/vehiculoLicencia.js";
 
-// Registro de vehículo y licencia (E02-HU03).
+// Registro de vehículo y licencia (E02-HU03). Una cuenta «Habilitado» actualiza los que ya tiene.
 // El conductor es siempre el usuario de la sesión (req.usuario), nunca un dato del cuerpo.
 
 export async function registrarVehiculoYLicencia(req, res) {
@@ -25,6 +25,14 @@ export async function registrarVehiculoYLicencia(req, res) {
     if (!resultado.ok && resultado.motivo === "no_verificada") {
       return res.status(403).json({ mensaje: mensajeCuentaNoVerificada(resultado.estado) });
     }
+    if (resultado.actualizado) {
+      return res.status(200).json({
+        mensaje: "Vehículo y licencia actualizados. Tu cuenta sigue en estado «Habilitado».",
+        usuario: resultado.usuario,
+        vehiculo: resultado.vehiculo,
+        licencia: resultado.licencia,
+      });
+    }
 
     return res.status(201).json({
       mensaje: "Vehículo y licencia registrados. Tu cuenta quedó en estado «Habilitado».",
@@ -44,9 +52,6 @@ export async function registrarVehiculoYLicencia(req, res) {
 function mensajeCuentaNoVerificada(estado) {
   if (estado === ESTADO_SIN_VERIFICAR) {
     return "Debes verificar tu cuenta antes de registrar el vehículo y la licencia.";
-  }
-  if (estado === ESTADO_HABILITADO) {
-    return "Tu cuenta ya está habilitada. Este registro solo aplica a cuentas en estado «Verificada».";
   }
   return "Solo una cuenta en estado «Verificada» puede registrar el vehículo y la licencia.";
 }
