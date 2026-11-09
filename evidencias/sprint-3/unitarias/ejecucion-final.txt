@@ -1,0 +1,112 @@
+
+> rideu-backend@0.1.0 test:coverage
+> cross-env NODE_OPTIONS=--experimental-vm-modules jest --runInBand --coverage
+
+(node:2301) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+  console.error
+    Error al enviar el correo de verificación: Error: SMTP caído
+        at Object.<anonymous> (/home/user/rideu/backend/tests/controllers/authController.test.js:127:48)
+        at Promise.finally.completed (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1834:28)
+        at new Promise (<anonymous>)
+        at callAsyncCircusFn (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1774:10)
+        at _callCircusTest (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1167:40)
+        at _runTestInContext (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1103:3)
+        at runTestWithContext (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:996:5)
+        at _runTestsForDescribeBlockOnce (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1008:11)
+        at _runTestsForDescribeBlock (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:824:5)
+        at _runTestsForDescribeBlockOnce (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1003:11)
+        at _runTestsForDescribeBlock (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:824:5)
+        at run (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:789:3)
+        at runAndTransformResultsToJestFormat (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:2300:21)
+        at jestAdapter (/home/user/rideu/backend/node_modules/jest-circus/build/runner.js:111:19)
+        at runTestInternal (/home/user/rideu/backend/node_modules/jest-runner/build/index.js:247:16)
+        at runTest (/home/user/rideu/backend/node_modules/jest-runner/build/index.js:315:7)
+
+      53 |         console.error("No se pudo deshacer el registro tras fallar el correo:", borrado);
+      54 |       });
+    > 55 |       console.error("Error al enviar el correo de verificación:", error);
+         |               ^
+      56 |       return res.status(500).json({
+      57 |         mensaje: "No se pudo enviar el correo de verificación. Inténtalo de nuevo.",
+      58 |       });
+
+      at error (src/controllers/authController.js:55:15)
+      at Object.<anonymous> (tests/controllers/authController.test.js:132:5)
+
+  console.error
+    Error al validar la sesión: Error: DB caída
+        at Object.<anonymous> (/home/user/rideu/backend/tests/middleware/requiereSesion.test.js:92:46)
+        at Promise.finally.completed (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1834:28)
+        at new Promise (<anonymous>)
+        at callAsyncCircusFn (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1774:10)
+        at _callCircusTest (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1167:40)
+        at _runTestInContext (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1103:3)
+        at runTestWithContext (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:996:5)
+        at _runTestsForDescribeBlockOnce (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1008:11)
+        at _runTestsForDescribeBlock (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:824:5)
+        at _runTestsForDescribeBlockOnce (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1003:11)
+        at _runTestsForDescribeBlock (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:824:5)
+        at run (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:789:3)
+        at runAndTransformResultsToJestFormat (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:2300:21)
+        at jestAdapter (/home/user/rideu/backend/node_modules/jest-circus/build/runner.js:111:19)
+        at runTestInternal (/home/user/rideu/backend/node_modules/jest-runner/build/index.js:247:16)
+        at runTest (/home/user/rideu/backend/node_modules/jest-runner/build/index.js:315:7)
+
+      15 |     return next();
+      16 |   } catch (error) {
+    > 17 |     console.error("Error al validar la sesión:", error);
+         |             ^
+      18 |     return res.status(500).json({ mensaje: "No se pudo validar la sesión." });
+      19 |   }
+      20 | }
+
+      at error (src/middleware/requiereSesion.js:17:13)
+      at Object.<anonymous> (tests/middleware/requiereSesion.test.js:97:5)
+
+------------------------|---------|----------|---------|---------|------------------------
+File                    | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s      
+------------------------|---------|----------|---------|---------|------------------------
+All files               |   97.53 |    94.18 |   96.96 |   97.52 |                        
+ src                    |    90.9 |       80 |     100 |    90.9 |                        
+  app.js                |    90.9 |       80 |     100 |    90.9 | 18                     
+ src/config             |     100 |      100 |     100 |     100 |                        
+  env.js                |     100 |      100 |     100 |     100 |                        
+ src/controllers        |   93.91 |    94.87 |    90.9 |   93.91 |                        
+  authController.js     |   87.27 |    88.23 |      80 |   87.27 | 53,71-72,98-99,140-141 
+  sedeController.js     |     100 |      100 |     100 |     100 |                        
+  trayectoController.js |     100 |      100 |     100 |     100 |                        
+  vehiculoController.js |     100 |      100 |     100 |     100 |                        
+ src/middleware         |     100 |      100 |     100 |     100 |                        
+  requiereSesion.js     |     100 |      100 |     100 |     100 |                        
+ src/models             |     100 |     87.5 |     100 |     100 |                        
+  licencia.js           |     100 |       75 |     100 |     100 | 18                     
+  sede.js               |     100 |      100 |     100 |     100 |                        
+  sesion.js             |     100 |      100 |     100 |     100 |                        
+  trayecto.js           |     100 |      100 |     100 |     100 |                        
+  usuario.js            |     100 |    84.61 |     100 |     100 | 37-77                  
+  vehiculo.js           |     100 |     87.5 |     100 |     100 | 12-38                  
+ src/routes             |     100 |      100 |     100 |     100 |                        
+  authRoutes.js         |     100 |      100 |     100 |     100 |                        
+  sedeRoutes.js         |     100 |      100 |     100 |     100 |                        
+  trayectoRoutes.js     |     100 |      100 |     100 |     100 |                        
+  vehiculoRoutes.js     |     100 |      100 |     100 |     100 |                        
+ src/services           |   89.47 |       65 |      75 |   89.47 |                        
+  correo.js             |   89.47 |       65 |      75 |   89.47 | 52-59                  
+ src/validation         |   99.45 |    98.28 |     100 |   99.45 |                        
+  registro.js           |   97.77 |    97.56 |     100 |   97.72 | 85                     
+  trayecto.js           |     100 |    97.75 |     100 |     100 | 46,86                  
+  vehiculoLicencia.js   |     100 |      100 |     100 |     100 |                        
+------------------------|---------|----------|---------|---------|------------------------
+
+=============================== Coverage summary ===============================
+Statements   : 97.53% ( 435/446 )
+Branches     : 94.18% ( 324/344 )
+Functions    : 96.96% ( 64/66 )
+Lines        : 97.52% ( 434/445 )
+================================================================================
+Test Suites: 15 passed, 15 total
+Tests:       236 passed, 236 total
+Snapshots:   0 total
+Time:        1.821 s, estimated 2 s
+Ran all test suites.
