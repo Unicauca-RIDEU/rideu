@@ -20,8 +20,9 @@
 | `POST /api/trayectos` y `/trayectos/publicar` | Es la forma de crear los trayectos que luego se buscan. |
 | Login para cuentas «Habilitado» (`authController.js`) | Necesario para HU03: sin él, un conductor que registra su vehículo no puede volver a iniciar sesión. |
 
-La dependencia también aparece en el backlog (hoja «Trazabilidad»): HU06 depende de HU05 y HU05 de HU04.
-La evaluación de HU04 (criterios, casos de prueba y pruebas unitarias) corresponde a su propio sprint.
+En el plan de sprints, HU04 pertenece al **Sprint 3** (6 nov – 19 nov de 2026) y HU06 no depende de otra historia;
+la relación con HU04 es solo técnica. La evaluación de HU04 (criterios, casos de prueba y pruebas unitarias)
+corresponde al Sprint 3.
 
 ## Base de datos
 
