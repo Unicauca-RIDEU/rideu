@@ -9,6 +9,7 @@ const buscarCredencialesPorCorreo = jest.fn();
 const crearTokenVerificacion = jest.fn();
 const crearSesion = jest.fn();
 const buscarUsuarioPorSesion = jest.fn();
+const eliminarSesion = jest.fn();
 const enviarCorreoVerificacion = jest.fn();
 const bcryptHash = jest.fn();
 const bcryptCompare = jest.fn();
@@ -33,6 +34,7 @@ jest.unstable_mockModule("../../src/models/usuario.js", () => ({
 }));
 
 jest.unstable_mockModule("../../src/models/sesion.js", () => ({
+  eliminarSesion,
   crearSesion,
   buscarUsuarioPorSesion,
 }));
@@ -218,6 +220,46 @@ describe("rutas /api/auth (Supertest)", () => {
     // Assert
     expect(respuesta.status).toBe(200);
     expect(respuesta.body.usuario.correo).toBe("ana@unicauca.edu.co");
+  });
+
+  test("POST /logout debería exigir sesión iniciada", async () => {
+    const respuesta = await request(app).post("/api/auth/logout");
+
+    expect(respuesta.status).toBe(401);
+    expect(eliminarSesion).not.toHaveBeenCalled();
+  });
+
+  test("POST /logout debería eliminar la sesión del token recibido", async () => {
+    buscarUsuarioPorSesion.mockResolvedValue({ id: "u1", nombre: "Ana", estado: "Verificada" });
+    eliminarSesion.mockResolvedValue(undefined);
+
+    const respuesta = await request(app)
+      .post("/api/auth/logout")
+      .set("Authorization", "Bearer sesion-ok");
+
+    expect(respuesta.status).toBe(200);
+    expect(respuesta.body.mensaje).toBe("Sesión cerrada.");
+    expect(eliminarSesion).toHaveBeenCalledWith("sesion-ok");
+  });
+
+  test("POST /logout debería responder 500 si falla la base de datos", async () => {
+    buscarUsuarioPorSesion.mockResolvedValue({ id: "u1", nombre: "Ana", estado: "Verificada" });
+    eliminarSesion.mockRejectedValue(new Error("sin conexión"));
+
+    const respuesta = await request(app)
+      .post("/api/auth/logout")
+      .set("Authorization", "Bearer sesion-ok");
+
+    expect(respuesta.status).toBe(500);
+    expect(respuesta.body.mensaje).toBe("No se pudo cerrar la sesión.");
+  });
+
+  test("debería responder 404 en JSON para una ruta de /api que no existe", async () => {
+    const respuesta = await request(app).get("/api/ruta-inexistente");
+
+    expect(respuesta.status).toBe(404);
+    expect(respuesta.headers["content-type"]).toMatch(/application\/json/);
+    expect(respuesta.body).toEqual({ mensaje: "La ruta solicitada no existe." });
   });
 
   test("debería responder 400 si el cuerpo no es JSON válido", async () => {
