@@ -4,6 +4,7 @@ import request from "supertest";
 const buscarUsuarioPorSesion = jest.fn();
 const buscarPerfilConductor = jest.fn();
 const crearTrayecto = jest.fn();
+const existeTrayectoEnHorario = jest.fn();
 const buscarTrayectosDisponibles = jest.fn();
 const buscarSedePorId = jest.fn();
 const listarSedes = jest.fn();
@@ -21,6 +22,7 @@ jest.unstable_mockModule("../../src/models/trayecto.js", () => ({
   ESTADO_DISPONIBLE: "Disponible",
   buscarPerfilConductor,
   crearTrayecto,
+  existeTrayectoEnHorario,
   buscarTrayectosDisponibles,
 }));
 
@@ -78,6 +80,8 @@ describe("rutas /api/trayectos (Supertest)", () => {
     buscarUsuarioPorSesion.mockReset();
     buscarPerfilConductor.mockReset();
     crearTrayecto.mockReset();
+    existeTrayectoEnHorario.mockReset();
+    existeTrayectoEnHorario.mockResolvedValue(false);
     buscarTrayectosDisponibles.mockReset();
     buscarSedePorId.mockReset();
     listarSedes.mockReset();
@@ -142,6 +146,24 @@ describe("rutas /api/trayectos (Supertest)", () => {
         conductorId: usuarioSesion.id,
         vehiculoId: perfilHabilitado.vehiculo_id,
       });
+    });
+
+    test("debería rechazar un segundo trayecto del mismo conductor en la misma fecha y hora", async () => {
+      existeTrayectoEnHorario.mockResolvedValueOnce(true);
+
+      const res = await request(app).post("/api/trayectos").set(SESION).send(trayectoValido);
+
+      expect(res.status).toBe(409);
+      expect(res.body.mensaje).toBe("Ya tienes un trayecto publicado para esa fecha y hora.");
+      expect(res.body.errores).toEqual([
+        { campo: "hora", mensaje: "Ya tienes un trayecto publicado para esa fecha y hora." },
+      ]);
+      expect(existeTrayectoEnHorario).toHaveBeenCalledWith({
+        conductorId: usuarioSesion.id,
+        fecha: manana,
+        hora: "07:00",
+      });
+      expect(crearTrayecto).not.toHaveBeenCalled();
     });
 
     test("debería tomar el conductor de la sesión e ignorar el enviado por el frontend", async () => {

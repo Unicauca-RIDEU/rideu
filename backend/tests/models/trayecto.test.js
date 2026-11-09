@@ -6,7 +6,13 @@ jest.unstable_mockModule("../../src/config/database.js", () => ({
   pool: { query },
 }));
 
-const { crearTrayecto, buscarPerfilConductor, buscarTrayectosDisponibles, ESTADO_DISPONIBLE } = await import(
+const {
+  crearTrayecto,
+  buscarPerfilConductor,
+  buscarTrayectosDisponibles,
+  existeTrayectoEnHorario,
+  ESTADO_DISPONIBLE,
+} = await import(
   "../../src/models/trayecto.js"
 );
 
@@ -73,6 +79,33 @@ describe("modelo trayecto", () => {
     // Assert
     expect(cliente.query).toHaveBeenCalledTimes(1);
     expect(query).not.toHaveBeenCalled();
+  });
+
+  test("debería detectar un trayecto «Disponible» del conductor en la misma fecha y hora", async () => {
+    query.mockResolvedValueOnce({ rows: [{ existe: true }] });
+
+    const existe = await existeTrayectoEnHorario({
+      conductorId: "conductor-1",
+      fecha: "2030-05-20",
+      hora: "07:00",
+    });
+
+    expect(existe).toBe(true);
+    const [sql, parametros] = query.mock.calls[0];
+    expect(sql).toContain("FROM trayectos");
+    expect(parametros).toEqual(["conductor-1", "2030-05-20", "07:00", ESTADO_DISPONIBLE]);
+  });
+
+  test("debería indicar que no hay trayecto en ese horario", async () => {
+    query.mockResolvedValueOnce({ rows: [{ existe: false }] });
+
+    const existe = await existeTrayectoEnHorario({
+      conductorId: "conductor-1",
+      fecha: "2030-05-20",
+      hora: "09:00",
+    });
+
+    expect(existe).toBe(false);
   });
 
   test("debería devolver el perfil del conductor con vehículo y licencia", async () => {
