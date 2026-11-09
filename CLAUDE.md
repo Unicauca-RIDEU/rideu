@@ -69,7 +69,7 @@ La configuración se lee de `.env` en la raíz (plantilla en `.env.example`).
 
 ## 6. Organización Scrum
 
-Documentos vigentes: Product Backlog v1.3 (`documentacion/Backlogs/`) e Historias de usuario v1.1 (`documentacion/UserStories/`). Ante una diferencia entre ambos, se consulta al responsable antes de asumir.
+Documentos vigentes: Product Backlog v1.4 (`documentacion/Backlogs/`) e Historias de usuario v1.2 (`documentacion/UserStories/`). Ante una diferencia entre ambos, se consulta al responsable antes de asumir.
 
 ### Plan de sprints
 
@@ -156,9 +156,10 @@ Antes de desarrollar una historia: revisar la historia y sus criterios, identifi
 
 - Solo evidencias auténticas, tomadas de ejecuciones reales. No se generan capturas simuladas ni se alteran resultados.
 - Si una captura no se puede tomar con las herramientas disponibles, se informa al responsable para que la realice.
-- Pruebas unitarias: registro en `evidencias/Pruebas_Unitarias_RideU.xlsx` y capturas en `evidencias/casos-ajuste/CU-NN/` (`error-CUNN.png` y `solved-CUNN.png`).
-- Pruebas funcionales: registro en `documentacion/TestCases/`.
-- **Por confirmar:** carpeta para las capturas de pruebas funcionales y de la ejecución final, organizadas por sprint, tipo de prueba e historia.
+- Pruebas unitarias: registro en `evidencias/Pruebas_Unitarias_RideU.xlsx`; ejecución inicial y posterior al ajuste en `evidencias/casos-ajuste/CU-NN/` (`error-CUNN` y `solved-CUNN`, como captura `.png` o salida `.txt`).
+- Ejecución final de la suite: `evidencias/sprint-N/unitarias/ejecucion-final.txt`.
+- Pruebas funcionales: registro en `documentacion/TestCases/` y en el README del sprint; capturas en `evidencias/sprint-N/funcionales/`.
+- Las salidas de consola se guardan como `.txt`: `.gitignore` excluye los `.log`.
 
 ## 11. Definition of Done
 

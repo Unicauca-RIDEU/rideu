@@ -20,13 +20,14 @@ Dependencias: HU01 → HU02 → HU03 → HU04 → HU05 · HU06 → HU07 → HU08
 | --- | --- |
 | [Sprint 1](sprint-1/) | Diagramas de componentes del sistema |
 | [Sprint 2](sprint-2/) | Alcance (HU03 y HU06), nota sobre HU04 como base técnica, base de datos, API y pruebas unitarias |
+| [Sprint 3](sprint-3/) | Alcance (HU04 y HU09), defectos corregidos de HU01 y HU03, pruebas unitarias y funcionales, revisión independiente |
 
 ## Documentos del proyecto
 
 | Carpeta | Contenido | Versión vigente |
 | --- | --- | --- |
-| [Backlogs](Backlogs/) | Product Backlog, Planning Poker y trazabilidad de pruebas | v1.3 |
-| [UserStories](UserStories/) | Historias de usuario y criterios de aceptación | v1.1 |
+| [Backlogs](Backlogs/) | Product Backlog, Planning Poker y trazabilidad de pruebas | v1.4 |
+| [UserStories](UserStories/) | Historias de usuario y criterios de aceptación | v1.2 |
 | [TestCases](TestCases/) | Casos de prueba funcionales y registro de ejecución | v1.1 |
 | [RiskManagement](RiskManagement/) | Plan de gestión de riesgos | v1.0 |
 | [figma](figma/) | Prototipos de las pantallas | — |
