@@ -48,7 +48,7 @@ Todas exigen `Authorization: Bearer <token>`.
 - **6 casos de ajuste**, uno por criterio de aceptación: **CU-14 a CU-16** (HU03) y **CU-17 a CU-19** (HU06).
   En la primera ejecución fallaron 8 pruebas; tras la corrección todas pasan.
 - Evidencia: [`evidencias/Pruebas_Unitarias_RideU.xlsx`](../../evidencias/Pruebas_Unitarias_RideU.xlsx)
-  (sección «Sprint 2» de cada hoja) y [`evidencias/casos-ajuste/CU-14` … `CU-19`](../../evidencias/casos-ajuste/)
+  (sección «Sprint 2» de cada hoja) y [`evidencias/casos-ajuste/sprint-02/CU-14` … `CU-19`](../../evidencias/casos-ajuste/sprint-02/)
   con las capturas `error-CUxx.png` y `solved-CUxx.png`.
 
 | Caso | HU · criterio | Falla controlada |

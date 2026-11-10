@@ -156,7 +156,7 @@ Antes de desarrollar una historia: revisar la historia y sus criterios, identifi
 
 - Solo evidencias auténticas, tomadas de ejecuciones reales. No se generan capturas simuladas ni se alteran resultados.
 - Si una captura no se puede tomar con las herramientas disponibles, se informa al responsable para que la realice.
-- Pruebas unitarias: registro en `evidencias/Pruebas_Unitarias_RideU.xlsx`; ejecución inicial y posterior al ajuste en `evidencias/casos-ajuste/CU-NN/` (`error-CUNN` y `solved-CUNN`, como captura `.png` o salida `.txt`).
+- Pruebas unitarias: registro en `evidencias/Pruebas_Unitarias_RideU.xlsx`; evidencia fotográfica de cada prueba que falló, separada por sprint, en `evidencias/casos-ajuste/sprint-NN/CU-NN/`: `error-CUNN.png` (ejecución inicial) y `solved-CUNN.png` (después del ajuste), como capturas de una terminal real.
 - Ejecución final de la suite: `evidencias/sprint-N/unitarias/ejecucion-final.txt`.
 - Pruebas funcionales: registro en `documentacion/TestCases/` y en el README del sprint; capturas en `evidencias/sprint-N/funcionales/`.
 - Las salidas de consola se guardan como `.txt`: `.gitignore` excluye los `.log`.

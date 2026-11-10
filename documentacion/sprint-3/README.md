@@ -29,8 +29,8 @@ Cada defecto tuvo tres momentos: la prueba se escribió y se ejecutó contra el 
 
 | Momento | Resultado | Evidencia |
 | --- | --- | --- |
-| 1. Ejecución inicial | 8 pruebas fallaron | `evidencias/casos-ajuste/CU-20` … `CU-23` (`error-CUNN.txt`) |
-| 2. Después del ajuste | Las 8 pasan | `evidencias/casos-ajuste/CU-20` … `CU-23` (`solved-CUNN.txt`) |
+| 1. Ejecución inicial | 8 pruebas fallaron | `evidencias/casos-ajuste/sprint-03/CU-20` … `CU-23` (`error-CUNN.png`) |
+| 2. Después del ajuste | Las 8 pasan | `evidencias/casos-ajuste/sprint-03/CU-20` … `CU-23` (`solved-CUNN.png`) |
 | 3. Ejecución final de toda la suite | 236 de 236 pasan · cobertura de líneas 97,52 % | Reemplazada por la ejecución final de la segunda ronda (254 pruebas) |
 
 Porcentaje de pruebas fallidas en la ejecución inicial, medido sobre lo ejecutado:
@@ -39,6 +39,8 @@ Porcentaje de pruebas fallidas en la ejecución inicial, medido sobre lo ejecuta
 - Sobre la suite completa en ese momento (235 pruebas): 8 fallaron (**3,4 %**).
 
 Ningún fallo fue inducido: las pruebas fallaron porque el defecto existía en el código.
+
+Las capturas `error-CUNN.png` y `solved-CUNN.png` son fotografías de una terminal. Se tomaron el 10 de noviembre de 2026 volviendo a ejecutar cada prueba sobre el commit anterior a la corrección y sobre el commit corregido. Junto a ellas se conserva, como `.txt`, la salida de la ejecución original.
 
 | ID | Historia | Criterio | Datos de entrada | Resultado esperado | Resultado inicial | Estado final | Defecto | Evidencia |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -117,8 +119,8 @@ Ramas: `bugfix/E02-HU03-mensajes-y-datos-del-vehiculo`, `bugfix/E02-HU04-trayect
 
 | Momento | Resultado | Evidencia |
 | --- | --- | --- |
-| 1. Ejecución inicial | 27 pruebas fallaron (18 en HU03, 3 en HU04, 6 en HU02) | `evidencias/casos-ajuste/CU-24` … `CU-29` (`error-CUNN.txt`) |
-| 2. Después del ajuste | Las 27 pasan | `evidencias/casos-ajuste/CU-24` … `CU-29` (`solved-CUNN.txt`) |
+| 1. Ejecución inicial | 27 pruebas fallaron (18 en HU03, 3 en HU04, 6 en HU02) | `evidencias/casos-ajuste/sprint-03/CU-24` … `CU-29` (`error-CUNN.png`) |
+| 2. Después del ajuste | Las 27 pasan | `evidencias/casos-ajuste/sprint-03/CU-24` … `CU-29` (`solved-CUNN.png`) |
 | 3. Ejecución final de toda la suite | 254 de 254 pasan · cobertura de líneas 97,70 % | `evidencias/sprint-3/unitarias/ejecucion-final.txt` |
 
 Porcentaje real de fallos iniciales de esta ronda: 27 de las 251 pruebas de la suite (**10,8 %**). De las 27, 15 son pruebas nuevas y 12 son pruebas existentes cuyo resultado esperado cambió (textos oficiales y orden de las consultas). Sumando las dos rondas del sprint: 35 fallos iniciales sobre 251 pruebas (**13,9 %**). No se indujo ningún fallo.
