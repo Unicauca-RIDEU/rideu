@@ -48,6 +48,10 @@ export default function Panel() {
             <strong>Publicar trayecto</strong>
             <small>Comparte tus cupos</small>
           </Link>
+          <Link className="acceso-publicar" to="/historial">
+            <strong>Historial</strong>
+            <small>Tus trayectos y reservas</small>
+          </Link>
         </div>
       </main>
 

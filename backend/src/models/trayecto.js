@@ -103,6 +103,32 @@ export async function buscarTrayectosDisponibles({ sedeDestinoId, fecha, horaDes
   return resultado.rows;
 }
 
+// Historial (E04-HU09): trayectos publicados por el usuario, del más reciente al más antiguo.
+// Un trayecto cuya fecha y hora de salida ya pasaron se muestra como «Completado».
+// ahoraColombia es la fecha y hora actual de Colombia como 'AAAA-MM-DD HH:MM'.
+export async function listarTrayectosDeConductor({ conductorId, ahoraColombia }) {
+  const resultado = await pool.query(
+    `SELECT t.id,
+            to_char(t.fecha, 'YYYY-MM-DD') AS fecha,
+            to_char(t.hora, 'HH24:MI') AS hora,
+            t.origen,
+            s.nombre AS sede_destino,
+            t.cupos,
+            t.cupos_disponibles,
+            t.aporte_sugerido,
+            CASE
+              WHEN (t.fecha + t.hora) <= $2::timestamp THEN 'Completado'
+              ELSE 'Pendiente'
+            END AS estado_historial
+     FROM trayectos t
+     JOIN sedes s ON s.id = t.sede_destino_id
+     WHERE t.conductor_id = $1
+     ORDER BY t.fecha DESC, t.hora DESC`,
+    [conductorId, ahoraColombia],
+  );
+  return resultado.rows;
+}
+
 // Estado de la cuenta, vehículo y licencia del usuario en una sola consulta.
 // Solo lee las tablas de HU03; vehiculo_id y licencia_vencimiento son null si faltan.
 export async function buscarPerfilConductor(usuarioId) {
