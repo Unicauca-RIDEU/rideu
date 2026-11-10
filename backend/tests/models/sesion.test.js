@@ -45,6 +45,17 @@ describe("modelo sesion", () => {
     expect(query.mock.calls[0][0]).toContain("expira <= NOW()");
   });
 
+  test("debería crear la sesión aunque falle el borrado de las vencidas", async () => {
+    jest.spyOn(console, "error").mockImplementation(() => {});
+    query.mockRejectedValueOnce(new Error("sin conexión"));
+    query.mockResolvedValueOnce({ rows: [] });
+
+    const { token } = await crearSesion("usuario-1");
+
+    expect(token).toMatch(/^[a-f0-9]{64}$/);
+    expect(query.mock.calls[1][0]).toContain("INSERT INTO sesiones");
+  });
+
   test("debería eliminar la sesión por el hash de su token", async () => {
     query.mockResolvedValueOnce({ rows: [] });
 

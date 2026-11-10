@@ -8,12 +8,17 @@ export async function crearSesion(usuarioId) {
   const token = randomBytes(32).toString("hex");
   const expira = new Date(Date.now() + HORAS_SESION * 60 * 60 * 1000);
   // Las sesiones vencidas del usuario ya no sirven: se borran para que la tabla no crezca sin límite.
-  await pool.query(
-    `DELETE FROM sesiones
-     WHERE usuario_id = $1
-       AND expira <= NOW()`,
-    [usuarioId],
-  );
+  // La limpieza es accesoria: si falla, no debe impedir el inicio de sesión.
+  try {
+    await pool.query(
+      `DELETE FROM sesiones
+       WHERE usuario_id = $1
+         AND expira <= NOW()`,
+      [usuarioId],
+    );
+  } catch (error) {
+    console.error("No se pudieron borrar las sesiones vencidas:", error);
+  }
   await pool.query(
     `INSERT INTO sesiones (usuario_id, token_hash, expira)
      VALUES ($1, $2, $3)`,
