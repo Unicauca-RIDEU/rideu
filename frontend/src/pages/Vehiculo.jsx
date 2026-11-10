@@ -33,8 +33,17 @@ export default function Vehiculo() {
     let activo = true;
     obtenerVehiculo()
       .then((respuesta) => {
-        if (!activo || !respuesta.ok || !respuesta.vehiculo) return;
-        setDatos({
+        if (!activo) return;
+        if (respuesta.status === 401) {
+          navigate("/login", { replace: true });
+          return;
+        }
+        if (!respuesta.ok || !respuesta.vehiculo) {
+          setMensaje("No se pudieron cargar tus datos actuales. Escríbelos de nuevo para actualizarlos.");
+          return;
+        }
+        // Solo se precarga si la persona todavía no ha escrito nada.
+        setDatos((actual) => (actual !== vacio ? actual : {
           placa: respuesta.vehiculo.placa ?? "",
           marca: respuesta.vehiculo.marca ?? "",
           modelo: respuesta.vehiculo.modelo ?? "",
@@ -42,13 +51,17 @@ export default function Vehiculo() {
           capacidadPasajeros: String(respuesta.vehiculo.capacidadPasajeros ?? ""),
           categoriaLicencia: respuesta.licencia?.categoria ?? "",
           fechaVencimientoLicencia: fechaLatina(respuesta.licencia?.fechaVencimiento),
-        });
+        }));
       })
-      .catch(() => {});
+      .catch(() => {
+        if (activo) {
+          setMensaje("No se pudieron cargar tus datos actuales. Escríbelos de nuevo para actualizarlos.");
+        }
+      });
     return () => {
       activo = false;
     };
-  }, [usuarioSesion?.estado]);
+  }, [usuarioSesion?.estado, navigate]);
 
   const nombre = usuario?.nombre?.trim() || "Tu perfil";
   const siglas = iniciales(usuario?.nombre);

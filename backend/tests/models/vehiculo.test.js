@@ -188,6 +188,24 @@ describe("modelo vehiculo: guardarVehiculoYLicencia", () => {
     expect(release).toHaveBeenCalledTimes(1);
   });
 
+  test.each([
+    ["igual a los cupos publicados", 3],
+    ["sin trayectos publicados", null],
+  ])("debería aceptar la capacidad %s", async (_caso, cupos) => {
+    clienteQuery.mockImplementation(async (sql) => {
+      if (sql.includes("FOR UPDATE")) return { rows: [habilitado] };
+      if (sql.includes("MAX(t.cupos)")) return { rows: [{ cupos }] };
+      if (sql.includes("UPDATE vehiculos")) return { rows: [vehiculo] };
+      if (sql.includes("UPDATE licencias")) return { rows: [licencia] };
+      return { rows: [] };
+    });
+
+    const resultado = await guardarVehiculoYLicencia({ ...datos, capacidadPasajeros: 3 });
+
+    expect(resultado.ok).toBe(true);
+    expect(sentencias().at(-1)).toBe("COMMIT");
+  });
+
   test("debería deshacer y relanzar el error si la placa actualizada ya es de otro vehículo", async () => {
     const duplicada = Object.assign(new Error("duplicada"), { code: "23505" });
     clienteQuery.mockImplementation(async (sql) => {
