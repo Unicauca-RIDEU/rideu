@@ -1,0 +1,6 @@
+RU-E004-HU09-CP03 al abrir /historial sin sesión la URL es: /login
+RU-E004-HU09-CP01 títulos: ["Trayectos publicados (2)","Reservas (0)"]
+RU-E004-HU09-CP01 trayectos: [["2026-11-20 · 07:00","Pendiente","Bello Horizonte → Facultad de Ingeniería Electrónica y Telecomunicaciones"],["2026-11-05 · 06:30","Completado","La Esmeralda → Facultad de Artes"]]
+RU-E004-HU09-CP01 reservas: ["Aún no tienes reservas."]
+RU-E004-HU09-CP02 mensaje: ["Aún no tienes registros en tu historial."]
+RU-E004-HU09-CP04 trayectos de otro usuario visibles: 0

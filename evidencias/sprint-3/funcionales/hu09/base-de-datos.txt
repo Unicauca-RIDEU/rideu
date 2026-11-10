@@ -1,0 +1,3 @@
+Precondición: el trayecto de La Esmeralda se dejó con fecha pasada (2026-11-05) directamente en la base de datos.
+BD trayectos de laura.gomez: Bello Horizonte 2026-11-20 07:00:00 | La Esmeralda 2026-11-05 06:30:00
+BD trayectos de carlos.mera: 0
