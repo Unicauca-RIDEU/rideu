@@ -7,7 +7,7 @@
 | Épica | Historia | Ruta | Estado |
 | --- | --- | --- | --- |
 | E02 | **HU04 · Publicar trayecto** | `/trayectos/publicar` | Evaluada: sus 5 criterios tienen pruebas unitarias y casos funcionales ejecutados, con evidencia. Se agregó el criterio 6 (trayecto duplicado). |
-| E04 | **HU09 · Consultar historial de trayectos y reservas** | `/historial` | Pendiente. Plan propuesto al final de este documento, por aprobar. |
+| E04 | **HU09 · Consultar historial de trayectos y reservas** | `/historial` | Trayectos publicados: hecho y probado. Reservas: en el Sprint 4 con HU07. Estado «Cancelado»: con HU05. |
 | E01, E02 | **Correcciones y mejoras de HU01, HU02, HU03 y HU04** | `/registro/verificacion`, `/panel`, `/perfil/vehiculo`, `/trayectos/publicar` | Hechas (este documento). |
 
 ## Defectos corregidos (primera ronda)
@@ -174,64 +174,74 @@ Los tres casos de HU03 que estaban en «Falló» en el registro del tester (CP02
 
 ## Pendientes conocidos
 
-- El tester debe incorporar a su registro (`documentacion/TestCases`) los casos funcionales nuevos de este documento y repetir RU-E002-HU03-CP02 a CP04.
+- Los casos funcionales del sprint están en `documentacion/TestCases/sprint-03`. Se ejecutaron de forma automatizada en Chromium; falta la firma del tester.
 - La comprobación de trayecto duplicado se hace en la API; no hay una restricción única en la base de datos, así que dos peticiones simultáneas podrían crear el duplicado.
 - No hay pruebas automatizadas del frontend; la interfaz se verifica con las pruebas funcionales.
 - El cierre de sesión cierra solo la sesión actual, no las abiertas en otros dispositivos.
 
-## Plan propuesto para HU09 · Consultar historial de trayectos y reservas
+## HU09 · Consultar historial de trayectos y reservas
 
-**Estado: propuesta, pendiente de aprobación.** No se ha desarrollado nada de HU09.
+### Alcance aprobado
 
-### Historia y criterios
+El responsable aprobó el 10 de noviembre de 2026:
 
-| Criterio | Dado | Cuando | Entonces |
-| --- | --- | --- | --- |
-| CA-HU09-01 Historial con actividad | un usuario tiene trayectos publicados o reservas previas | accede a `/historial` desde la navegación | ve la lista completa de su actividad con su estado (completado, cancelado o pendiente) |
-| CA-HU09-02 Historial sin actividad | un usuario no tiene actividad registrada | accede a `/historial` desde la navegación | ve un mensaje indicando que aún no hay registros |
+1. Entregar en el Sprint 3 los trayectos publicados por el usuario y completar las reservas en el Sprint 4, con HU07.
+2. Un trayecto cuya fecha y hora de salida ya pasaron se muestra como «Completado»; el resto, como «Pendiente».
+3. Agregar al backlog la dependencia de HU09 con HU07 y HU05 (Backlog v1.6).
 
-### Dependencias
+El estado «Cancelado» se mostrará cuando exista HU05.
 
-| Dependencia | Situación | Efecto en HU09 |
-| --- | --- | --- |
-| HU04 Publicar trayecto | Hecha | El historial puede mostrar los trayectos publicados. |
-| HU07 Reservar cupo (Sprint 4) | Pendiente | No existen reservas: la parte de reservas del historial no se puede construir ni probar todavía. |
-| HU05 Editar o cancelar trayecto (Sprint 5) | Pendiente | Ningún trayecto puede estar «cancelado» todavía. |
-
-El backlog no declara dependencias para HU09, pero el criterio 1 nombra reservas y el estado «cancelado», que dependen de HU07 y HU05.
-
-### Alcance propuesto para el Sprint 3
-
-1. Historial de **trayectos publicados** por el usuario, del más reciente al más antiguo.
-2. Estado de cada trayecto: **pendiente** si aún no ha salido y **completado** si su fecha y hora ya pasaron (hora de Colombia). **Cancelado** se mostrará cuando exista HU05.
-3. Sección de **reservas** presente pero vacía, con el texto de que aún no hay reservas; se completa en el Sprint 4 junto con HU07.
-4. Mensaje de historial vacío cuando el usuario no tiene trayectos ni reservas.
-
-### Cambios técnicos
+### Implementación
 
 | Capa | Cambio |
 | --- | --- |
-| Base de datos | Ninguno. |
-| Modelo | `listarTrayectosDeConductor(conductorId, ahoraColombia)` en `models/trayecto.js`, con el estado calculado en la consulta. |
-| API | `GET /api/historial` (con sesión): `{ trayectos, reservas: [], total }`. Controlador y ruta nuevos, registrados en `app.js`. |
-| Frontend | Pantalla `Historial.jsx` en `/historial` (ruta protegida), servicio `historial.js` y acceso desde el panel. |
-| Documentación | README (pantalla y endpoint) y este documento. |
+| Modelo | `listarTrayectosDeConductor` en `models/trayecto.js`: trayectos del usuario, del más reciente al más antiguo, con el estado calculado en hora de Colombia. |
+| API | `GET /api/historial` (con sesión): `{ mensaje, total, trayectos, reservas }`. `reservas` va vacío hasta HU07. |
+| Frontend | Pantalla `/historial` (ruta protegida) y acceso desde el panel. |
+| Base de datos | Sin cambios. |
 
-Rama: `feature/E04-HU09-historial`.
+Rama: `feature/E04-HU09-historial`, integrada en `develop`.
 
-### Pruebas previstas
+### Pruebas unitarias
 
-| Tipo | Casos |
-| --- | --- |
-| Unitarias | Modelo: filtra por el usuario de la sesión, ordena y calcula «pendiente» y «completado». Rutas: 401 sin sesión, 200 con actividad, 200 sin actividad, 500 ante error. |
-| Funcionales | RU-E004-HU09-CP01 historial con trayectos (uno pendiente y uno ya salido); CP02 historial vacío; CP03 `/historial` sin sesión redirige a `/login`; CP04 un usuario no ve trayectos de otro. |
+| Momento | Resultado | Evidencia |
+| --- | --- | --- |
+| 1. Ejecución inicial | Las 8 pruebas nuevas fallaron: la historia aún no estaba implementada | `evidencias/casos-ajuste/sprint-03/CU-30/error-CU30.png` |
+| 2. Después de implementar | Las 8 pasan | `evidencias/casos-ajuste/sprint-03/CU-30/solved-CU30.png` |
+| 3. Ejecución final de toda la suite | 262 de 262 pasan · cobertura de líneas 97,76 % | `evidencias/sprint-3/unitarias/ejecucion-final.txt` |
 
-### Estimación
+Fallos iniciales de HU09: 8 de las 262 pruebas ejecutadas (**3,1 %**). En todo el Sprint 3: 43 fallos iniciales sobre 262 pruebas (**16,4 %**). Las pruebas se escribieron antes que el código; ningún fallo fue inducido.
 
-El backlog asigna 5 Story Points a HU09 y no se cambia. Con este corte, la parte de trayectos se entrega en el Sprint 3 y la de reservas queda como trabajo restante de la historia en el Sprint 4.
+Las pruebas están en el Excel como UT-249 a UT-256.
 
-### Decisiones que necesita el responsable
+### Pruebas funcionales
 
-1. ¿Se acepta entregar en el Sprint 3 solo los trayectos publicados y completar las reservas en el Sprint 4?
-2. ¿«Completado» puede significar «la fecha y hora de salida ya pasaron»? El sistema no registra que un viaje se haya realizado.
-3. ¿Se agrega al backlog la dependencia de HU09 con HU07 y HU05?
+Ejecutadas en Chromium contra la aplicación real el 10 de noviembre de 2026. El detalle de cada caso está en `documentacion/TestCases/sprint-03`.
+
+| Caso | Criterio | Resultado esperado | Resultado obtenido | Estado | Evidencia |
+| --- | --- | --- | --- | --- | --- |
+| RU-E004-HU09-CP01 | CA-HU09-01 Historial con actividad | Lista de la actividad con su estado. | 2 trayectos: 2026-11-20 07:00 «Pendiente» y 2026-11-05 06:30 «Completado», en ese orden; «Aún no tienes reservas.» | Pasó | `HU09-CP01-historial-con-actividad.png` |
+| RU-E004-HU09-CP02 | CA-HU09-02 Historial sin actividad | Mensaje de que aún no hay registros. | «Aún no tienes registros en tu historial.» | Pasó | `HU09-CP02-historial-sin-actividad.png` |
+| RU-E004-HU09-CP03 | CA-HU09-01 Sin sesión | Redirige a `/login`. | Redirigió a `/login`. | Pasó | `HU09-CP03-sin-sesion.png` |
+| RU-E004-HU09-CP04 | CA-HU09-01 Aislamiento entre usuarios | Un usuario no ve los trayectos de otro. | 0 trayectos visibles para el usuario sin actividad. | Pasó | `HU09-CP02-historial-sin-actividad.png` |
+
+Evidencia en [`evidencias/sprint-3/funcionales/hu09`](../../evidencias/sprint-3/funcionales/hu09/). El trayecto pasado se preparó cambiando su fecha en la base de datos, porque la aplicación no permite publicar en el pasado.
+
+### Revisión independiente
+
+Veredicto: aprobado con observaciones, sin hallazgos críticos ni altos.
+
+| Observación | Gravedad | Estado |
+| --- | --- | --- |
+| La regla «Completado / Pendiente» y el orden solo se comprueban como texto SQL en las unitarias | Media | Atendida con las pruebas funcionales contra PostgreSQL real (CP01 y CP04) |
+| Una respuesta sin lista de trayectos dejaba la pantalla en blanco | Baja | Atendida: se muestra el aviso de error |
+| El aviso de error decía «Inténtalo de nuevo» sin ofrecer cómo | Baja | Atendida: indica recargar la página |
+| Con HU05, un trayecto cancelado y pasado saldría «Completado» | Baja | Anotado en el modelo para HU05 |
+| La fecha se muestra como `2026-11-20`, distinto de la búsqueda | Baja | Pendiente |
+| Faltan pruebas del controlador en archivo propio y con token vencido | Baja | Pendiente |
+
+### Pendiente de HU09
+
+- Reservas del usuario en el historial (Sprint 4, con HU07).
+- Estado «Cancelado» (Sprint 5, con HU05).
+- Caso funcional de un trayecto del mismo día, antes y después de la hora actual.

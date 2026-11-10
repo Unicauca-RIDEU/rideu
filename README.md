@@ -12,7 +12,7 @@ El stack es React (Vite) en el frontend, Node.js con Express en el backend y Pos
 | --- | --- | --- | --- |
 | Sprint 1 | 9 oct – 22 oct | HU01 Registro con correo institucional · HU02 Inicio de sesión validado | Implementadas |
 | Sprint 2 | 23 oct – 5 nov | HU03 Registrar vehículo y licencia · HU06 Buscar trayectos disponibles | Implementadas |
-| Sprint 3 | 6 nov – 19 nov | HU04 Publicar trayecto · HU09 Consultar historial de trayectos y reservas | En curso: HU04 evaluada, HU09 pendiente, correcciones y mejoras de HU01 a HU04 hechas |
+| Sprint 3 | 6 nov – 19 nov | HU04 Publicar trayecto · HU09 Consultar historial de trayectos y reservas | En curso: HU04 evaluada; HU09 con el historial de trayectos hecho (las reservas llegan con HU07); correcciones y mejoras de HU01 a HU04 hechas |
 | Sprint 4 | 20 nov – 3 dic | HU07 Reservar cupo · HU10 y HU11 Contacto por WhatsApp | Pendientes |
 | Sprint 5 | 4 dic – 17 dic | HU05 Editar o cancelar trayecto · HU08 Cancelar reserva | Pendientes |
 
@@ -91,6 +91,7 @@ npm run build --prefix frontend
 | `/perfil/vehiculo` | HU03 | Sí |
 | `/trayectos/publicar` | HU04 | Sí |
 | `/trayectos/buscar` | HU06 | Sí |
+| `/historial` | HU09 | Sí |
 
 ## API
 
@@ -109,6 +110,7 @@ Las rutas con sesión exigen el encabezado `Authorization: Bearer <token>`; el t
 | `POST /api/trayectos` | HU04 | Sí | Publica un trayecto; rechaza otro del mismo conductor en la misma fecha y hora |
 | `GET /api/trayectos?sedeDestinoId=&fecha=&horaDesde=` | HU06 | Sí | Trayectos disponibles con cupos, ordenados por hora de salida |
 | `GET /api/sedes` | HU06 | Sí | Sedes de destino |
+| `GET /api/historial` | HU09 | Sí | Trayectos publicados por el usuario, con estado «Pendiente» o «Completado» |
 
 ## Estructura
 

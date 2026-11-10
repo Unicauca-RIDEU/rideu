@@ -69,7 +69,7 @@ La configuración se lee de `.env` en la raíz (plantilla en `.env.example`).
 
 ## 6. Organización Scrum
 
-Documentos vigentes: Product Backlog v1.5 (`documentacion/Backlogs/`) e Historias de usuario v1.3 (`documentacion/UserStories/`), con criterios en formato Dado / Cuando / Entonces. Ante una diferencia entre ambos, se consulta al responsable antes de asumir.
+Documentos vigentes: Product Backlog v1.6 (`documentacion/Backlogs/`) e Historias de usuario v1.3 (`documentacion/UserStories/`), con criterios en formato Dado / Cuando / Entonces. Ante una diferencia entre ambos, se consulta al responsable antes de asumir.
 
 ### Plan de sprints
 
@@ -93,7 +93,7 @@ Documentos vigentes: Product Backlog v1.5 (`documentacion/Backlogs/`) e Historia
 | HU06 | E03 | Buscar trayectos disponibles | Alta | 8 | — |
 | HU07 | E04 | Reservar cupo en trayecto | Alta | 13 | HU06 |
 | HU08 | E04 | Cancelar reserva | Media | 8 | HU07 |
-| HU09 | E04 | Consultar historial de trayectos y reservas | Baja | 5 | — |
+| HU09 | E04 | Consultar historial de trayectos y reservas | Baja | 5 | HU05, HU07 |
 | HU10 | E05 | Contacto WhatsApp para el pasajero | Media | 3 | HU07 |
 | HU11 | E05 | Contacto WhatsApp para el conductor | Baja | 3 | HU04, HU07 |
 
@@ -158,7 +158,8 @@ Antes de desarrollar una historia: revisar la historia y sus criterios, identifi
 - Si una captura no se puede tomar con las herramientas disponibles, se informa al responsable para que la realice.
 - Pruebas unitarias: registro en `evidencias/Pruebas_Unitarias_RideU.xlsx`; evidencia fotográfica de cada prueba que falló, separada por sprint, en `evidencias/casos-ajuste/sprint-NN/CU-NN/`: `error-CUNN.png` (ejecución inicial) y `solved-CUNN.png` (después del ajuste), como capturas de una terminal real.
 - Ejecución final de la suite: `evidencias/sprint-N/unitarias/ejecucion-final.txt`.
-- Pruebas funcionales: registro en `documentacion/TestCases/` y en el README del sprint; capturas en `evidencias/sprint-N/funcionales/`.
+- Pruebas funcionales: un Word y un Excel por sprint en `documentacion/TestCases/sprint-NN/`, con versión si se actualizan; capturas en `evidencias/sprint-N/funcionales/`.
+- El backlog no lleva trazabilidad de pruebas: la de las unitarias está en `evidencias/Pruebas_Unitarias_RideU.xlsx`.
 - Las salidas de consola se guardan como `.txt`: `.gitignore` excluye los `.log`.
 
 ## 11. Definition of Done
