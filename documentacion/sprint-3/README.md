@@ -6,11 +6,11 @@
 
 | Épica | Historia | Ruta | Estado |
 | --- | --- | --- | --- |
-| E02 | **HU04 · Publicar trayecto** | `/trayectos/publicar` | Código base y pruebas unitarias en `develop` desde el Sprint 2. Pendiente: casos funcionales y evidencias de sus 5 criterios. |
-| E04 | **HU09 · Consultar historial de trayectos y reservas** | `/historial` | Pendiente. |
-| E01, E02 | **Correcciones de HU01 y HU03** | `/registro/verificacion`, `/perfil/vehiculo` | Hechas (este documento). |
+| E02 | **HU04 · Publicar trayecto** | `/trayectos/publicar` | Evaluada: sus 5 criterios tienen pruebas unitarias y casos funcionales ejecutados, con evidencia. Se agregó el criterio 6 (trayecto duplicado). |
+| E04 | **HU09 · Consultar historial de trayectos y reservas** | `/historial` | Pendiente. Plan propuesto al final de este documento, por aprobar. |
+| E01, E02 | **Correcciones y mejoras de HU01, HU02, HU03 y HU04** | `/registro/verificacion`, `/panel`, `/perfil/vehiculo`, `/trayectos/publicar` | Hechas (este documento). |
 
-## Defectos corregidos
+## Defectos corregidos (primera ronda)
 
 Los defectos se encontraron en la auditoría del 9 de noviembre de 2026, sobre el código de `develop`.
 
@@ -23,7 +23,7 @@ Los defectos se encontraron en la auditoría del 9 de noviembre de 2026, sobre e
 
 Ramas: `bugfix/E01-HU01-enlace-verificacion-usado` (D3) y `bugfix/E02-HU03-actualizar-vehiculo-licencia` (D1, D2 y D4), integradas en `develop`.
 
-## Pruebas unitarias
+## Pruebas unitarias de la primera ronda
 
 Cada defecto tuvo tres momentos: la prueba se escribió y se ejecutó contra el código sin corregir, se volvió a ejecutar tras el ajuste y al final se ejecutó la suite completa.
 
@@ -31,7 +31,7 @@ Cada defecto tuvo tres momentos: la prueba se escribió y se ejecutó contra el 
 | --- | --- | --- |
 | 1. Ejecución inicial | 8 pruebas fallaron | `evidencias/casos-ajuste/CU-20` … `CU-23` (`error-CUNN.txt`) |
 | 2. Después del ajuste | Las 8 pasan | `evidencias/casos-ajuste/CU-20` … `CU-23` (`solved-CUNN.txt`) |
-| 3. Ejecución final de toda la suite | 236 de 236 pasan · cobertura de líneas 97,52 % | `evidencias/sprint-3/unitarias/ejecucion-final.txt` |
+| 3. Ejecución final de toda la suite | 236 de 236 pasan · cobertura de líneas 97,52 % | Reemplazada por la ejecución final de la segunda ronda (254 pruebas) |
 
 Porcentaje de pruebas fallidas en la ejecución inicial, medido sobre lo ejecutado:
 
@@ -57,7 +57,7 @@ La prueba UT-104 («debería responder 403 para una cuenta en estado Habilitado�
 
 El registro completo está en [`evidencias/Pruebas_Unitarias_RideU.xlsx`](../../evidencias/Pruebas_Unitarias_RideU.xlsx), sección «Sprint 3» de cada hoja.
 
-## Pruebas funcionales
+## Pruebas funcionales de la primera ronda
 
 Se ejecutaron en Chromium contra la aplicación real (frontend, backend y PostgreSQL), una vez sobre la versión anterior a las correcciones (`b435f59`) y otra sobre `develop` corregido. Fecha de ejecución: 9 de noviembre de 2026.
 
@@ -76,28 +76,160 @@ D4 no tiene caso funcional: depende de la hora del servidor y solo se comprobó 
 
 Estos casos todavía no están en el registro de casos de prueba (`documentacion/TestCases`); los debe incorporar el tester.
 
+## Evaluación de HU04 · Publicar trayecto
+
+El código de HU04 llegó a `develop` en el Sprint 2 como base técnica de HU06, sin casos funcionales ni evidencias. En este sprint se evaluó contra sus criterios.
+
+**Pruebas unitarias.** 80 pruebas de HU04 (validación, modelo, rutas y sedes) quedaron registradas en el Excel como UT-153 a UT-232. En su primera ejecución registrada (9 de noviembre de 2026) pasaron todas: 0 % de fallos. No hay registro de cómo se ejecutaron cuando se escribieron en el Sprint 2.
+
+**Pruebas funcionales.** Ejecutadas en Chromium contra la aplicación real; la ejecución final, con el código ya revisado, es del 10 de noviembre de 2026.
+
+Precondiciones: base de datos recién migrada; `laura.gomez@unicauca.edu.co` «Habilitado» con un vehículo de 4 pasajeros; `carlos.mera@unicauca.edu.co` «Verificada» sin vehículo; sesión iniciada desde `/login`.
+
+| Caso | Criterio | Pasos | Datos | Resultado esperado | Resultado obtenido | Estado | Evidencia |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| RU-E002-HU04-CP01 | CA-HU04-01 Publicación válida | Abrir `/trayectos/publicar`, diligenciar y «Publicar trayecto». | Bello Horizonte → sede 1, 2026-11-20, 07:00, 3 cupos, 2500 COP | Crea el trayecto y lo muestra como disponible. | «Trayecto publicado. Ya está disponible para los pasajeros.», tarjeta «Disponible»; 1 fila en la base; aparece en la búsqueda de HU06. | Pasó | `HU04-CP01-publicacion-valida.png` |
+| RU-E002-HU04-CP02 | CA-HU04-02 Campos vacíos | Dejar el formulario vacío y «Publicar trayecto». | — | Señala los campos faltantes y no publica. | «Completa los campos obligatorios.» y cada campo marcado. | Pasó | `HU04-CP02-campos-vacios.png` |
+| RU-E002-HU04-CP03 | CA-HU04-03 Cupos en cero o negativos | Publicar con cupos 0 y con cupos −1. | cupos 0; cupos −1 | Rechaza con mensaje de validación. | «Ingresa al menos 1 cupo.» en ambos intentos. | Pasó | `HU04-CP03a-cupos-cero.png`, `HU04-CP03b-cupos-negativos.png` |
+| RU-E002-HU04-CP04 | CA-HU04-04 Cupos sobre la capacidad | Publicar con más cupos que la capacidad. | cupos 5, capacidad 4 | Rechaza e informa la capacidad máxima. | «La capacidad máxima es 4.» | Pasó | `HU04-CP04-cupos-sobre-capacidad.png` |
+| RU-E002-HU04-CP05 | CA-HU04-05 Conductor no habilitado | Con la cuenta sin vehículo, abrir `/trayectos/publicar`. | — | Impide publicar y dirige a `/perfil/vehiculo`. | «Conductor no habilitado. No puedes publicar trayectos.», formulario bloqueado y botón «Ir a registrar vehículo». | Pasó | `HU04-CP05-conductor-no-habilitado.png` |
+| RU-E002-HU04-CP06 | CA-HU04-06 Trayecto duplicado | Publicar otra vez el mismo trayecto. | Mismos datos de CP01 | Rechaza el duplicado. | «Ya tienes un trayecto publicado para esa fecha y hora.»; sigue habiendo 1 fila. | Pasó | `HU04-CP06-trayecto-duplicado.png` |
+
+Evidencia en [`evidencias/sprint-3/funcionales/hu04-y-mejoras`](../../evidencias/sprint-3/funcionales/hu04-y-mejoras/) (capturas, `navegador.txt` y `base-de-datos.txt`).
+
+## Mejoras de robustez (segunda ronda)
+
+No incumplían ningún criterio, pero debilitaban el proyecto. Cada una tuvo prueba inicial fallida, ajuste y ejecución final.
+
+| Caso | Historia | Qué se hizo | Criterio |
+| --- | --- | --- | --- |
+| CU-24 | HU03 | Textos oficiales: «La licencia de conducción no está vigente.», «Este campo es obligatorio.» y «La placa debe tener tres letras y tres números.», en la API y en la pantalla. | CA-HU03-02, CA-HU03-03 |
+| CU-25 | HU03 | La capacidad del vehículo no puede bajar de los cupos de un trayecto publicado que aún no ha salido (409). | CA-HU03-05 (nuevo) |
+| CU-26 | HU03 | `GET /api/vehiculos` y formulario precargado con los datos actuales al actualizar. | CA-HU03-04 (nuevo) |
+| — | HU03 | Migración `007_normalizar_placas.sql`: pasa al formato `ABC 123` las placas guardadas antes; no borra ni fusiona filas. | CA-HU03-03 |
+| CU-27 | HU04 | Un conductor no puede publicar dos trayectos en la misma fecha y hora (409). | CA-HU04-06 (nuevo) |
+| CU-28 | HU02 | `POST /api/auth/logout`, botón «Cerrar sesión» en el panel y borrado de las sesiones vencidas al iniciar sesión. | CA-HU02-07 (nuevo) |
+| CU-29 | — | Las rutas inexistentes de `/api` responden 404 en JSON. | Sin criterio de historia |
+
+Ramas: `bugfix/E02-HU03-mensajes-y-datos-del-vehiculo`, `bugfix/E02-HU04-trayecto-duplicado` y `bugfix/E01-HU02-cierre-de-sesion`, integradas en `develop`.
+
+### Pruebas unitarias de la segunda ronda
+
+| Momento | Resultado | Evidencia |
+| --- | --- | --- |
+| 1. Ejecución inicial | 27 pruebas fallaron (18 en HU03, 3 en HU04, 6 en HU02) | `evidencias/casos-ajuste/CU-24` … `CU-29` (`error-CUNN.txt`) |
+| 2. Después del ajuste | Las 27 pasan | `evidencias/casos-ajuste/CU-24` … `CU-29` (`solved-CUNN.txt`) |
+| 3. Ejecución final de toda la suite | 254 de 254 pasan · cobertura de líneas 97,70 % | `evidencias/sprint-3/unitarias/ejecucion-final.txt` |
+
+Porcentaje real de fallos iniciales de esta ronda: 27 de las 251 pruebas de la suite (**10,8 %**). De las 27, 15 son pruebas nuevas y 12 son pruebas existentes cuyo resultado esperado cambió (textos oficiales y orden de las consultas). Sumando las dos rondas del sprint: 35 fallos iniciales sobre 251 pruebas (**13,9 %**). No se indujo ningún fallo.
+
+Las pruebas nuevas están en el Excel como UT-233 a UT-248; las tres últimas se añadieron tras la revisión independiente y pasaron desde su primera ejecución. Dos pruebas de `GET /api/vehiculos` comparten título con pruebas ya registradas y no tienen fila propia.
+
+### Pruebas funcionales de la segunda ronda
+
+Misma ejecución y precondiciones que la evaluación de HU04.
+
+| Caso | Historia · criterio | Pasos | Resultado esperado | Resultado obtenido | Estado | Evidencia |
+| --- | --- | --- | --- | --- | --- | --- |
+| RU-E002-HU03-CP02 (repetición) | HU03 · CA-HU03-02 | Registrar con licencia vencida el 15/01/2020. | «La licencia de conducción no está vigente.» y estado «No habilitado». | El mismo texto; estado «No habilitado». | Pasó (antes: Falló) | `HU03-CP02-licencia-vencida.png` |
+| RU-E002-HU03-CP03 (repetición) | HU03 · CA-HU03-03 | Guardar el formulario vacío. | «Este campo es obligatorio.» en cada campo y «Completa los campos obligatorios.» | Los dos textos, en los 7 campos. | Pasó (antes: Falló) | `HU03-CP03-campos-vacios.png` |
+| RU-E002-HU03-CP04 (repetición) | HU03 · CA-HU03-03 | Guardar con la placa `ABC 12`. | «La placa debe tener tres letras y tres números.» | El mismo texto. | Pasó (antes: Falló) | `HU03-CP04-placa-invalida.png` |
+| RU-E002-HU03-CP08 | HU03 · CA-HU03-04 | Abrir `/perfil/vehiculo` con la cuenta «Habilitado». | El formulario muestra los datos actuales. | Placa `ABC 123`, Mazda, 3 · 2020, Rojo, 4, B1, 15 / 01 / 2027. | Pasó | `HU03-CP08-datos-precargados.png` |
+| RU-E002-HU03-CP09 | HU03 · CA-HU03-05 | Con un trayecto publicado de 3 cupos, bajar la capacidad a 2 y guardar. | Rechaza el cambio e indica los cupos publicados. | «Tienes un trayecto publicado con 3 cupos. La capacidad del vehículo no puede ser menor.»; la capacidad sigue en 4. | Pasó | `HU03-CP09-capacidad-menor-que-cupos.png` |
+| RU-E001-HU02-CP07 | HU02 · CA-HU02-07 | En `/panel`, «Cerrar sesión»; después abrir `/panel`. | Va a `/login` y `/panel` vuelve a exigir sesión. | Redirige a `/login` las dos veces; 0 sesiones del usuario en la base. | Pasó | `HU02-CP07-cierre-de-sesion.png` |
+| Regresión HU06 | HU06 · CA-HU06-01 | Buscar sede 1, 2026-11-20, desde las 06:00. | Aparece el trayecto publicado. | 1 trayecto: 07:00, Bello Horizonte, 3 cupos. | Pasó | `navegador.txt` |
+| Ruta inexistente | — | `GET /api/ruta-inexistente`. | 404 en JSON. | 404, `application/json`, «La ruta solicitada no existe.» | Pasó | `navegador.txt` |
+| Migración 007 | HU03 · CA-HU03-03 | Dejar una placa como `abc123` y ejecutar `npm run db:migrate`. | La placa queda `ABC 123`. | `ABC 123`. | Pasó | `base-de-datos.txt` |
+| Sesiones vencidas | HU02 | Vencer la sesión en la base e iniciar sesión. | La sesión vencida se borra. | Queda 1 sesión, 0 vencidas. | Pasó | `base-de-datos.txt` |
+
+Los tres casos de HU03 que estaban en «Falló» en el registro del tester (CP02 a CP04) pasan con los textos oficiales. Falta que el tester los repita y actualice su registro.
+
 ## Revisión independiente
 
-Se revisaron el código y las pruebas de las correcciones. Veredicto: **aprobado con observaciones**, sin hallazgos críticos ni altos.
+**Primera ronda (D1 a D4).** Veredicto: aprobado con observaciones, sin hallazgos críticos ni altos. Las observaciones quedaron atendidas en el sprint:
 
-Atendido en este sprint:
+| Observación | Cómo se atendió |
+| --- | --- |
+| La pantalla no avisaba que la actualización se había aplicado | Muestra «Vehículo y licencia actualizados.» |
+| El aviso de error no se limpiaba al escribir | Corregido |
+| Las pruebas del modelo no comprobaban el usuario de los `UPDATE` | Se comprueban los parámetros |
+| Faltaba la prueba de placa duplicada al actualizar | UT-152 |
+| Formulario vacío al actualizar | CU-26: datos precargados |
+| Capacidad por debajo de los cupos publicados | CU-25: se rechaza con 409 |
+| Placas antiguas sin formato | Migración 007 |
 
-- La pantalla no avisaba que la actualización se había aplicado: ahora muestra «Vehículo y licencia actualizados.».
-- El aviso de error no se limpiaba al escribir con la cuenta «Habilitado».
-- Las pruebas del modelo no comprobaban que los `UPDATE` usan el usuario de la sesión.
-- Faltaba la prueba de placa duplicada al actualizar (UT-152).
+**Segunda ronda (CU-24 a CU-29).** Veredicto: aprobado con observaciones, sin hallazgos críticos ni altos. El revisor ejecutó la suite completa; el SQL y la interfaz los revisó por lectura.
 
-Pendiente de decisión:
-
-| Observación | Detalle | Propuesta |
+| Observación | Gravedad | Estado |
 | --- | --- | --- |
-| Formulario vacío al actualizar | Para renovar la licencia hay que volver a escribir todos los datos del vehículo. | Precargar los datos actuales del conductor. |
-| Capacidad y trayectos publicados | Se puede bajar la capacidad del vehículo por debajo de los cupos de un trayecto ya publicado. | Rechazar el cambio o dejarlo documentado como regla aceptada. |
-| Placas antiguas | Las placas guardadas antes de la corrección conservan su formato original. | Migración que las normalice, revisando antes posibles duplicados. |
+| La precarga del formulario podía sobrescribir lo que la persona ya había escrito y no avisaba si fallaba | Media | Atendida: solo precarga si el formulario está vacío, avisa si falla y lleva a `/login` si la sesión venció |
+| Dos publicaciones simultáneas del mismo conductor pueden saltarse la comprobación de trayecto duplicado | Media | Pendiente: requiere un índice único en la base de datos, y antes hay que revisar que no existan duplicados |
+| Si fallaba el borrado de sesiones vencidas, fallaba el inicio de sesión | Baja | Atendida: el fallo se registra y la sesión se crea |
+| Faltaban pruebas de capacidad igual a los cupos y sin trayectos | Baja | Atendida: UT-246 y UT-247 |
+| La migración 007 no toca placas con espacios sobrantes ni lista los pares duplicados | Baja | Pendiente: consulta de diagnóstico para el responsable |
+| El cierre de sesión no muestra estado de espera y solo está en el panel | Baja | Pendiente |
+| Otras pruebas sugeridas (orden del borrado de sesiones, 404 con otros métodos) | Baja | Pendiente |
 
-## Otros pendientes conocidos
+## Pendientes conocidos
 
-- Tres casos funcionales de HU03 siguen en «Falló» (RU-E002-HU03-CP02 a CP04): el texto de los mensajes no coincide con el esperado por el caso de prueba. Las historias no fijan un texto exacto; falta decidir cuál es el oficial.
-- Se puede publicar dos veces el mismo trayecto idéntico; ningún criterio lo prohíbe.
-- Las rutas inexistentes de `/api` responden HTML en lugar de JSON.
-- No hay cierre de sesión ni limpieza de sesiones vencidas.
+- El tester debe incorporar a su registro (`documentacion/TestCases`) los casos funcionales nuevos de este documento y repetir RU-E002-HU03-CP02 a CP04.
+- La comprobación de trayecto duplicado se hace en la API; no hay una restricción única en la base de datos, así que dos peticiones simultáneas podrían crear el duplicado.
+- No hay pruebas automatizadas del frontend; la interfaz se verifica con las pruebas funcionales.
+- El cierre de sesión cierra solo la sesión actual, no las abiertas en otros dispositivos.
+
+## Plan propuesto para HU09 · Consultar historial de trayectos y reservas
+
+**Estado: propuesta, pendiente de aprobación.** No se ha desarrollado nada de HU09.
+
+### Historia y criterios
+
+| Criterio | Dado | Cuando | Entonces |
+| --- | --- | --- | --- |
+| CA-HU09-01 Historial con actividad | un usuario tiene trayectos publicados o reservas previas | accede a `/historial` desde la navegación | ve la lista completa de su actividad con su estado (completado, cancelado o pendiente) |
+| CA-HU09-02 Historial sin actividad | un usuario no tiene actividad registrada | accede a `/historial` desde la navegación | ve un mensaje indicando que aún no hay registros |
+
+### Dependencias
+
+| Dependencia | Situación | Efecto en HU09 |
+| --- | --- | --- |
+| HU04 Publicar trayecto | Hecha | El historial puede mostrar los trayectos publicados. |
+| HU07 Reservar cupo (Sprint 4) | Pendiente | No existen reservas: la parte de reservas del historial no se puede construir ni probar todavía. |
+| HU05 Editar o cancelar trayecto (Sprint 5) | Pendiente | Ningún trayecto puede estar «cancelado» todavía. |
+
+El backlog no declara dependencias para HU09, pero el criterio 1 nombra reservas y el estado «cancelado», que dependen de HU07 y HU05.
+
+### Alcance propuesto para el Sprint 3
+
+1. Historial de **trayectos publicados** por el usuario, del más reciente al más antiguo.
+2. Estado de cada trayecto: **pendiente** si aún no ha salido y **completado** si su fecha y hora ya pasaron (hora de Colombia). **Cancelado** se mostrará cuando exista HU05.
+3. Sección de **reservas** presente pero vacía, con el texto de que aún no hay reservas; se completa en el Sprint 4 junto con HU07.
+4. Mensaje de historial vacío cuando el usuario no tiene trayectos ni reservas.
+
+### Cambios técnicos
+
+| Capa | Cambio |
+| --- | --- |
+| Base de datos | Ninguno. |
+| Modelo | `listarTrayectosDeConductor(conductorId, ahoraColombia)` en `models/trayecto.js`, con el estado calculado en la consulta. |
+| API | `GET /api/historial` (con sesión): `{ trayectos, reservas: [], total }`. Controlador y ruta nuevos, registrados en `app.js`. |
+| Frontend | Pantalla `Historial.jsx` en `/historial` (ruta protegida), servicio `historial.js` y acceso desde el panel. |
+| Documentación | README (pantalla y endpoint) y este documento. |
+
+Rama: `feature/E04-HU09-historial`.
+
+### Pruebas previstas
+
+| Tipo | Casos |
+| --- | --- |
+| Unitarias | Modelo: filtra por el usuario de la sesión, ordena y calcula «pendiente» y «completado». Rutas: 401 sin sesión, 200 con actividad, 200 sin actividad, 500 ante error. |
+| Funcionales | RU-E004-HU09-CP01 historial con trayectos (uno pendiente y uno ya salido); CP02 historial vacío; CP03 `/historial` sin sesión redirige a `/login`; CP04 un usuario no ve trayectos de otro. |
+
+### Estimación
+
+El backlog asigna 5 Story Points a HU09 y no se cambia. Con este corte, la parte de trayectos se entrega en el Sprint 3 y la de reservas queda como trabajo restante de la historia en el Sprint 4.
+
+### Decisiones que necesita el responsable
+
+1. ¿Se acepta entregar en el Sprint 3 solo los trayectos publicados y completar las reservas en el Sprint 4?
+2. ¿«Completado» puede significar «la fecha y hora de salida ya pasaron»? El sistema no registra que un viaje se haya realizado.
+3. ¿Se agrega al backlog la dependencia de HU09 con HU07 y HU05?

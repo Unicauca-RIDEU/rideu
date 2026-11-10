@@ -12,7 +12,7 @@ El stack es React (Vite) en el frontend, Node.js con Express en el backend y Pos
 | --- | --- | --- | --- |
 | Sprint 1 | 9 oct – 22 oct | HU01 Registro con correo institucional · HU02 Inicio de sesión validado | Implementadas |
 | Sprint 2 | 23 oct – 5 nov | HU03 Registrar vehículo y licencia · HU06 Buscar trayectos disponibles | Implementadas |
-| Sprint 3 | 6 nov – 19 nov | HU04 Publicar trayecto · HU09 Consultar historial de trayectos y reservas | En curso: HU04 con código base, HU09 pendiente, correcciones de HU01 y HU03 hechas |
+| Sprint 3 | 6 nov – 19 nov | HU04 Publicar trayecto · HU09 Consultar historial de trayectos y reservas | En curso: HU04 evaluada, HU09 pendiente, correcciones y mejoras de HU01 a HU04 hechas |
 | Sprint 4 | 20 nov – 3 dic | HU07 Reservar cupo · HU10 y HU11 Contacto por WhatsApp | Pendientes |
 | Sprint 5 | 4 dic – 17 dic | HU05 Editar o cancelar trayecto · HU08 Cancelar reserva | Pendientes |
 
@@ -94,17 +94,19 @@ npm run build --prefix frontend
 
 ## API
 
-Las rutas con sesión exigen el encabezado `Authorization: Bearer <token>`; el token lo entrega el inicio de sesión.
+Las rutas con sesión exigen el encabezado `Authorization: Bearer <token>`; el token lo entrega el inicio de sesión. Una ruta de `/api` que no existe responde 404 en JSON.
 
 | Método y ruta | Historia | Sesión | Descripción |
 | --- | --- | --- | --- |
 | `POST /api/auth/registro` | HU01 | No | Crea la cuenta en estado «Sin verificar» y envía el enlace de verificación |
 | `POST /api/auth/verificacion` | HU01 | No | Pasa la cuenta a «Verificada» con el token del enlace |
 | `POST /api/auth/login` | HU02 | No | Inicia sesión y devuelve el token |
+| `POST /api/auth/logout` | HU02 | Sí | Cierra la sesión del token |
 | `GET /api/auth/sesion` | HU02 | Sí | Devuelve el usuario de la sesión |
+| `GET /api/vehiculos` | HU03 | Sí | Vehículo y licencia del usuario de la sesión |
 | `POST /api/vehiculos` | HU03 | Sí | Registra vehículo y licencia y deja la cuenta «Habilitado»; si ya lo está, los actualiza |
 | `GET /api/trayectos/publicacion` | HU04 | Sí | Datos para la pantalla de publicación |
-| `POST /api/trayectos` | HU04 | Sí | Publica un trayecto |
+| `POST /api/trayectos` | HU04 | Sí | Publica un trayecto; rechaza otro del mismo conductor en la misma fecha y hora |
 | `GET /api/trayectos?sedeDestinoId=&fecha=&horaDesde=` | HU06 | Sí | Trayectos disponibles con cupos, ordenados por hora de salida |
 | `GET /api/sedes` | HU06 | Sí | Sedes de destino |
 
