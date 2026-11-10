@@ -24,6 +24,10 @@ export default function Historial() {
           setCarga({ estado: "error", mensaje: respuesta.mensaje });
           return;
         }
+        if (!Array.isArray(respuesta.trayectos)) {
+          setCarga({ estado: "error" });
+          return;
+        }
         setCarga({ estado: "listo", ...respuesta });
       })
       .catch(() => {
@@ -36,6 +40,7 @@ export default function Historial() {
 
   const trayectos = carga.trayectos ?? [];
   const reservas = carga.reservas ?? [];
+  const total = trayectos.length + reservas.length;
 
   return (
     <div className="pantalla">
@@ -67,17 +72,17 @@ export default function Historial() {
 
         {carga.estado === "error" ? (
           <p className="aviso aviso-error" role="alert">
-            {carga.mensaje || "No se pudo cargar el historial. Inténtalo de nuevo."}
+            {carga.mensaje || "No se pudo cargar el historial. Recarga la página para intentarlo de nuevo."}
           </p>
         ) : null}
 
-        {carga.estado === "listo" && carga.total === 0 ? (
+        {carga.estado === "listo" && total === 0 ? (
           <p className="aviso" role="status">
             {carga.mensaje || "Aún no tienes registros en tu historial."}
           </p>
         ) : null}
 
-        {carga.estado === "listo" && carga.total > 0 ? (
+        {carga.estado === "listo" && total > 0 ? (
           <>
             <section aria-labelledby="historial-trayectos">
               <h3 id="historial-trayectos">Trayectos publicados ({trayectos.length})</h3>

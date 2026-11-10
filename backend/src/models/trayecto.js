@@ -105,6 +105,7 @@ export async function buscarTrayectosDisponibles({ sedeDestinoId, fecha, horaDes
 
 // Historial (E04-HU09): trayectos publicados por el usuario, del más reciente al más antiguo.
 // Un trayecto cuya fecha y hora de salida ya pasaron se muestra como «Completado».
+// Cuando E02-HU05 agregue el estado «Cancelado», debe evaluarse antes que la fecha.
 // ahoraColombia es la fecha y hora actual de Colombia como 'AAAA-MM-DD HH:MM'.
 export async function listarTrayectosDeConductor({ conductorId, ahoraColombia }) {
   const resultado = await pool.query(
