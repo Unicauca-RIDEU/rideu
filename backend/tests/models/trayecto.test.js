@@ -11,6 +11,7 @@ const {
   buscarPerfilConductor,
   buscarTrayectosDisponibles,
   existeTrayectoEnHorario,
+  listarTrayectosDeConductor,
   ESTADO_DISPONIBLE,
 } = await import(
   "../../src/models/trayecto.js"
@@ -106,6 +107,40 @@ describe("modelo trayecto", () => {
     });
 
     expect(existe).toBe(false);
+  });
+
+  describe("listarTrayectosDeConductor (HU09)", () => {
+    const filtros = { conductorId: "conductor-1", ahoraColombia: "2026-11-10 09:00" };
+
+    test("criterio 1: debería listar solo los trayectos del conductor, del más reciente al más antiguo", async () => {
+      const filas = [{ id: "t2" }, { id: "t1" }];
+      query.mockResolvedValueOnce({ rows: filas });
+
+      const trayectos = await listarTrayectosDeConductor(filtros);
+
+      expect(trayectos).toEqual(filas);
+      const [sql, parametros] = query.mock.calls[0];
+      expect(sql).toContain("WHERE t.conductor_id = $1");
+      expect(sql).toContain("ORDER BY t.fecha DESC, t.hora DESC");
+      expect(parametros).toEqual(["conductor-1", "2026-11-10 09:00"]);
+    });
+
+    test("criterio 1: debería marcar «Completado» el trayecto cuya salida ya pasó y «Pendiente» el resto", async () => {
+      query.mockResolvedValueOnce({ rows: [] });
+
+      await listarTrayectosDeConductor(filtros);
+
+      const [sql] = query.mock.calls[0];
+      expect(sql).toContain("(t.fecha + t.hora) <= $2::timestamp THEN 'Completado'");
+      expect(sql).toContain("ELSE 'Pendiente'");
+      expect(sql).toContain("AS estado_historial");
+    });
+
+    test("criterio 2: debería devolver una lista vacía si el conductor no ha publicado trayectos", async () => {
+      query.mockResolvedValueOnce({ rows: [] });
+
+      expect(await listarTrayectosDeConductor(filtros)).toEqual([]);
+    });
   });
 
   test("debería devolver el perfil del conductor con vehículo y licencia", async () => {
