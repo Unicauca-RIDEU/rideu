@@ -1,4 +1,6 @@
 const CORREO_INSTITUCIONAL = /^[^\s@]+@unicauca\.edu\.co$/;
+// Longitud máxima del correo, igual a la de su columna en la base de datos.
+const LONGITUD_MAXIMA_CORREO = 254;
 const MENSAJE_DOMINIO = "Solo se permite el correo institucional @unicauca.edu.co.";
 
 export function validarRegistro(body) {
@@ -27,6 +29,11 @@ export function validarRegistro(body) {
     errores.push({ campo: "correo", mensaje: "El correo institucional es obligatorio." });
   } else if (!CORREO_INSTITUCIONAL.test(correo)) {
     errores.push({ campo: "correo", mensaje: MENSAJE_DOMINIO });
+  } else if (correo.length > LONGITUD_MAXIMA_CORREO) {
+    errores.push({
+      campo: "correo",
+      mensaje: `El correo no puede superar ${LONGITUD_MAXIMA_CORREO} caracteres.`,
+    });
   }
 
   if (!contrasena) {

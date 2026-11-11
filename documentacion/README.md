@@ -18,7 +18,7 @@ Dependencias: HU01 → HU02 → HU03 → HU04 → HU05 · HU06 → HU07 → HU08
 
 | Documento | Contenido |
 | --- | --- |
-| [Migración a Oracle](migracion-oracle/) | Cambio de PostgreSQL a Oracle Database: equivalencias del modelo y de las consultas, errores encontrados, pruebas ejecutadas y pendientes |
+| [Migración a Oracle](migracion-oracle/) | Cambio de PostgreSQL a Oracle Database: equivalencias del modelo y de las consultas, pruebas ejecutadas y pendientes |
 
 ## Documentos del proyecto
 

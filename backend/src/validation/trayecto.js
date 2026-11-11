@@ -2,6 +2,8 @@
 // No recibe el conductor: el usuario se obtiene siempre de la sesión.
 
 export const CUPOS_MAXIMOS = 4;
+// Longitud máxima del origen, igual a la de su columna en la base de datos.
+export const LONGITUD_MAXIMA_ORIGEN = 200;
 
 // Colombia (America/Bogota) usa UTC-5 todo el año, sin horario de verano.
 const DESFASE_COLOMBIA_HORAS = 5;
@@ -97,6 +99,11 @@ export function validarTrayecto(body, { cuposMaximos = CUPOS_MAXIMOS, ahora = ne
 
   if (!origen) {
     errores.push({ campo: "origen", mensaje: "El origen es obligatorio." });
+  } else if (origen.length > LONGITUD_MAXIMA_ORIGEN) {
+    errores.push({
+      campo: "origen",
+      mensaje: `El origen no puede superar ${LONGITUD_MAXIMA_ORIGEN} caracteres.`,
+    });
   }
 
   if (estaVacio(sedeDestinoId)) {

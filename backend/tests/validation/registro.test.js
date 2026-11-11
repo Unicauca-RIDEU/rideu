@@ -136,3 +136,27 @@ describe("validarRegistro", () => {
     expect(resultado.datos.whatsapp).toBe("+573001234567");
   });
 });
+
+describe("validarRegistro: longitud máxima del correo", () => {
+  const DOMINIO = "@unicauca.edu.co";
+
+  test("debería aceptar un correo de 254 caracteres", () => {
+    const correo = "a".repeat(254 - DOMINIO.length) + DOMINIO;
+
+    const resultado = validarRegistro({ ...valido, correo });
+
+    expect(resultado.ok).toBe(true);
+    expect(resultado.datos.correo).toHaveLength(254);
+  });
+
+  test("debería rechazar un correo de más de 254 caracteres", () => {
+    const correo = "a".repeat(255 - DOMINIO.length) + DOMINIO;
+
+    const resultado = validarRegistro({ ...valido, correo });
+
+    expect(resultado.ok).toBe(false);
+    expect(resultado.errores).toEqual([
+      { campo: "correo", mensaje: "El correo no puede superar 254 caracteres." },
+    ]);
+  });
+});

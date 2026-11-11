@@ -167,3 +167,28 @@ describe("validarVehiculoYLicencia (E02-HU03)", () => {
     ]);
   });
 });
+
+describe("validarVehiculoYLicencia: longitud máxima de los textos", () => {
+  test.each(["marca", "modelo", "color", "categoriaLicencia"])(
+    "debería aceptar %s con 100 caracteres",
+    (campo) => {
+      const resultado = validarVehiculoYLicencia({ ...valido, [campo]: "a".repeat(100) });
+
+      expect(resultado.ok).toBe(true);
+      expect(resultado.datos[campo]).toHaveLength(100);
+    },
+  );
+
+  test.each(["marca", "modelo", "color", "categoriaLicencia"])(
+    "debería rechazar %s con más de 100 caracteres",
+    (campo) => {
+      const resultado = validarVehiculoYLicencia({ ...valido, [campo]: "a".repeat(101) });
+
+      expect(resultado.ok).toBe(false);
+      expect(resultado.errores).toEqual([
+        { campo, mensaje: "Este campo no puede superar 100 caracteres." },
+      ]);
+      expect(resultado.mensaje).toBe("Este campo no puede superar 100 caracteres.");
+    },
+  );
+});

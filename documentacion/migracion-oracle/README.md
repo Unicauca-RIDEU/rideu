@@ -33,6 +33,8 @@ Se conservan las 6 tablas, sus columnas, relaciones, cardinalidades y restriccio
 
 Restricciones nuevas, todas para conservar una regla que antes daba el tipo de dato: `trayectos_fecha_sin_hora`, `trayectos_hora_valida` y `licencias_fecha_sin_hora`.
 
+Como Oracle limita la longitud de los textos, las validaciones de la API rechazan con 400 los valores más largos que su columna: marca, modelo, color y categoría de licencia (100 caracteres), origen (200) y correo (254). El nombre ya tenía su límite de 120.
+
 ## Consultas
 
 | PostgreSQL | Oracle |
@@ -52,23 +54,13 @@ Restricciones nuevas, todas para conservar una regla que antes daba el tipo de d
 
 En los archivos de `backend/sql/` cada sentencia termina con una línea `/`, porque `oracledb` ejecuta una sentencia por llamada. Ese formato también funciona en SQL*Plus y SQLcl.
 
-## Errores encontrados y solución
-
-| # | Error | Causa | Solución |
-| --- | --- | --- | --- |
-| 1 | `ORA-00060` (interbloqueo) en una prueba de integración sobre Oracle Free 23.26, al borrar un usuario mientras otro proceso creaba sesiones | En Oracle, borrar una fila padre bloquea toda la tabla hija si la clave foránea no está indexada. `sesiones.usuario_id` y `trayectos.vehiculo_id` no tenían índice | `backend/sql/008_indices_claves_foraneas.sql`. Después, 8 ejecuciones seguidas de la integración en cada versión sin repetirse el error. No se hizo una prueba aislada que reproduzca el interbloqueo quitando el índice |
-| 2 | Las pruebas unitarias no cargaban (`does not provide an export named 'SALIDA'`) y 2 fallaban por el código `23505` | Las pruebas simulan `config/database.js` y comprobaban SQL y códigos de PostgreSQL | Se adaptaron 10 archivos de `backend/tests/` a los binds con nombre, a `commit()` / `rollback()` y a `ORA-00001`. Salida inicial en `evidencias/migracion-oracle/unitarias/ejecucion-inicial.txt` |
-| 3 | La nueva prueba de integración de restricciones se quedaba colgada de forma intermitente | Defecto de la propia prueba: lanzaba nueve inserciones inválidas a la vez y dejaba rechazos sin capturar | Las inserciones se ejecutan una por una. Después, 10 ejecuciones seguidas correctas en cada versión |
-| 4 | Docker Hub (límite de peticiones), `ghcr.io` y el registro de Oracle no eran accesibles desde el entorno de trabajo | Política de red del entorno | Las imágenes se descargaron del espejo `mirror.gcr.io/gvenzl/…` |
-
 ## Pruebas ejecutadas
 
 Ejecutadas el 11 de noviembre de 2026 contra dos bases reales en contenedores: **Oracle Database 21c Express Edition 21.0.0.0.0** y **Oracle AI Database 26ai Free 23.26.3.0.0**.
 
 | Prueba | Resultado | Evidencia |
 | --- | --- | --- |
-| Unitarias (Jest, base simulada), antes de adaptar las pruebas | 10 de 16 archivos no cargaron; de 145 pruebas ejecutadas, 2 fallaron | `evidencias/migracion-oracle/unitarias/ejecucion-inicial.txt` |
-| Unitarias (Jest), ejecución final con cobertura | 262 de 262 aprobadas; cobertura global 97,79 % de líneas, por encima del umbral en todas las carpetas | `evidencias/migracion-oracle/unitarias/ejecucion-final.txt` |
+| Unitarias (Jest), ejecución final con cobertura | 274 de 274 aprobadas; cobertura global 97,85 % de líneas, por encima del umbral en todas las carpetas | `evidencias/migracion-oracle/unitarias/ejecucion-final.txt` |
 | Migraciones (`db:migrate`), dos veces seguidas en cada versión | Correctas e idempotentes | — |
 | Integración (`test:integration`) en 21c XE | 19 de 19 aprobadas, 0 omitidas | `evidencias/migracion-oracle/integracion/ejecucion-oracle-21c-xe.txt` |
 | Integración en Free 23.26 | 19 de 19 aprobadas, 0 omitidas | `evidencias/migracion-oracle/integracion/ejecucion-oracle-free-23.26.txt` |
@@ -81,6 +73,5 @@ La integración (`backend/src/db/oracle.test.js` y las tres pruebas que ya exist
 ## Pendiente y limitaciones
 
 - **Oracle 19c no se probó directamente**: no hay una imagen de 19c de libre descarga. El SQL usa solo sintaxis disponible desde 12.2 y se probó en 21c y en 23.26; antes de usar una base 19c conviene ejecutar `npm run db:migrate` y `npm run test:integration` contra ella.
-- **Longitud de los textos**: PostgreSQL aceptaba textos sin límite en marca, modelo, color, categoría de licencia y origen; Oracle los limita (100 y 200 caracteres). Un valor más largo hoy produce un error 500. Las validaciones no se cambiaron porque hacerlo modifica reglas aprobadas; se propone agregar el límite en `validation/` con un mensaje 400.
-- **Registro de pruebas**: no se actualizó `documentacion/pruebas-unitarias/Pruebas_Unitarias_RideU.xlsx` ni se crearon casos `CU-NN`; las salidas quedaron como `.txt`. Queda a decisión del responsable si los fallos de la ejecución inicial se registran como casos de ajuste.
+- **Registro de pruebas**: no se actualizó `documentacion/pruebas-unitarias/Pruebas_Unitarias_RideU.xlsx` ni se crearon casos `CU-NN`; las salidas quedaron como `.txt`.
 - **SMTP**: el correo solo se probó en modo `console`.

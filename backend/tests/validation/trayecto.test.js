@@ -326,3 +326,30 @@ describe("validarBusqueda (HU06)", () => {
     expect(validarBusqueda(undefined).ok).toBe(false);
   });
 });
+
+describe("validarTrayecto: longitud máxima del origen", () => {
+  const trayecto = {
+    origen: "Bello Horizonte",
+    sedeDestinoId: 1,
+    fecha: "2099-05-20",
+    hora: "07:00",
+    cupos: 2,
+    aporteSugerido: 2500,
+  };
+
+  test("debería aceptar un origen de 200 caracteres", () => {
+    const resultado = validarTrayecto({ ...trayecto, origen: "a".repeat(200) });
+
+    expect(resultado.ok).toBe(true);
+    expect(resultado.datos.origen).toHaveLength(200);
+  });
+
+  test("debería rechazar un origen de más de 200 caracteres", () => {
+    const resultado = validarTrayecto({ ...trayecto, origen: "a".repeat(201) });
+
+    expect(resultado.ok).toBe(false);
+    expect(resultado.errores).toEqual([
+      { campo: "origen", mensaje: "El origen no puede superar 200 caracteres." },
+    ]);
+  });
+});

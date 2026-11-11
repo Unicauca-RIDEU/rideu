@@ -4,6 +4,9 @@ import { fechaEnColombia } from "./trayecto.js";
 const PLACA = /^[A-Za-z]{3} ?\d{3}$/;
 const MENSAJE_PLACA = "La placa debe tener tres letras y tres números.";
 const MENSAJE_OBLIGATORIO = "Este campo es obligatorio.";
+// Longitud máxima de los textos libres, igual a la de sus columnas en la base de datos.
+export const LONGITUD_MAXIMA_TEXTO = 100;
+const MENSAJE_MUY_LARGO = `Este campo no puede superar ${LONGITUD_MAXIMA_TEXTO} caracteres.`;
 const MENSAJE_LICENCIA_VENCIDA = "La licencia de conducción no está vigente.";
 
 export function validarVehiculoYLicencia(body, { ahora = new Date() } = {}) {
@@ -31,18 +34,26 @@ export function validarVehiculoYLicencia(body, { ahora = new Date() } = {}) {
   }
   if (!marca) {
     errores.push({ campo: "marca", mensaje: MENSAJE_OBLIGATORIO });
+  } else if (marca.length > LONGITUD_MAXIMA_TEXTO) {
+    errores.push({ campo: "marca", mensaje: MENSAJE_MUY_LARGO });
   }
   if (!modelo) {
     errores.push({ campo: "modelo", mensaje: MENSAJE_OBLIGATORIO });
+  } else if (modelo.length > LONGITUD_MAXIMA_TEXTO) {
+    errores.push({ campo: "modelo", mensaje: MENSAJE_MUY_LARGO });
   }
   if (!color) {
     errores.push({ campo: "color", mensaje: MENSAJE_OBLIGATORIO });
+  } else if (color.length > LONGITUD_MAXIMA_TEXTO) {
+    errores.push({ campo: "color", mensaje: MENSAJE_MUY_LARGO });
   }
   if (!categoriaLicencia) {
     errores.push({
       campo: "categoriaLicencia",
       mensaje: MENSAJE_OBLIGATORIO,
     });
+  } else if (categoriaLicencia.length > LONGITUD_MAXIMA_TEXTO) {
+    errores.push({ campo: "categoriaLicencia", mensaje: MENSAJE_MUY_LARGO });
   }
   if (!fechaVencimientoLicencia) {
     errores.push({
