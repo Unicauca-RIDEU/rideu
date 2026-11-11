@@ -1,0 +1,160 @@
+(node:16352) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+ PASS  tests/routes/authRoutes.test.js
+  rutas /api/auth (Supertest)
+    √ POST /registro debería responder 201 al registrar correctamente (29 ms)
+    √ POST /registro debería usar código 201 y no 200 en el alta exitosa (3 ms)
+    √ POST /registro debería responder 400 si el correo no es institucional (2 ms)
+    √ POST /registro debería responder 409 si el correo ya está registrado (1 ms)
+    √ POST /verificacion debería responder 200 con token válido (2 ms)
+    √ POST /login debería responder 401 con credenciales inválidas (2 ms)
+    √ POST /login debería responder 403 si el correo no está verificado (1 ms)
+    √ POST /login debería responder 200 y devolver token de sesión (1 ms)
+    √ GET /sesion debería responder 401 sin Bearer token (2 ms)
+    √ GET /sesion debería responder 200 con sesión válida (2 ms)
+    √ debería responder 400 si el cuerpo no es JSON válido (5 ms)
+
+  console.error
+    Error al enviar el correo de verificación: Error: SMTP caído
+        at Object.<anonymous> (C:\Users\sebas\AppData\Local\Temp\claude\bd04a407a7929802\174ffc89-f024-4dde-b4d3-fc4e59816954\scratchpad\v0.1\backend\tests\controllers\authController.test.js:126:48)
+        at Promise.finally.completed (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:1834:28)
+        at new Promise (<anonymous>)
+        at callAsyncCircusFn (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:1774:10)
+        at _callCircusTest (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:1167:40)
+        at _runTestInContext (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:1103:3)
+        at runTestWithContext (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:996:5)
+        at _runTestsForDescribeBlockOnce (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:1008:11)
+        at _runTestsForDescribeBlock (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:824:5)
+        at _runTestsForDescribeBlockOnce (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:1003:11)
+        at _runTestsForDescribeBlock (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:824:5)
+        at run (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:789:3)
+        at runAndTransformResultsToJestFormat (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:2300:21)
+        at jestAdapter (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\runner.js:111:19)
+        at runTestInternal (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-runner\build\index.js:247:16)
+        at runTest (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-runner\build\index.js:315:7)
+
+      52 |         console.error("No se pudo deshacer el registro tras fallar el correo:", borrado);
+      53 |       });
+    > 54 |       console.error("Error al enviar el correo de verificación:", error);
+         |               ^
+      55 |       return res.status(500).json({
+      56 |         mensaje: "No se pudo enviar el correo de verificación. Inténtalo de nuevo.",
+      57 |       });
+
+      at registrar (src/controllers/authController.js:54:15)
+      at Object.<anonymous> (tests/controllers/authController.test.js:131:5)
+
+ PASS  tests/controllers/authController.test.js
+  authController.registrar
+    √ debería responder 400 si la validación falla (1 ms)
+    √ debería responder 409 si el correo ya existe
+    √ debería crear la cuenta y responder 201 en el caso feliz
+    √ debería responder 500 y deshacer el usuario si falla el correo (10 ms)
+    √ debería responder 409 ante violación de unicidad en base de datos
+  authController.verificar
+    √ debería responder 400 si el token está vacío (1 ms)
+    √ debería responder 200 cuando la verificación es exitosa
+    √ debería responder 409 si el enlace ya fue usado
+    √ debería responder 400 si el enlace expiró
+    √ debería responder 400 si el enlace no es válido
+  authController.iniciarSesion
+    √ debería responder 400 si faltan correo o contraseña
+    √ debería responder 401 con el mismo mensaje si el correo no existe
+    √ debería responder 401 si la contraseña no coincide
+    √ debería normalizar el correo a minúsculas antes de buscar credenciales
+    √ debería responder 403 si el correo no está verificado
+    √ debería responder 200 y devolver token en el caso feliz
+  authController.sesionActual
+    √ debería responder 200 con el usuario de la petición (1 ms)
+
+ PASS  tests/services/correo.test.js
+  servicio correo
+    √ debería armar el enlace de verificación sin barra final duplicada (1 ms)
+    √ debería codificar caracteres especiales del token en el enlace
+    √ debería escribir el enlace en consola y no usar SMTP en modo console (1 ms)
+    √ debería exigir SMTP_HOST y MAIL_FROM en modo smtp (2 ms)
+    √ debería rechazar un MAIL_MODE desconocido (1 ms)
+    √ debería enviar por SMTP el enlace al correo institucional
+
+ PASS  tests/security/password.test.js
+  Hash y comparación de contraseñas (bcryptjs)
+    √ debería generar un hash distinto al texto plano (6 ms)
+    √ debería confirmar la contraseña correcta con bcrypt.compare (2 ms)
+    √ debería rechazar una contraseña incorrecta (2 ms)
+    √ debería rechazar comparación contra hash vacío o inválido sin lanzar de forma inesperada (1 ms)
+
+ PASS  tests/models/usuario.test.js
+  modelo usuario
+    √ debería hashear el token con SHA-256 en hexadecimal (1 ms)
+    √ debería crear un token de verificación opaco con expiración futura
+    √ debería devolver null si el correo no existe (1 ms)
+    √ debería devolver credenciales cuando el correo existe
+    √ debería insertar usuario en estado Sin verificar (1 ms)
+    √ debería eliminar un usuario por id
+    √ debería marcar la cuenta como verificada con token válido
+    √ debería reportar motivo invalido cuando el token no existe
+    √ debería reportar motivo usado si la cuenta ya está verificada (1 ms)
+    √ debería reportar motivo expirado si el token venció
+
+  console.error
+    Error al validar la sesión: Error: DB caída
+        at Object.<anonymous> (C:\Users\sebas\AppData\Local\Temp\claude\bd04a407a7929802\174ffc89-f024-4dde-b4d3-fc4e59816954\scratchpad\v0.1\backend\tests\middleware\requiereSesion.test.js:92:46)
+        at Promise.finally.completed (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:1834:28)
+        at new Promise (<anonymous>)
+        at callAsyncCircusFn (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:1774:10)
+        at _callCircusTest (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:1167:40)
+        at _runTestInContext (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:1103:3)
+        at runTestWithContext (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:996:5)
+        at _runTestsForDescribeBlockOnce (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:1008:11)
+        at _runTestsForDescribeBlock (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:824:5)
+        at _runTestsForDescribeBlockOnce (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:1003:11)
+        at _runTestsForDescribeBlock (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:824:5)
+        at run (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:789:3)
+        at runAndTransformResultsToJestFormat (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:2300:21)
+        at jestAdapter (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\runner.js:111:19)
+        at runTestInternal (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-runner\build\index.js:247:16)
+        at runTest (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-runner\build\index.js:315:7)
+
+      15 |     return next();
+      16 |   } catch (error) {
+    > 17 |     console.error("Error al validar la sesión:", error);
+         |             ^
+      18 |     return res.status(500).json({ mensaje: "No se pudo validar la sesión." });
+      19 |   }
+      20 | }
+
+      at requiereSesion (src/middleware/requiereSesion.js:17:13)
+      at Object.<anonymous> (tests/middleware/requiereSesion.test.js:97:5)
+
+ PASS  tests/middleware/requiereSesion.test.js
+  middleware requiereSesion
+    √ debería responder 401 si no hay encabezado Authorization Bearer (1 ms)
+    √ debería rechazar el esquema Basic y exigir Bearer
+    √ debería responder 401 si el token de sesión no es válido (1 ms)
+    √ debería adjuntar el usuario y continuar si la sesión es válida
+    √ debería responder 500 si falla la consulta de sesión (3 ms)
+
+ PASS  tests/validation/registro.test.js
+  validarRegistro
+    √ debería aceptar un registro válido y normalizar correo y WhatsApp (1 ms)
+    √ debería rechazar el registro si el correo no es institucional
+    √ debería rechazar un correo que solo contiene unicauca.edu.co como subcadena
+    √ debería rechazar campos vacíos o nulos en el cuerpo (1 ms)
+    √ debería rechazar nombre fuera de rango 3-120 caracteres
+    √ debería rechazar contraseña menor a 8 o mayor a 72 caracteres
+    √ debería rechazar una contraseña de exactamente 7 caracteres
+    √ debería rechazar un nombre de exactamente 2 caracteres (1 ms)
+    √ debería rechazar WhatsApp que no sea celular colombiano
+    √ debería normalizar WhatsApp con prefijo 57 a formato +57
+
+ PASS  tests/models/sesion.test.js
+  modelo sesion
+    √ debería crear una sesión con token opaco y expiración a 7 días (2 ms)
+    √ debería devolver el usuario si el token de sesión es válido
+    √ debería devolver null si el token de sesión no existe o expiró
+
+Test Suites: 8 passed, 8 total
+Tests:       66 passed, 66 total
+Snapshots:   0 total
+Time:        0.656 s, estimated 1 s
+Ran all test suites.

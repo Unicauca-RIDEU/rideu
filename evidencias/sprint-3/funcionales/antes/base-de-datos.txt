@@ -1,3 +1,0 @@
-BD vehiculos: placa=abc123 capacidad=4
-BD licencias: vence=2027-01-15
-BD usuario: estado=Habilitado

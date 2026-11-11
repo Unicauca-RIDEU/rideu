@@ -1,5 +1,0 @@
-Sesión iniciada; redirige a /panel
-Paso 1 (registro inicial) estado mostrado: Habilitado
-Paso 2 botón «Guardar vehículo» deshabilitado: true
-Paso 2 respuesta de POST /api/vehiculos: sin petición (el formulario no se pudo enviar)
-Paso 3 mensaje al reabrir el enlace: ["El enlace de verificación expiró."]

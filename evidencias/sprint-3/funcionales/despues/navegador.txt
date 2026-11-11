@@ -1,5 +1,0 @@
-Sesión iniciada; redirige a /panel
-Paso 1 (registro inicial) estado mostrado: Habilitado
-Paso 2 botón «Guardar vehículo» deshabilitado: false
-Paso 2 respuesta de POST /api/vehiculos: HTTP 200 "Vehículo y licencia actualizados. Tu cuenta sigue en estado «Habilitado»."
-Paso 3 mensaje al reabrir el enlace: ["Este enlace de verificación ya fue usado."]

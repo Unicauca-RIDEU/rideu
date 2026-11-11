@@ -1,0 +1,357 @@
+
+> rideu-backend@0.1.0 test
+> cross-env NODE_OPTIONS=--experimental-vm-modules jest --runInBand --colors
+
+(node:8776) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+ PASS  tests/routes/trayectoRoutes.test.js
+  rutas /api/trayectos (Supertest)
+    POST /api/trayectos
+      √ debería exigir sesión iniciada (23 ms)
+      √ debería rechazar un token de sesión inválido (3 ms)
+      √ criterio 1 y 2: debería crear el trayecto en estado «Disponible» (3 ms)
+      √ debería tomar el conductor de la sesión e ignorar el enviado por el frontend (3 ms)
+      √ debería aceptar un aporte sugerido de 0 (2 ms)
+      √ criterio 3: debería señalar los campos faltantes y no crear el trayecto (2 ms)
+      √ criterio 4: debería rechazar 0 cupos (2 ms)
+      √ criterio 4: debería rechazar -1 cupos (2 ms)
+      √ criterio 5: debería rechazar cupos por encima de la capacidad del vehículo e informar el máximo (2 ms)
+      √ criterio 5: debería limitar a 4 cupos aunque el vehículo tenga más capacidad (2 ms)
+      √ criterio 6: debería impedir publicar a un usuario sin vehículo ni licencia y dirigir a /perfil/vehiculo (1 ms)
+      √ criterio 6: debería impedir publicar a un usuario con vehículo pero sin licencia y dirigir a /perfil/vehiculo (1 ms)
+      √ criterio 6: debería impedir publicar a un usuario con la licencia vencida y dirigir a /perfil/vehiculo (2 ms)
+      √ criterio 6: debería bloquear antes de validar los campos (1 ms)
+      √ debería rechazar una salida que ya pasó (1 ms)
+      √ debería rechazar una sede de destino que no existe (2 ms)
+      √ debería responder 500 si falla la base de datos (2 ms)
+    GET /api/trayectos/publicacion
+      √ debería exigir sesión iniciada (2 ms)
+      √ debería devolver vehículo, cupos máximos y sedes a un conductor habilitado (2 ms)
+      √ debería indicar el bloqueo y la redirección a un usuario sin vehículo (1 ms)
+      √ debería usar el nombre de la sesión si no se encuentra el perfil (2 ms)
+      √ debería responder 500 si falla la base de datos (1 ms)
+    GET /api/trayectos (HU06 · buscar)
+      √ debería exigir sesión iniciada (3 ms)
+      √ criterio 1: debería devolver los trayectos coincidentes en el orden de la consulta (2 ms)
+      √ debería consultar con los filtros validados y la hora actual de Colombia (1 ms)
+      √ criterio 2: debería responder «No hay resultados disponibles» si no hay coincidencias (2 ms)
+      √ debería exigir los tres filtros (2 ms)
+      √ debería rechazar una hora con formato inválido (1 ms)
+      √ debería rechazar una sede que no existe (2 ms)
+      √ debería responder 500 si falla la base de datos (1 ms)
+    GET /api/sedes (HU06)
+      √ debería exigir sesión iniciada (1 ms)
+      √ debería listar las sedes de destino (2 ms)
+      √ debería responder 500 si falla la base de datos (2 ms)
+
+ PASS  tests/routes/vehiculoRoutes.test.js
+  rutas /api/vehiculos (Supertest)
+    √ debería exigir sesión iniciada (14 ms)
+    √ debería rechazar un token de sesión inválido (2 ms)
+    √ criterio 1: debería registrar el vehículo y la licencia y habilitar la cuenta (3 ms)
+    √ debería usar el usuario de la sesión e ignorar el usuarioId del cuerpo (2 ms)
+    √ criterio 2: debería rechazar una licencia vencida sin guardar nada (1 ms)
+    √ criterio 3: debería señalar campos vacíos y placa inválida sin guardar nada (2 ms)
+    √ debería responder 404 si la cuenta de la sesión ya no existe (2 ms)
+    √ debería responder 403 para una cuenta en estado "Sin verificar" (2 ms)
+    √ debería responder 403 para una cuenta en estado "Habilitado" (1 ms)
+    √ debería responder 403 para una cuenta en estado "Otro" (1 ms)
+    √ debería responder 409 si la placa ya está registrada (2 ms)
+    √ debería responder 500 ante un error inesperado (2 ms)
+
+ PASS  tests/routes/authRoutes.test.js
+  rutas /api/auth (Supertest)
+    √ POST /registro debería responder 201 al registrar correctamente (11 ms)
+    √ POST /registro debería usar código 201 y no 200 en el alta exitosa (2 ms)
+    √ POST /registro debería responder 400 si el correo no es institucional (2 ms)
+    √ POST /registro debería responder 409 si el correo ya está registrado (2 ms)
+    √ POST /verificacion debería responder 200 con token válido (2 ms)
+    √ POST /login debería responder 401 con credenciales inválidas (2 ms)
+    √ POST /login debería responder 403 si el correo no está verificado (1 ms)
+    √ POST /login debería responder 200 y devolver token de sesión (2 ms)
+    √ GET /sesion debería responder 401 sin Bearer token (2 ms)
+    √ GET /sesion debería responder 200 con sesión válida (1 ms)
+    √ debería responder 400 si el cuerpo no es JSON válido (4 ms)
+
+ PASS  tests/services/correo.test.js
+  servicio correo
+    √ debería armar el enlace de verificación sin barra final duplicada (1 ms)
+    √ debería codificar caracteres especiales del token en el enlace
+    √ debería escribir el enlace en consola y no usar SMTP en modo console
+    √ debería exigir SMTP_HOST y MAIL_FROM en modo smtp (3 ms)
+    √ debería rechazar un MAIL_MODE desconocido
+    √ debería enviar por SMTP el enlace al correo institucional (1 ms)
+
+ PASS  tests/validation/trayecto.test.js
+  cuposPermitidos
+    √ debería limitar los cupos al menor valor entre la capacidad y 4 (1 ms)
+    √ debería devolver 0 si la capacidad no es un entero positivo
+  validarTrayecto
+    √ debería aceptar un trayecto válido y normalizar el origen (1 ms)
+    √ no debería incluir datos del conductor aunque vengan en el cuerpo
+    √ debería rechazar un cuerpo que no es un objeto (null) (1 ms)
+    √ debería rechazar un cuerpo que no es un objeto (undefined)
+    √ debería rechazar un cuerpo que no es un objeto ("texto")
+    √ debería rechazar un cuerpo que no es un objeto ([])
+    √ debería rechazar un cuerpo que no es un objeto (5)
+    √ debería señalar todos los campos obligatorios vacíos (1 ms)
+    √ debería exigir origen (valor "")
+    √ debería exigir origen (valor "   ")
+    √ debería exigir sedeDestinoId (valor "")
+    √ debería exigir sedeDestinoId (valor null)
+    √ debería exigir fecha (valor "")
+    √ debería exigir hora (valor "")
+    √ debería exigir cupos (valor "")
+    √ debería exigir aporteSugerido (valor undefined)
+    √ debería rechazar cupos menores o iguales a cero (0)
+    √ debería rechazar cupos menores o iguales a cero (-1)
+    √ debería rechazar cupos menores o iguales a cero (-4)
+    √ debería rechazar cupos que no son enteros (1.5)
+    √ debería rechazar cupos que no son enteros ("2")
+    √ debería rechazar cupos que no son enteros ("dos")
+    √ debería rechazar más de 4 cupos aunque no se indique la capacidad
+    √ debería rechazar cupos por encima de la capacidad del vehículo e informar el máximo
+    √ debería aplicar el tope de 4 aunque el vehículo tenga más capacidad
+    √ debería aceptar un aporte sugerido de 0
+    √ debería rechazar un aporte inválido (-1)
+    √ debería rechazar un aporte inválido (2500.5)
+    √ debería rechazar un aporte inválido ("2500") (1 ms)
+    √ debería rechazar una sede que no es un id válido (0)
+    √ debería rechazar una sede que no es un id válido (-2)
+    √ debería rechazar una sede que no es un id válido (1.5)
+    √ debería rechazar una sede que no es un id válido ("1")
+    √ debería rechazar una fecha con formato inválido ("05/11/2026")
+    √ debería rechazar una fecha con formato inválido ("2026-02-30") (1 ms)
+    √ debería rechazar una fecha con formato inválido ("2026-13-01")
+    √ debería rechazar una hora con formato inválido ("7:00")
+    √ debería rechazar una hora con formato inválido ("24:00")
+    √ debería rechazar una hora con formato inválido ("07:60")
+    √ debería rechazar una hora con formato inválido ("7 a. m.")
+    √ debería rechazar una salida que ya pasó en hora de Colombia (2026-11-03 18:00)
+    √ debería rechazar una salida que ya pasó en hora de Colombia (2026-11-04 06:59) (1 ms)
+    √ debería rechazar una salida que ya pasó en hora de Colombia (2026-11-04 07:00)
+    √ debería aceptar una salida del mismo día posterior a la hora actual de Colombia
+  fechaEnColombia
+    √ debería usar la fecha de Colombia (UTC-5) y no la de UTC
+  verificarConductorHabilitado
+    √ debería permitir publicar a un conductor habilitado con licencia vigente
+    √ debería permitir publicar si la licencia vence el mismo día
+    √ debería bloquear y pedir registrar el vehículo si no existe el perfil (1 ms)
+    √ debería bloquear y pedir registrar el vehículo si la cuenta está «Verificada» pero no «Habilitado»
+    √ debería bloquear y pedir registrar el vehículo si no tiene vehículo
+    √ debería bloquear y pedir registrar el vehículo si no tiene licencia
+    √ debería bloquear si la licencia venció
+    √ debería dirigir a la pantalla de registro de vehículo
+  momentoEnColombia
+    √ debería dar la fecha y hora de Colombia (UTC-5) como AAAA-MM-DD HH:MM (1 ms)
+  validarBusqueda (HU06)
+    √ debería aceptar filtros válidos y convertir la sede a número (1 ms)
+    √ debería exigir los tres filtros
+    √ debería exigir sedeDestinoId
+    √ debería exigir fecha
+    √ debería exigir horaDesde
+    √ debería rechazar una sede inválida ("0")
+    √ debería rechazar una sede inválida ("-1")
+    √ debería rechazar una sede inválida ("abc")
+    √ debería rechazar una sede inválida ("1.5")
+    √ debería rechazar una fecha inválida ("05/11/2026")
+    √ debería rechazar una fecha inválida ("2026-02-30")
+    √ debería rechazar una hora inválida ("6:30") (1 ms)
+    √ debería rechazar una hora inválida ("25:00")
+    √ debería rechazar una hora inválida ("06:30 a. m.")
+    √ debería rechazar filtros repetidos en la URL (llegan como lista)
+    √ debería tolerar que no lleguen filtros
+
+  console.error
+    Error al enviar el correo de verificación: Error: SMTP caído
+        at Object.<anonymous> (C:\Users\sebas\AppData\Local\Temp\claude\bd04a407a7929802\174ffc89-f024-4dde-b4d3-fc4e59816954\scratchpad\v0.2\backend\tests\controllers\authController.test.js:127:48)
+        at Promise.finally.completed (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:1834:28)
+        at new Promise (<anonymous>)
+        at callAsyncCircusFn (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:1774:10)
+        at _callCircusTest (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:1167:40)
+        at _runTestInContext (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:1103:3)
+        at runTestWithContext (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:996:5)
+        at _runTestsForDescribeBlockOnce (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:1008:11)
+        at _runTestsForDescribeBlock (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:824:5)
+        at _runTestsForDescribeBlockOnce (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:1003:11)
+        at _runTestsForDescribeBlock (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:824:5)
+        at run (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:789:3)
+        at runAndTransformResultsToJestFormat (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:2300:21)
+        at jestAdapter (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\runner.js:111:19)
+        at runTestInternal (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-runner\build\index.js:247:16)
+        at runTest (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-runner\build\index.js:315:7)
+
+      53 |         console.error("No se pudo deshacer el registro tras fallar el correo:", borrado);
+      54 |       });
+    > 55 |       console.error("Error al enviar el correo de verificación:", error);
+         |               ^
+      56 |       return res.status(500).json({
+      57 |         mensaje: "No se pudo enviar el correo de verificación. Inténtalo de nuevo.",
+      58 |       });
+
+      at registrar (src/controllers/authController.js:55:15)
+      at Object.<anonymous> (tests/controllers/authController.test.js:132:5)
+
+ PASS  tests/controllers/authController.test.js
+  authController.registrar
+    √ debería responder 400 si la validación falla (1 ms)
+    √ debería responder 409 si el correo ya existe
+    √ debería crear la cuenta y responder 201 en el caso feliz (1 ms)
+    √ debería responder 500 y deshacer el usuario si falla el correo (9 ms)
+    √ debería responder 409 ante violación de unicidad en base de datos (1 ms)
+  authController.verificar
+    √ debería responder 400 si el token está vacío
+    √ debería responder 200 cuando la verificación es exitosa
+    √ debería responder 409 si el enlace ya fue usado
+    √ debería responder 400 si el enlace expiró
+    √ debería responder 400 si el enlace no es válido
+  authController.iniciarSesion
+    √ debería responder 400 si faltan correo o contraseña
+    √ debería responder 401 con el mismo mensaje si el correo no existe
+    √ debería responder 401 si la contraseña no coincide
+    √ debería normalizar el correo a minúsculas antes de buscar credenciales (1 ms)
+    √ debería responder 403 si el correo no está verificado
+    √ debería permitir el acceso a una cuenta «Habilitado» (conductor de HU03)
+    √ debería responder 200 y devolver token en el caso feliz
+  authController.sesionActual
+    √ debería responder 200 con el usuario de la petición (1 ms)
+
+ PASS  tests/security/password.test.js
+  Hash y comparación de contraseñas (bcryptjs)
+    √ debería generar un hash distinto al texto plano (4 ms)
+    √ debería confirmar la contraseña correcta con bcrypt.compare (2 ms)
+    √ debería rechazar una contraseña incorrecta (2 ms)
+    √ debería rechazar comparación contra hash vacío o inválido sin lanzar de forma inesperada (1 ms)
+
+ PASS  tests/validation/vehiculoLicencia.test.js
+  validarVehiculoYLicencia (E02-HU03)
+    √ debería aceptar un vehículo y una licencia vigente (1 ms)
+    √ no debería exigir ni devolver usuarioId (lo pone la sesión)
+    √ debería aceptar la placa sin espacio y normalizar espacios repetidos
+    √ debería rechazar un cuerpo que no es objeto (null) (1 ms)
+    √ debería rechazar un cuerpo que no es objeto (undefined)
+    √ debería rechazar un cuerpo que no es objeto ("texto")
+    √ debería rechazar un cuerpo que no es objeto ([[Object]])
+    √ criterio 3: debería señalar todos los campos obligatorios vacíos
+    √ criterio 3: debería devolver el mensaje del campo cuando solo falta uno (1 ms)
+    √ criterio 3: debería rechazar la placa con formato inválido "AB 123"
+    √ criterio 3: debería rechazar la placa con formato inválido "ABCD 123"
+    √ criterio 3: debería rechazar la placa con formato inválido "ABC 12"
+    √ criterio 3: debería rechazar la placa con formato inválido "123 ABC"
+    √ criterio 3: debería rechazar la placa con formato inválido "ABC-123"
+    √ debería rechazar la capacidad de pasajeros 0
+    √ debería rechazar la capacidad de pasajeros -1
+    √ debería rechazar la capacidad de pasajeros 2.5
+    √ debería rechazar la capacidad de pasajeros "4"
+    √ debería rechazar la fecha de vencimiento mal formada "15/09/2029"
+    √ debería rechazar la fecha de vencimiento mal formada "2029-13-01" (1 ms)
+    √ debería rechazar la fecha de vencimiento mal formada "2029-02-30"
+    √ criterio 2: debería rechazar una licencia vencida
+
+ PASS  tests/models/vehiculo.test.js
+  modelo vehiculo: guardarVehiculoYLicencia
+    √ debería guardar vehículo y licencia y habilitar la cuenta en una transacción (2 ms)
+    √ debería deshacer si la cuenta no existe
+    √ debería deshacer si la cuenta no está «Verificada» (1 ms)
+    √ debería deshacer si no se pudo cambiar el estado a «Habilitado»
+    √ debería deshacer y relanzar el error si falla un INSERT
+  modelos vehiculo y licencia: consultas simples
+    √ debería listar y eliminar vehículos del usuario (1 ms)
+    √ debería crear, listar y eliminar licencias
+
+  console.error
+    Error al validar la sesión: Error: DB caída
+        at Object.<anonymous> (C:\Users\sebas\AppData\Local\Temp\claude\bd04a407a7929802\174ffc89-f024-4dde-b4d3-fc4e59816954\scratchpad\v0.2\backend\tests\middleware\requiereSesion.test.js:92:46)
+        at Promise.finally.completed (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:1834:28)
+        at new Promise (<anonymous>)
+        at callAsyncCircusFn (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:1774:10)
+        at _callCircusTest (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:1167:40)
+        at _runTestInContext (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:1103:3)
+        at runTestWithContext (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:996:5)
+        at _runTestsForDescribeBlockOnce (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:1008:11)
+        at _runTestsForDescribeBlock (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:824:5)
+        at _runTestsForDescribeBlockOnce (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:1003:11)
+        at _runTestsForDescribeBlock (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:824:5)
+        at run (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:789:3)
+        at runAndTransformResultsToJestFormat (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\jestAdapterInit.js:2300:21)
+        at jestAdapter (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-circus\build\runner.js:111:19)
+        at runTestInternal (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-runner\build\index.js:247:16)
+        at runTest (C:\Users\sebas\Documents\UNIVERSIDAD\rideu\backend\node_modules\jest-runner\build\index.js:315:7)
+
+      15 |     return next();
+      16 |   } catch (error) {
+    > 17 |     console.error("Error al validar la sesión:", error);
+         |             ^
+      18 |     return res.status(500).json({ mensaje: "No se pudo validar la sesión." });
+      19 |   }
+      20 | }
+
+      at requiereSesion (src/middleware/requiereSesion.js:17:13)
+      at Object.<anonymous> (tests/middleware/requiereSesion.test.js:97:5)
+
+ PASS  tests/middleware/requiereSesion.test.js
+  middleware requiereSesion
+    √ debería responder 401 si no hay encabezado Authorization Bearer (1 ms)
+    √ debería rechazar el esquema Basic y exigir Bearer (1 ms)
+    √ debería responder 401 si el token de sesión no es válido
+    √ debería adjuntar el usuario y continuar si la sesión es válida (1 ms)
+    √ debería responder 500 si falla la consulta de sesión (3 ms)
+
+ PASS  tests/models/usuario.test.js
+  modelo usuario
+    √ debería hashear el token con SHA-256 en hexadecimal (1 ms)
+    √ debería crear un token de verificación opaco con expiración futura
+    √ debería devolver null si el correo no existe (1 ms)
+    √ debería devolver credenciales cuando el correo existe
+    √ debería insertar usuario en estado Sin verificar (1 ms)
+    √ debería eliminar un usuario por id
+    √ debería marcar la cuenta como verificada con token válido
+    √ debería reportar motivo invalido cuando el token no existe
+    √ debería reportar motivo usado si la cuenta ya está verificada (1 ms)
+    √ debería reportar motivo expirado si el token venció
+
+ PASS  tests/validation/registro.test.js
+  validarRegistro
+    √ debería aceptar un registro válido y normalizar correo y WhatsApp (1 ms)
+    √ debería rechazar el registro si el correo no es institucional
+    √ debería rechazar un correo que solo contiene unicauca.edu.co como subcadena
+    √ debería rechazar campos vacíos o nulos en el cuerpo (1 ms)
+    √ debería rechazar nombre fuera de rango 3-120 caracteres
+    √ debería rechazar contraseña menor a 8 o mayor a 72 caracteres
+    √ debería rechazar una contraseña de exactamente 7 caracteres
+    √ debería rechazar un nombre de exactamente 2 caracteres (1 ms)
+    √ debería rechazar WhatsApp que no sea celular colombiano
+    √ debería normalizar WhatsApp con prefijo 57 a formato +57
+
+ PASS  tests/models/trayecto.test.js
+  modelo trayecto
+    √ debería crear el trayecto con estado «Disponible» (1 ms)
+    √ debería iniciar los cupos disponibles iguales a los cupos ofrecidos (HU06)
+    √ debería usar el cliente de base de datos recibido (transacción)
+    √ debería devolver el perfil del conductor con vehículo y licencia
+    √ debería devolver null si el usuario no existe
+    buscarTrayectosDisponibles (HU06)
+      √ debería devolver las filas de la consulta
+      √ debería filtrar por estado, sede, fecha, hora desde y momento actual
+      √ criterio 3: debería excluir los trayectos sin cupos disponibles
+      √ criterio 1: debería ordenar por hora de salida
+      √ debería ocultar los trayectos que ya salieron
+      √ debería devolver una lista vacía si no hay coincidencias
+
+ PASS  tests/models/sesion.test.js
+  modelo sesion
+    √ debería crear una sesión con token opaco y expiración a 7 días (1 ms)
+    √ debería devolver el usuario si el token de sesión es válido
+    √ debería devolver null si el token de sesión no existe o expiró
+
+ PASS  tests/models/sede.test.js
+  modelo sede
+    √ debería listar las sedes ordenadas por id (2 ms)
+    √ debería buscar una sede por id
+    √ debería devolver null si la sede no existe (1 ms)
+
+Test Suites: 15 passed, 15 total
+Tests:       227 passed, 227 total
+Snapshots:   0 total
+Time:        1.359 s, estimated 2 s
+Ran all test suites.

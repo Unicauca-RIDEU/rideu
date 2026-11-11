@@ -18,18 +18,18 @@ Dependencias: HU01 → HU02 → HU03 → HU04 → HU05 · HU06 → HU07 → HU08
 
 | Sprint | Contenido |
 | --- | --- |
-| [Sprint 1](sprint-1/) | Diagramas de componentes del sistema |
-| [Sprint 2](sprint-2/) | Alcance (HU03 y HU06), nota sobre HU04 como base técnica, base de datos, API y pruebas unitarias |
-| [Sprint 3](sprint-3/) | Alcance (HU04 y HU09), evaluación de HU04, correcciones y mejoras de HU01 a HU04, HU09, pruebas unitarias y funcionales y revisiones independientes |
+| [Sprint 1](sprint-01/) | Diagramas de componentes del sistema |
+| [Sprint 2](sprint-02/) | Alcance (HU03 y HU06), nota sobre HU04 como base técnica, base de datos, API y pruebas unitarias |
+| [Sprint 3](sprint-03/) | Alcance (HU04 y HU09), evaluación de HU04, correcciones y mejoras de HU01 a HU04, HU09, pruebas unitarias y funcionales y revisiones independientes |
 
 ## Documentos del proyecto
 
 | Carpeta | Contenido | Versión vigente |
 | --- | --- | --- |
-| [Backlogs](Backlogs/) | Product Backlog y Planning Poker | v1.6 |
-| [UserStories](UserStories/) | Historias de usuario y criterios de aceptación (Dado / Cuando / Entonces) | v1.3 |
-| [TestCases](TestCases/) | Casos de prueba funcionales, un documento Word y un registro Excel por sprint | Ver la tabla siguiente |
-| [RiskManagement](RiskManagement/) | Plan de gestión de riesgos | v1.0 |
+| [backlog](backlog/) | Product Backlog y Planning Poker | v1.6 |
+| [historias-usuario](historias-usuario/) | Historias de usuario y criterios de aceptación (Dado / Cuando / Entonces) | v1.3 |
+| [pruebas-funcionales](pruebas-funcionales/) | Casos de prueba funcionales, un documento Word y un registro Excel por sprint | Ver la tabla siguiente |
+| [manejo-riesgos](manejo-riesgos/) | Plan de gestión de riesgos | v1.0 |
 | [figma](figma/) | Prototipos de las pantallas | — |
 
 Las versiones anteriores se conservan como historial; la vigente es siempre la de número mayor.
@@ -38,9 +38,8 @@ Las versiones anteriores se conservan como historial; la vigente es siempre la d
 
 | Carpeta | Casos | Versión vigente |
 | --- | --- | --- |
-| [TestCases/sprint-01](TestCases/sprint-01/) | 20 casos de HU01 y HU02 | v1.1 |
-| [TestCases/sprint-02](TestCases/sprint-02/) | 7 casos de HU03 y HU06 | v1.0 |
-| [TestCases/sprint-03](TestCases/sprint-03/) | 20 casos de HU01 a HU04 (correcciones y mejoras) y HU09 | v1.0 |
-| [TestCases/historico](TestCases/historico/) | Versión 1.1 original, que reunía los sprints 1 y 2 | — |
+| [pruebas-funcionales/sprint-01](pruebas-funcionales/sprint-01/) | 20 casos de HU01 y HU02 | v1.1 |
+| [pruebas-funcionales/sprint-02](pruebas-funcionales/sprint-02/) | 7 casos de HU03 y HU06 | v1.0 |
+| [pruebas-funcionales/sprint-03](pruebas-funcionales/sprint-03/) | 20 casos de HU01 a HU04 (correcciones y mejoras) y HU09 | v1.1 |
 
 La trazabilidad de las pruebas unitarias está en [`evidencias/Pruebas_Unitarias_RideU.xlsx`](../evidencias/Pruebas_Unitarias_RideU.xlsx).

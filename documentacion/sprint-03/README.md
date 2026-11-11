@@ -72,11 +72,11 @@ Se ejecutaron en Chromium contra la aplicación real (frontend, backend y Postgr
 | RU-E002-HU03-CP07 | HU03 · CA-HU03-03 | Consultar la placa guardada en la base de datos. | — | `ABC 123` | `abc123` | `ABC 123` (leída tras el paso anterior, en el que se escribió `ABC 123`; la conversión de `abc123` la cubren UT-144 a UT-146) | Pasó (antes: Falló) |
 | RU-E001-HU01-CP15 | HU01 · CA-HU01-12 | Abrir de nuevo el enlace de verificación con la cuenta «Habilitado». | Token del registro | «Este enlace de verificación ya fue usado.» | «El enlace de verificación expiró.» | «Este enlace de verificación ya fue usado.» | Pasó (antes: Falló) |
 
-Evidencia: capturas del navegador, salida del navegador y consulta a la base de datos en [`evidencias/sprint-3/funcionales/antes`](../../evidencias/sprint-3/funcionales/antes/) y [`despues`](../../evidencias/sprint-3/funcionales/despues/).
+Evidencia: capturas de antes y después de la corrección en cada caso del Word [`RideU_TEST_TestCases_Sprint03_v1.1.docx`](../pruebas-funcionales/sprint-03/RideU_TEST_TestCases_Sprint03_v1.1.docx); la salida del navegador y la consulta a la base de datos están en su Anexo A (A.1 y A.2).
 
 D4 no tiene caso funcional: depende de la hora del servidor y solo se comprobó con pruebas unitarias.
 
-Estos casos todavía no están en el registro de casos de prueba (`documentacion/TestCases`); los debe incorporar el tester.
+Estos casos todavía no están en el registro de casos de prueba (`documentacion/pruebas-funcionales`); los debe incorporar el tester.
 
 ## Evaluación de HU04 · Publicar trayecto
 
@@ -97,7 +97,7 @@ Precondiciones: base de datos recién migrada; `laura.gomez@unicauca.edu.co` «H
 | RU-E002-HU04-CP05 | CA-HU04-05 Conductor no habilitado | Con la cuenta sin vehículo, abrir `/trayectos/publicar`. | — | Impide publicar y dirige a `/perfil/vehiculo`. | «Conductor no habilitado. No puedes publicar trayectos.», formulario bloqueado y botón «Ir a registrar vehículo». | Pasó | `HU04-CP05-conductor-no-habilitado.png` |
 | RU-E002-HU04-CP06 | CA-HU04-06 Trayecto duplicado | Publicar otra vez el mismo trayecto. | Mismos datos de CP01 | Rechaza el duplicado. | «Ya tienes un trayecto publicado para esa fecha y hora.»; sigue habiendo 1 fila. | Pasó | `HU04-CP06-trayecto-duplicado.png` |
 
-Evidencia en [`evidencias/sprint-3/funcionales/hu04-y-mejoras`](../../evidencias/sprint-3/funcionales/hu04-y-mejoras/) (capturas, `navegador.txt` y `base-de-datos.txt`).
+Evidencia: capturas en cada caso del Word [`RideU_TEST_TestCases_Sprint03_v1.1.docx`](../pruebas-funcionales/sprint-03/RideU_TEST_TestCases_Sprint03_v1.1.docx); la salida del navegador y la consulta a la base de datos están en su Anexo A (A.3).
 
 ## Mejoras de robustez (segunda ronda)
 
@@ -121,7 +121,7 @@ Ramas: `bugfix/E02-HU03-mensajes-y-datos-del-vehiculo`, `bugfix/E02-HU04-trayect
 | --- | --- | --- |
 | 1. Ejecución inicial | 27 pruebas fallaron (18 en HU03, 3 en HU04, 6 en HU02) | `evidencias/casos-ajuste/sprint-03/CU-24` … `CU-29` (`error-CUNN.png`) |
 | 2. Después del ajuste | Las 27 pasan | `evidencias/casos-ajuste/sprint-03/CU-24` … `CU-29` (`solved-CUNN.png`) |
-| 3. Ejecución final de toda la suite | 254 de 254 pasan · cobertura de líneas 97,70 % | `evidencias/sprint-3/unitarias/ejecucion-final.txt` |
+| 3. Ejecución final de toda la suite | 254 de 254 pasan · cobertura de líneas 97,70 % | `evidencias/ss/sprint-03/ejecucion-final-cobertura.txt` |
 
 Porcentaje real de fallos iniciales de esta ronda: 27 de las 251 pruebas de la suite (**10,8 %**). De las 27, 15 son pruebas nuevas y 12 son pruebas existentes cuyo resultado esperado cambió (textos oficiales y orden de las consultas). Sumando las dos rondas del sprint: 35 fallos iniciales sobre 251 pruebas (**13,9 %**). No se indujo ningún fallo.
 
@@ -174,7 +174,7 @@ Los tres casos de HU03 que estaban en «Falló» en el registro del tester (CP02
 
 ## Pendientes conocidos
 
-- Los casos funcionales del sprint están en `documentacion/TestCases/sprint-03`. Se ejecutaron de forma automatizada en Chromium; falta la firma del tester.
+- Los casos funcionales del sprint están en `documentacion/pruebas-funcionales/sprint-03`. Se ejecutaron de forma automatizada en Chromium; falta la firma del tester.
 - La comprobación de trayecto duplicado se hace en la API; no hay una restricción única en la base de datos, así que dos peticiones simultáneas podrían crear el duplicado.
 - No hay pruebas automatizadas del frontend; la interfaz se verifica con las pruebas funcionales.
 - El cierre de sesión cierra solo la sesión actual, no las abiertas en otros dispositivos.
@@ -208,7 +208,7 @@ Rama: `feature/E04-HU09-historial`, integrada en `develop`.
 | --- | --- | --- |
 | 1. Ejecución inicial | Las 8 pruebas nuevas fallaron: la historia aún no estaba implementada | `evidencias/casos-ajuste/sprint-03/CU-30/error-CU30.png` |
 | 2. Después de implementar | Las 8 pasan | `evidencias/casos-ajuste/sprint-03/CU-30/solved-CU30.png` |
-| 3. Ejecución final de toda la suite | 262 de 262 pasan · cobertura de líneas 97,76 % | `evidencias/sprint-3/unitarias/ejecucion-final.txt` |
+| 3. Ejecución final de toda la suite | 262 de 262 pasan · cobertura de líneas 97,76 % | `evidencias/ss/sprint-03/ejecucion-final-cobertura.txt` |
 
 Fallos iniciales de HU09: 8 de las 262 pruebas ejecutadas (**3,1 %**). En todo el Sprint 3: 43 fallos iniciales sobre 262 pruebas (**16,4 %**). Las pruebas se escribieron antes que el código; ningún fallo fue inducido.
 
@@ -216,7 +216,7 @@ Las pruebas están en el Excel como UT-249 a UT-256.
 
 ### Pruebas funcionales
 
-Ejecutadas en Chromium contra la aplicación real el 10 de noviembre de 2026. El detalle de cada caso está en `documentacion/TestCases/sprint-03`.
+Ejecutadas en Chromium contra la aplicación real el 10 de noviembre de 2026. El detalle de cada caso está en `documentacion/pruebas-funcionales/sprint-03`.
 
 | Caso | Criterio | Resultado esperado | Resultado obtenido | Estado | Evidencia |
 | --- | --- | --- | --- | --- | --- |
@@ -225,7 +225,7 @@ Ejecutadas en Chromium contra la aplicación real el 10 de noviembre de 2026. El
 | RU-E004-HU09-CP03 | CA-HU09-01 Sin sesión | Redirige a `/login`. | Redirigió a `/login`. | Pasó | `HU09-CP03-sin-sesion.png` |
 | RU-E004-HU09-CP04 | CA-HU09-01 Aislamiento entre usuarios | Un usuario no ve los trayectos de otro. | 0 trayectos visibles para el usuario sin actividad. | Pasó | `HU09-CP02-historial-sin-actividad.png` |
 
-Evidencia en [`evidencias/sprint-3/funcionales/hu09`](../../evidencias/sprint-3/funcionales/hu09/). El trayecto pasado se preparó cambiando su fecha en la base de datos, porque la aplicación no permite publicar en el pasado.
+Evidencia: capturas en cada caso del Word [`RideU_TEST_TestCases_Sprint03_v1.1.docx`](../pruebas-funcionales/sprint-03/RideU_TEST_TestCases_Sprint03_v1.1.docx); la salida del navegador y la consulta a la base de datos están en su Anexo A (A.4). El trayecto pasado se preparó cambiando su fecha en la base de datos, porque la aplicación no permite publicar en el pasado.
 
 ### Revisión independiente
 
