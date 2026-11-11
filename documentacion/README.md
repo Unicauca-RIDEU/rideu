@@ -14,21 +14,15 @@ Material de gestión, diseño y pruebas del proyecto.
 
 Dependencias: HU01 → HU02 → HU03 → HU04 → HU05 · HU06 → HU07 → HU08 · HU07 → HU10 y HU11 · HU04 → HU11 · HU05 y HU07 → HU09.
 
-## Documentación por sprint
-
-| Sprint | Contenido |
-| --- | --- |
-| [Sprint 1](sprint-01/) | Diagramas de componentes del sistema |
-| [Sprint 2](sprint-02/) | Alcance (HU03 y HU06), nota sobre HU04 como base técnica, base de datos, API y pruebas unitarias |
-| [Sprint 3](sprint-03/) | Alcance (HU04 y HU09), evaluación de HU04, correcciones y mejoras de HU01 a HU04, HU09, pruebas unitarias y funcionales y revisiones independientes |
-
 ## Documentos del proyecto
 
 | Carpeta | Contenido | Versión vigente |
 | --- | --- | --- |
 | [backlog](backlog/) | Product Backlog y Planning Poker | v1.6 |
 | [historias-usuario](historias-usuario/) | Historias de usuario y criterios de aceptación (Dado / Cuando / Entonces) | v1.3 |
+| [storymapping](storymapping/) | Mapa de historias de usuario | — |
 | [pruebas-funcionales](pruebas-funcionales/) | Casos de prueba funcionales, un documento Word y un registro Excel por sprint | Ver la tabla siguiente |
+| [pruebas-unitarias](pruebas-unitarias/) | Registro y trazabilidad de las pruebas unitarias (UT-NN) y de los casos de ajuste (CU-NN) | — |
 | [manejo-riesgos](manejo-riesgos/) | Plan de gestión de riesgos | v1.0 |
 | [figma](figma/) | Prototipos de las pantallas | — |
 
@@ -42,4 +36,4 @@ Las versiones anteriores se conservan como historial; la vigente es siempre la d
 | [pruebas-funcionales/sprint-02](pruebas-funcionales/sprint-02/) | 7 casos de HU03 y HU06 | v1.0 |
 | [pruebas-funcionales/sprint-03](pruebas-funcionales/sprint-03/) | 20 casos de HU01 a HU04 (correcciones y mejoras) y HU09 | v1.1 |
 
-La trazabilidad de las pruebas unitarias está en [`evidencias/Pruebas_Unitarias_RideU.xlsx`](../evidencias/Pruebas_Unitarias_RideU.xlsx).
+La trazabilidad de las pruebas unitarias está en [`pruebas-unitarias/Pruebas_Unitarias_RideU.xlsx`](pruebas-unitarias/Pruebas_Unitarias_RideU.xlsx).

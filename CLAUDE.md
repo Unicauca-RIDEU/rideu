@@ -36,8 +36,8 @@ backend/tests/            Pruebas Jest, en espejo de src/
 frontend/src/pages/       Pantallas
 frontend/src/components/  Componentes compartidos
 frontend/src/services/    Llamadas al backend
-documentacion/            backlog, historias-usuario, pruebas-funcionales, manejo-riesgos, figma, sprint-NN
-evidencias/               Excel de pruebas unitarias, casos-ajuste y ss (suite en verde por sprint)
+documentacion/            backlog, historias-usuario, storymapping, pruebas-funcionales, pruebas-unitarias, manejo-riesgos, figma
+evidencias/               casos-ajuste (pruebas que fallaron y se corrigieron) y ejecucion-final (suite en verde por sprint)
 ```
 
 ## 4. Comandos
@@ -156,10 +156,10 @@ Antes de desarrollar una historia: revisar la historia y sus criterios, identifi
 
 - Solo evidencias auténticas, tomadas de ejecuciones reales. No se generan capturas simuladas ni se alteran resultados.
 - Si una captura no se puede tomar con las herramientas disponibles, se informa al responsable para que la realice.
-- Pruebas unitarias: registro en `evidencias/Pruebas_Unitarias_RideU.xlsx`; evidencia fotográfica de cada prueba que falló, separada por sprint, en `evidencias/casos-ajuste/sprint-NN/CU-NN/`: `error-CUNN.png` (ejecución inicial) y `solved-CUNN.png` (después del ajuste), como capturas de una terminal real.
-- Ejecución de toda la suite en verde al cierre de cada sprint: `evidencias/ss/sprint-NN/pruebas-unitarias-sprint-NN.png`, con la salida de consola en `pruebas-unitarias-sprint-NN.txt` en la misma carpeta.
+- Pruebas unitarias: registro en `documentacion/pruebas-unitarias/Pruebas_Unitarias_RideU.xlsx`; evidencia fotográfica de cada prueba que falló, separada por sprint, en `evidencias/casos-ajuste/sprint-NN/CU-NN/`: `error-CUNN.png` (ejecución inicial) y `solved-CUNN.png` (después del ajuste), como capturas de una terminal real.
+- Ejecución de toda la suite en verde al cierre de cada sprint: `evidencias/ejecucion-final/sprint-NN/pruebas-unitarias-sprint-NN.png`, con la salida de consola en `pruebas-unitarias-sprint-NN.txt` en la misma carpeta.
 - Pruebas funcionales: un Word y un Excel por sprint en `documentacion/pruebas-funcionales/sprint-NN/`, con versión si se actualizan. Las capturas de los casos funcionales van insertadas en el Word del sprint, no en una carpeta de `evidencias/`. No se crean carpetas `evidencias/sprint-N/`.
-- El backlog no lleva trazabilidad de pruebas: la de las unitarias está en `evidencias/Pruebas_Unitarias_RideU.xlsx`.
+- El backlog no lleva trazabilidad de pruebas: la de las unitarias está en `documentacion/pruebas-unitarias/Pruebas_Unitarias_RideU.xlsx`.
 - Las salidas de consola se guardan como `.txt`: `.gitignore` excluye los `.log`.
 
 ## 11. Definition of Done

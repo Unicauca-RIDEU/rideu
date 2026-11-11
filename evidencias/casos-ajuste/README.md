@@ -13,4 +13,4 @@ Cada carpeta `CU-NN` contiene:
 - `error-CUNN.png`: captura de la terminal con la prueba fallando.
 - `solved-CUNN.png`: captura de la terminal con la prueba pasando tras la corrección.
 
-El detalle de cada caso (prueba, criterio, esperado, obtenido y corrección) está en [`Pruebas_Unitarias_RideU.xlsx`](../Pruebas_Unitarias_RideU.xlsx).
+El detalle de cada caso (prueba, criterio, esperado, obtenido y corrección) está en [`Pruebas_Unitarias_RideU.xlsx`](../../documentacion/pruebas-unitarias/Pruebas_Unitarias_RideU.xlsx).
