@@ -63,7 +63,7 @@ export async function registrar(req, res) {
       usuario,
     });
   } catch (error) {
-    if (error.code === "23505") {
+    if (error.code === "ORA-00001") {
       return res.status(409).json({
         mensaje: "Ya existe una cuenta con este correo institucional.",
       });

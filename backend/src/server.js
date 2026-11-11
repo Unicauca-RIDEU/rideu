@@ -3,8 +3,10 @@ import { env } from "./config/env.js";
 
 const app = createApp();
 
-if (!env.databaseUrl) {
-  console.error("Falta DATABASE_URL en .env. El registro no puede guardar cuentas.");
+if (!env.dbUser || !env.dbPassword || !env.dbConnectString) {
+  console.error(
+    "Faltan DB_USER, DB_PASSWORD o DB_CONNECT_STRING en .env. La API no puede conectarse a Oracle.",
+  );
 }
 
 console.log(`Correo de verificación en modo ${env.mailMode}.`);

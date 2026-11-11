@@ -13,9 +13,9 @@ RideU es una aplicación web de trayectos compartidos para la comunidad de la Un
 | Capa | Tecnología |
 | --- | --- |
 | Frontend | React 19, Vite 6, react-router-dom 7, JavaScript (ESM), CSS global |
-| Backend | Node.js >= 20 (ESM), Express 4, `pg`, `bcryptjs`, `nodemailer` |
-| Base de datos | PostgreSQL 16, SQL plano en `backend/sql/` |
-| Pruebas | Jest 30 y supertest en el backend |
+| Backend | Node.js >= 20 (ESM), Express 4, `oracledb` (modo Thin), `bcryptjs`, `nodemailer` |
+| Base de datos | Oracle Database 19c o superior, SQL plano en `backend/sql/` |
+| Pruebas | Jest 30 y supertest en el backend; integración con `node:test` contra Oracle real |
 
 - Flujo del backend: `routes → controllers → validation / models → services`.
 - Sesión: token opaco enviado como `Authorization: Bearer`, guardado como hash SHA-256 en la tabla `sesiones`, con vigencia de 7 días. Contraseñas con bcrypt.
@@ -37,7 +37,7 @@ frontend/src/pages/       Pantallas
 frontend/src/components/  Componentes compartidos
 frontend/src/services/    Llamadas al backend
 documentacion/            backlog, historias-usuario, storymapping, pruebas-funcionales, pruebas-unitarias, manejo-riesgos, figma
-evidencias/               casos-ajuste (pruebas que fallaron y se corrigieron) y ejecucion-final (suite en verde por sprint)
+evidencias/               casos-ajuste (pruebas que fallaron y se corrigieron) y ejecucion-final (suite en verde por sprint), y migracion-oracle (salidas de la migración de base de datos)
 ```
 
 ## 4. Comandos
@@ -45,11 +45,13 @@ evidencias/               casos-ajuste (pruebas que fallaron y se corrigieron) y
 ```bash
 npm install --prefix backend
 npm install --prefix frontend
+npm run db:check --prefix backend        # comprueba la conexión a Oracle
 npm run db:migrate --prefix backend      # aplica backend/sql en orden
 npm run dev --prefix backend             # http://localhost:3000
 npm run dev --prefix frontend            # http://localhost:5173
 npm test --prefix backend                # pruebas unitarias (Jest)
 npm run test:coverage --prefix backend   # con cobertura
+npm run test:integration --prefix backend  # integración contra Oracle real (se omite sin base)
 npm run build --prefix frontend          # comprobación del build
 ```
 
@@ -62,8 +64,10 @@ La configuración se lee de `.env` en la raíz (plantilla en `.env.example`).
 - Las validaciones son funciones puras que devuelven `{ ok: true, datos }` o `{ ok: false, mensaje, errores: [{ campo, mensaje }] }`.
 - Los controladores responden JSON con `mensaje` y usan: 400 validación, 401 sin sesión, 403 sin permiso, 404 no existe, 409 conflicto, 500 error interno.
 - El usuario se toma siempre de la sesión (`req.usuario`), nunca del cuerpo de la petición.
-- SQL siempre parametrizado; las escrituras múltiples van en una transacción.
-- Las fechas y horas de negocio se evalúan en hora de Colombia (UTC-5).
+- SQL siempre parametrizado con binds con nombre (`:nombre`); las escrituras múltiples van en una transacción (`pool.connect()`, `commit()` / `rollback()`).
+- Sintaxis compatible con Oracle 19c: sin `IF NOT EXISTS`, sin `BOOLEAN` y sin `LIMIT`. Los identificadores (UUID) los genera la aplicación.
+- En los archivos de `backend/sql/` cada sentencia termina con una línea `/`.
+- Las fechas y horas de negocio se evalúan en hora de Colombia (UTC-5). Las fechas se guardan como `DATE` a las 00:00 y la hora del trayecto como texto `HH24:MI`.
 - Cada cambio de esquema es un archivo nuevo `NNN_descripcion.sql`, idempotente y sin borrado de tablas ni de datos.
 - No se agregan dependencias sin justificación y aprobación.
 

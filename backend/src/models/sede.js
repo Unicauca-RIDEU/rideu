@@ -13,8 +13,8 @@ export async function buscarSedePorId(id) {
   const resultado = await pool.query(
     `SELECT id, nombre, direccion, ciudad
      FROM sedes
-     WHERE id = $1`,
-    [id],
+     WHERE id = :id`,
+    { id },
   );
   return resultado.rows[0] ?? null;
 }

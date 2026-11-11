@@ -49,7 +49,7 @@ export async function registrarVehiculoYLicencia(req, res) {
       licencia: resultado.licencia,
     });
   } catch (error) {
-    if (error.code === "23505" && error.constraint === "vehiculos_placa_unica") {
+    if (error.code === "ORA-00001" && error.constraint === "vehiculos_placa_unica") {
       return res.status(409).json({ mensaje: "Ya existe un vehículo con esta placa." });
     }
     console.error("Error al registrar vehículo y licencia:", error);

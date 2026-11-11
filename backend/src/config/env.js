@@ -9,7 +9,11 @@ dotenv.config({ path: path.join(repoRoot, ".env") });
 
 export const env = {
   port: Number(process.env.PORT) || 3000,
-  databaseUrl: process.env.DATABASE_URL ?? "",
+  dbUser: process.env.DB_USER ?? "",
+  dbPassword: process.env.DB_PASSWORD ?? "",
+  dbConnectString: process.env.DB_CONNECT_STRING ?? "",
+  dbPoolMin: Number(process.env.DB_POOL_MIN) || 1,
+  dbPoolMax: Number(process.env.DB_POOL_MAX) || 10,
   appUrl: process.env.APP_URL || "http://localhost:5173",
   mailMode: process.env.MAIL_MODE || "console",
   smtpHost: process.env.SMTP_HOST ?? "",

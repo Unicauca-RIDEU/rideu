@@ -11,11 +11,14 @@ import {
   ESTADO_VERIFICADA,
 } from "./usuario.js";
 
+// Cierra el pool de Oracle al terminar para que el proceso de la prueba pueda salir.
+test.after(() => pool.end());
+
 test("el token válido verifica una sola vez", async (t) => {
   try {
-    await pool.query("SELECT 1");
+    await pool.query("SELECT 1 FROM dual");
   } catch {
-    t.skip("PostgreSQL no está disponible");
+    t.skip("Oracle no está disponible");
     return;
   }
 
@@ -48,9 +51,9 @@ test("el token válido verifica una sola vez", async (t) => {
 
 test("un token vencido no cambia el estado", async (t) => {
   try {
-    await pool.query("SELECT 1");
+    await pool.query("SELECT 1 FROM dual");
   } catch {
-    t.skip("PostgreSQL no está disponible");
+    t.skip("Oracle no está disponible");
     return;
   }
 
@@ -68,7 +71,9 @@ test("un token vencido no cambia el estado", async (t) => {
   try {
     const resultado = await verificarCuenta(token);
     assert.deepEqual(resultado, { ok: false, motivo: "expirado" });
-    const fila = await pool.query("SELECT estado FROM usuarios WHERE id = $1", [usuario.id]);
+    const fila = await pool.query("SELECT estado FROM usuarios WHERE id = :id", {
+      id: usuario.id,
+    });
     assert.equal(fila.rows[0].estado, ESTADO_SIN_VERIFICAR);
   } finally {
     await eliminarUsuario(usuario.id);

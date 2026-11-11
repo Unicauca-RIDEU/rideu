@@ -1,4 +1,5 @@
 import { describe, test, expect, jest, beforeEach } from "@jest/globals";
+import { SALIDA } from "../helpers/database.js";
 import request from "supertest";
 
 const buscarUsuarioPorSesion = jest.fn();
@@ -7,6 +8,7 @@ const buscarPerfilConductor = jest.fn();
 
 jest.unstable_mockModule("../../src/config/database.js", () => ({
   pool: { query: jest.fn(), connect: jest.fn() },
+  SALIDA,
 }));
 
 jest.unstable_mockModule("../../src/models/sesion.js", () => ({
@@ -271,7 +273,7 @@ describe("rutas /api/vehiculos (Supertest)", () => {
   test("debería responder 409 si la placa ya está registrada", async () => {
     guardarVehiculoYLicencia.mockRejectedValueOnce(
       Object.assign(new Error("duplicada"), {
-        code: "23505",
+        code: "ORA-00001",
         constraint: "vehiculos_placa_unica",
       }),
     );

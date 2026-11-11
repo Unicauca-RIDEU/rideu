@@ -1,19 +1,11 @@
-import { pool } from "../config/database.js";
+import { randomUUID } from "node:crypto";
+import { SALIDA, pool } from "../config/database.js";
 
 export const ESTADO_DISPONIBLE = "Disponible";
 
-const COLUMNAS_TRAYECTO = `id,
-       conductor_id,
-       vehiculo_id,
-       sede_destino_id,
-       origen,
-       to_char(fecha, 'YYYY-MM-DD') AS fecha,
-       to_char(hora, 'HH24:MI') AS hora,
-       cupos,
-       cupos_disponibles,
-       aporte_sugerido,
-       estado,
-       creado_en`;
+// Momento de salida del trayecto: fecha (DATE a las 00:00) más hora («HH24:MI»).
+const SALIDA_DEL_TRAYECTO =
+  "TO_DATE(TO_CHAR(t.fecha, 'YYYY-MM-DD') || ' ' || t.hora, 'YYYY-MM-DD HH24:MI')";
 
 export async function crearTrayecto({
   conductorId,
@@ -27,6 +19,7 @@ export async function crearTrayecto({
 }, db = pool) {
   const resultado = await db.query(
     `INSERT INTO trayectos (
+       id,
        conductor_id,
        vehiculo_id,
        sede_destino_id,
@@ -38,19 +31,67 @@ export async function crearTrayecto({
        estado,
        cupos_disponibles
      )
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $7)
-     RETURNING ${COLUMNAS_TRAYECTO}`,
-    [
-      conductorId,
-      vehiculoId,
-      sedeDestinoId,
+     VALUES (
+       :id,
+       :conductor_id,
+       :vehiculo_id,
+       :sede_destino_id,
+       :origen,
+       TO_DATE(:fecha, 'YYYY-MM-DD'),
+       :hora,
+       :cupos,
+       :aporte_sugerido,
+       :estado,
+       :cupos
+     )
+     RETURNING id,
+               conductor_id,
+               vehiculo_id,
+               sede_destino_id,
+               origen,
+               TO_CHAR(fecha, 'YYYY-MM-DD'),
+               hora,
+               cupos,
+               cupos_disponibles,
+               aporte_sugerido,
+               estado,
+               creado_en
+     INTO :r_id,
+          :r_conductor_id,
+          :r_vehiculo_id,
+          :r_sede_destino_id,
+          :r_origen,
+          :r_fecha,
+          :r_hora,
+          :r_cupos,
+          :r_cupos_disponibles,
+          :r_aporte_sugerido,
+          :r_estado,
+          :r_creado_en`,
+    {
+      id: randomUUID(),
+      conductor_id: conductorId,
+      vehiculo_id: vehiculoId,
+      sede_destino_id: sedeDestinoId,
       origen,
       fecha,
       hora,
       cupos,
-      aporteSugerido,
-      ESTADO_DISPONIBLE,
-    ],
+      aporte_sugerido: aporteSugerido,
+      estado: ESTADO_DISPONIBLE,
+      r_id: SALIDA.texto,
+      r_conductor_id: SALIDA.texto,
+      r_vehiculo_id: SALIDA.texto,
+      r_sede_destino_id: SALIDA.numero,
+      r_origen: SALIDA.texto,
+      r_fecha: SALIDA.texto,
+      r_hora: SALIDA.texto,
+      r_cupos: SALIDA.numero,
+      r_cupos_disponibles: SALIDA.numero,
+      r_aporte_sugerido: SALIDA.numero,
+      r_estado: SALIDA.texto,
+      r_creado_en: SALIDA.instante,
+    },
   );
   return resultado.rows[0];
 }
@@ -58,17 +99,16 @@ export async function crearTrayecto({
 // Un conductor no puede tener dos trayectos «Disponible» que salgan en la misma fecha y hora.
 export async function existeTrayectoEnHorario({ conductorId, fecha, hora }) {
   const resultado = await pool.query(
-    `SELECT EXISTS (
-       SELECT 1
-       FROM trayectos
-       WHERE conductor_id = $1
-         AND fecha = $2
-         AND hora = $3
-         AND estado = $4
-     ) AS existe`,
-    [conductorId, fecha, hora, ESTADO_DISPONIBLE],
+    `SELECT COUNT(*) AS existe
+     FROM trayectos
+     WHERE conductor_id = :conductor_id
+       AND fecha = TO_DATE(:fecha, 'YYYY-MM-DD')
+       AND hora = :hora
+       AND estado = :estado
+       AND ROWNUM = 1`,
+    { conductor_id: conductorId, fecha, hora, estado: ESTADO_DISPONIBLE },
   );
-  return resultado.rows[0]?.existe === true;
+  return resultado.rows[0]?.existe === 1;
 }
 
 // Búsqueda de trayectos (E03-HU06): activos («Disponible», con cupos y que aún no han salido)
@@ -77,8 +117,8 @@ export async function existeTrayectoEnHorario({ conductorId, fecha, hora }) {
 export async function buscarTrayectosDisponibles({ sedeDestinoId, fecha, horaDesde, ahoraColombia }) {
   const resultado = await pool.query(
     `SELECT t.id,
-            to_char(t.fecha, 'YYYY-MM-DD') AS fecha,
-            to_char(t.hora, 'HH24:MI') AS hora,
+            TO_CHAR(t.fecha, 'YYYY-MM-DD') AS fecha,
+            t.hora,
             t.origen,
             t.sede_destino_id,
             s.nombre AS sede_destino,
@@ -91,14 +131,20 @@ export async function buscarTrayectosDisponibles({ sedeDestinoId, fecha, horaDes
      FROM trayectos t
      JOIN sedes s ON s.id = t.sede_destino_id
      JOIN usuarios u ON u.id = t.conductor_id
-     WHERE t.estado = $1
+     WHERE t.estado = :estado
        AND t.cupos_disponibles > 0
-       AND t.sede_destino_id = $2
-       AND t.fecha = $3
-       AND t.hora >= $4
-       AND (t.fecha + t.hora) > $5::timestamp
+       AND t.sede_destino_id = :sede_destino_id
+       AND t.fecha = TO_DATE(:fecha, 'YYYY-MM-DD')
+       AND t.hora >= :hora_desde
+       AND ${SALIDA_DEL_TRAYECTO} > TO_DATE(:ahora_colombia, 'YYYY-MM-DD HH24:MI')
      ORDER BY t.hora, t.creado_en`,
-    [ESTADO_DISPONIBLE, sedeDestinoId, fecha, horaDesde, ahoraColombia],
+    {
+      estado: ESTADO_DISPONIBLE,
+      sede_destino_id: sedeDestinoId,
+      fecha,
+      hora_desde: horaDesde,
+      ahora_colombia: ahoraColombia,
+    },
   );
   return resultado.rows;
 }
@@ -110,22 +156,23 @@ export async function buscarTrayectosDisponibles({ sedeDestinoId, fecha, horaDes
 export async function listarTrayectosDeConductor({ conductorId, ahoraColombia }) {
   const resultado = await pool.query(
     `SELECT t.id,
-            to_char(t.fecha, 'YYYY-MM-DD') AS fecha,
-            to_char(t.hora, 'HH24:MI') AS hora,
+            TO_CHAR(t.fecha, 'YYYY-MM-DD') AS fecha,
+            t.hora,
             t.origen,
             s.nombre AS sede_destino,
             t.cupos,
             t.cupos_disponibles,
             t.aporte_sugerido,
             CASE
-              WHEN (t.fecha + t.hora) <= $2::timestamp THEN 'Completado'
+              WHEN ${SALIDA_DEL_TRAYECTO} <= TO_DATE(:ahora_colombia, 'YYYY-MM-DD HH24:MI')
+                THEN 'Completado'
               ELSE 'Pendiente'
             END AS estado_historial
      FROM trayectos t
      JOIN sedes s ON s.id = t.sede_destino_id
-     WHERE t.conductor_id = $1
+     WHERE t.conductor_id = :conductor_id
      ORDER BY t.fecha DESC, t.hora DESC`,
-    [conductorId, ahoraColombia],
+    { conductor_id: conductorId, ahora_colombia: ahoraColombia },
   );
   return resultado.rows;
 }
@@ -144,24 +191,24 @@ export async function buscarPerfilConductor(usuarioId) {
             v.color,
             v.capacidad_pasajeros,
             l.categoria AS licencia_categoria,
-            to_char(l.fecha_vencimiento, 'YYYY-MM-DD') AS licencia_vencimiento
+            TO_CHAR(l.fecha_vencimiento, 'YYYY-MM-DD') AS licencia_vencimiento
      FROM usuarios u
-     LEFT JOIN LATERAL (
+     OUTER APPLY (
        SELECT id, placa, marca, modelo, color, capacidad_pasajeros
        FROM vehiculos
        WHERE usuario_id = u.id
        ORDER BY placa
-       LIMIT 1
-     ) v ON TRUE
-     LEFT JOIN LATERAL (
+       FETCH FIRST 1 ROWS ONLY
+     ) v
+     OUTER APPLY (
        SELECT categoria, fecha_vencimiento
        FROM licencias
        WHERE usuario_id = u.id
        ORDER BY fecha_vencimiento DESC
-       LIMIT 1
-     ) l ON TRUE
-     WHERE u.id = $1`,
-    [usuarioId],
+       FETCH FIRST 1 ROWS ONLY
+     ) l
+     WHERE u.id = :id`,
+    { id: usuarioId },
   );
   return resultado.rows[0] ?? null;
 }

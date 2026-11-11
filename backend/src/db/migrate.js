@@ -10,9 +10,21 @@ const archivos = fs
   .filter((archivo) => archivo.endsWith(".sql"))
   .sort();
 
+// Oracle ejecuta una sentencia por llamada: en los archivos, cada sentencia
+// (o bloque PL/SQL) termina con una línea que solo contiene «/», como en SQL*Plus.
+function separarSentencias(contenido) {
+  return contenido
+    .split(/^\s*\/\s*$/m)
+    .map((sentencia) => sentencia.trim())
+    .filter((sentencia) => sentencia.replace(/^\s*--.*$/gm, "").trim() !== "");
+}
+
 try {
   for (const archivo of archivos) {
-    await pool.query(fs.readFileSync(path.join(sqlDir, archivo), "utf8"));
+    const contenido = fs.readFileSync(path.join(sqlDir, archivo), "utf8");
+    for (const sentencia of separarSentencias(contenido)) {
+      await pool.query(sentencia);
+    }
     console.log(`Migración aplicada: ${archivo}`);
   }
   console.log("Tablas listas.");

@@ -139,7 +139,7 @@ describe("authController.registrar", () => {
 
   test("debería responder 409 ante violación de unicidad en base de datos", async () => {
     // Arrange
-    crearUsuario.mockRejectedValue({ code: "23505" });
+    crearUsuario.mockRejectedValue({ code: "ORA-00001" });
     const res = crearRespuestaMock();
 
     // Act

@@ -1,0 +1,176 @@
+
+> rideu-backend@0.1.0 test:coverage
+> cross-env NODE_OPTIONS=--experimental-vm-modules jest --runInBand --coverage
+
+(node:7874) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+  console.error
+    Error al consultar vehículo y licencia: Error: sin conexión
+        at Object.<anonymous> (/home/user/rideu/backend/tests/routes/vehiculoRoutes.test.js:264:51)
+        at Promise.finally.completed (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1834:28)
+        at new Promise (<anonymous>)
+        at callAsyncCircusFn (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1774:10)
+        at _callCircusTest (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1167:40)
+        at processTicksAndRejections (node:internal/process/task_queues:103:5)
+        at _runTestInContext (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1103:3)
+        at runTestWithContext (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:996:5)
+        at _runTestsForDescribeBlockOnce (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1008:11)
+        at _runTestsForDescribeBlock (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:824:5)
+        at _runTestsForDescribeBlockOnce (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1003:11)
+        at _runTestsForDescribeBlock (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:824:5)
+        at _runTestsForDescribeBlockOnce (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1003:11)
+        at _runTestsForDescribeBlock (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:824:5)
+        at run (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:789:3)
+        at runAndTransformResultsToJestFormat (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:2300:21)
+        at jestAdapter (/home/user/rideu/backend/node_modules/jest-circus/build/runner.js:111:19)
+        at runTestInternal (/home/user/rideu/backend/node_modules/jest-runner/build/index.js:247:16)
+        at runTest (/home/user/rideu/backend/node_modules/jest-runner/build/index.js:315:7)
+
+      77 |     });
+      78 |   } catch (error) {
+    > 79 |     console.error("Error al consultar vehículo y licencia:", error);
+         |             ^
+      80 |     return res.status(500).json({ mensaje: "No se pudieron cargar el vehículo y la licencia." });
+      81 |   }
+      82 | }
+
+      at error (src/controllers/vehiculoController.js:79:13)
+
+  console.error
+    Error al cerrar la sesión: Error: sin conexión
+        at Object.<anonymous> (/home/user/rideu/backend/tests/routes/authRoutes.test.js:249:38)
+        at Promise.finally.completed (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1834:28)
+        at new Promise (<anonymous>)
+        at callAsyncCircusFn (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1774:10)
+        at _callCircusTest (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1167:40)
+        at processTicksAndRejections (node:internal/process/task_queues:103:5)
+        at _runTestInContext (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1103:3)
+        at runTestWithContext (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:996:5)
+        at _runTestsForDescribeBlockOnce (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1008:11)
+        at _runTestsForDescribeBlock (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:824:5)
+        at _runTestsForDescribeBlockOnce (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1003:11)
+        at _runTestsForDescribeBlock (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:824:5)
+        at run (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:789:3)
+        at runAndTransformResultsToJestFormat (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:2300:21)
+        at jestAdapter (/home/user/rideu/backend/node_modules/jest-circus/build/runner.js:111:19)
+        at runTestInternal (/home/user/rideu/backend/node_modules/jest-runner/build/index.js:247:16)
+        at runTest (/home/user/rideu/backend/node_modules/jest-runner/build/index.js:315:7)
+
+      149 |     return res.status(200).json({ mensaje: "Sesión cerrada." });
+      150 |   } catch (error) {
+    > 151 |     console.error("Error al cerrar la sesión:", error);
+          |             ^
+      152 |     return res.status(500).json({ mensaje: "No se pudo cerrar la sesión." });
+      153 |   }
+      154 | }
+
+      at error (src/controllers/authController.js:151:13)
+
+  console.error
+    Error al enviar el correo de verificación: Error: SMTP caído
+        at Object.<anonymous> (/home/user/rideu/backend/tests/controllers/authController.test.js:128:48)
+        at Promise.finally.completed (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1834:28)
+        at new Promise (<anonymous>)
+        at callAsyncCircusFn (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1774:10)
+        at _callCircusTest (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1167:40)
+        at _runTestInContext (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1103:3)
+        at runTestWithContext (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:996:5)
+        at _runTestsForDescribeBlockOnce (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1008:11)
+        at _runTestsForDescribeBlock (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:824:5)
+        at _runTestsForDescribeBlockOnce (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1003:11)
+        at _runTestsForDescribeBlock (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:824:5)
+        at run (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:789:3)
+        at runAndTransformResultsToJestFormat (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:2300:21)
+        at jestAdapter (/home/user/rideu/backend/node_modules/jest-circus/build/runner.js:111:19)
+        at runTestInternal (/home/user/rideu/backend/node_modules/jest-runner/build/index.js:247:16)
+        at runTest (/home/user/rideu/backend/node_modules/jest-runner/build/index.js:315:7)
+
+      53 |         console.error("No se pudo deshacer el registro tras fallar el correo:", borrado);
+      54 |       });
+    > 55 |       console.error("Error al enviar el correo de verificación:", error);
+         |               ^
+      56 |       return res.status(500).json({
+      57 |         mensaje: "No se pudo enviar el correo de verificación. Inténtalo de nuevo.",
+      58 |       });
+
+      at error (src/controllers/authController.js:55:15)
+      at Object.<anonymous> (tests/controllers/authController.test.js:133:5)
+
+  console.error
+    Error al validar la sesión: Error: DB caída
+        at Object.<anonymous> (/home/user/rideu/backend/tests/middleware/requiereSesion.test.js:92:46)
+        at Promise.finally.completed (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1834:28)
+        at new Promise (<anonymous>)
+        at callAsyncCircusFn (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1774:10)
+        at _callCircusTest (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1167:40)
+        at _runTestInContext (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1103:3)
+        at runTestWithContext (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:996:5)
+        at _runTestsForDescribeBlockOnce (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1008:11)
+        at _runTestsForDescribeBlock (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:824:5)
+        at _runTestsForDescribeBlockOnce (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1003:11)
+        at _runTestsForDescribeBlock (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:824:5)
+        at run (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:789:3)
+        at runAndTransformResultsToJestFormat (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:2300:21)
+        at jestAdapter (/home/user/rideu/backend/node_modules/jest-circus/build/runner.js:111:19)
+        at runTestInternal (/home/user/rideu/backend/node_modules/jest-runner/build/index.js:247:16)
+        at runTest (/home/user/rideu/backend/node_modules/jest-runner/build/index.js:315:7)
+
+      16 |     return next();
+      17 |   } catch (error) {
+    > 18 |     console.error("Error al validar la sesión:", error);
+         |             ^
+      19 |     return res.status(500).json({ mensaje: "No se pudo validar la sesión." });
+      20 |   }
+      21 | }
+
+      at error (src/middleware/requiereSesion.js:18:13)
+      at Object.<anonymous> (tests/middleware/requiereSesion.test.js:97:5)
+
+-------------------------|---------|----------|---------|---------|------------------------
+File                     | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s      
+-------------------------|---------|----------|---------|---------|------------------------
+All files                |   97.79 |    94.56 |   97.26 |   97.79 |                        
+ src                     |   92.85 |       80 |     100 |   92.85 |                        
+  app.js                 |   92.85 |       80 |     100 |   92.85 | 23                     
+ src/config              |     100 |      100 |     100 |     100 |                        
+  env.js                 |     100 |      100 |     100 |     100 |                        
+ src/controllers         |      95 |    95.55 |   92.85 |      95 |                        
+  authController.js      |   88.33 |    88.23 |   83.33 |   88.33 | 53,71-72,98-99,140-141 
+  historialController.js |     100 |      100 |     100 |     100 |                        
+  sedeController.js      |     100 |      100 |     100 |     100 |                        
+  trayectoController.js  |     100 |      100 |     100 |     100 |                        
+  vehiculoController.js  |     100 |      100 |     100 |     100 |                        
+ src/middleware          |     100 |      100 |     100 |     100 |                        
+  requiereSesion.js      |     100 |      100 |     100 |     100 |                        
+ src/models              |     100 |    88.63 |     100 |     100 |                        
+  licencia.js            |     100 |       75 |     100 |     100 | 36                     
+  sede.js                |     100 |      100 |     100 |     100 |                        
+  sesion.js              |     100 |      100 |     100 |     100 |                        
+  trayecto.js            |     100 |      100 |     100 |     100 |                        
+  usuario.js             |     100 |    84.61 |     100 |     100 | 47-105                 
+  vehiculo.js            |     100 |       90 |     100 |     100 | 26-62                  
+ src/routes              |     100 |      100 |     100 |     100 |                        
+  authRoutes.js          |     100 |      100 |     100 |     100 |                        
+  historialRoutes.js     |     100 |      100 |     100 |     100 |                        
+  sedeRoutes.js          |     100 |      100 |     100 |     100 |                        
+  trayectoRoutes.js      |     100 |      100 |     100 |     100 |                        
+  vehiculoRoutes.js      |     100 |      100 |     100 |     100 |                        
+ src/services            |   89.47 |       65 |      75 |   89.47 |                        
+  correo.js              |   89.47 |       65 |      75 |   89.47 | 52-59                  
+ src/validation          |   99.45 |    98.28 |     100 |   99.45 |                        
+  registro.js            |   97.77 |    97.56 |     100 |   97.72 | 85                     
+  trayecto.js            |     100 |    97.75 |     100 |     100 | 46,86                  
+  vehiculoLicencia.js    |     100 |      100 |     100 |     100 |                        
+-------------------------|---------|----------|---------|---------|------------------------
+
+=============================== Coverage summary ===============================
+Statements   : 97.79% ( 488/499 )
+Branches     : 94.56% ( 348/368 )
+Functions    : 97.26% ( 71/73 )
+Lines        : 97.79% ( 487/498 )
+================================================================================
+Test Suites: 16 passed, 16 total
+Tests:       262 passed, 262 total
+Snapshots:   0 total
+Time:        2.309 s
+Ran all test suites.

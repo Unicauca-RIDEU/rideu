@@ -1,0 +1,60 @@
+Recorrido funcional en Chromium (Playwright) contra frontend (Vite) + backend + Oracle real.
+Fecha de ejecución: 2026-11-11 (UTC).
+
+== Oracle Database 21c Express Edition 21.0.0.0.0 (capturas 01 a 07 de esta carpeta)
+APROBADO F01 Registro crea la cuenta en Oracle (201) — HTTP 201
+APROBADO F02 Registro con correo repetido se rechaza (409) — HTTP 409
+APROBADO F03 Inicio de sesión sin verificar se rechaza (403) — HTTP 403
+APROBADO F04 El enlace verifica la cuenta (200) — HTTP 200
+APROBADO F05 Inicio de sesión abre el panel (200) — HTTP 200
+APROBADO F06 Sin vehículo no se puede publicar
+APROBADO F07 Registro de vehículo y licencia habilita la cuenta (201) — HTTP 201
+APROBADO F08 El vehículo y la licencia persisten al recargar — placa IPX 082, vence 16 / 12 / 2027
+APROBADO F09 Actualizar el vehículo responde 200 — HTTP 200
+APROBADO F10 Publicar trayecto (201) con fecha y hora correctas — HTTP 201, 2026-11-13 07:15
+APROBADO F11 Otro trayecto en la misma fecha y hora se rechaza (409) — HTTP 409
+APROBADO F12 La búsqueda muestra el trayecto publicado — HTTP 200
+APROBADO F13 Búsqueda sin coincidencias avisa «No hay resultados disponibles»
+APROBADO F14 El historial muestra el trayecto como «Pendiente» — HTTP 200
+APROBADO F15 Cerrar sesión responde 200 y vuelve al inicio de sesión — HTTP 200
+APROBADO F16 Sin sesión, una ruta protegida redirige al inicio de sesión — http://localhost:5173/login
+APROBADO F17 Sin errores 5xx ni errores de consola inesperados en el navegador
+
+Total: 17, aprobados: 17, fallidos: 0
+Cuenta de prueba: funcional.1794427202082@unicauca.edu.co
+
+Filas leídas con SQL*Plus después del recorrido:
+
+NOMBRE		     ESTADO	  PLACA
+-------------------- ------------ --------
+COLOR
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+VENCE	   ORIGEN		FECHA	   HORA       CUPOS	  DISP
+---------- -------------------- ---------- ----- ---------- ----------
+Camila Muñoz Peña    Habilitado   IPX 082
+Negro
+2027-12-16 Barrio La Esmeralda	2026-11-13 07:15	  3	     3
+
+
+
+== Oracle AI Database 26ai Free 23.26.3.0.0 (mismo recorrido, sin capturas guardadas)
+APROBADO F01 Registro crea la cuenta en Oracle (201) — HTTP 201
+APROBADO F02 Registro con correo repetido se rechaza (409) — HTTP 409
+APROBADO F03 Inicio de sesión sin verificar se rechaza (403) — HTTP 403
+APROBADO F04 El enlace verifica la cuenta (200) — HTTP 200
+APROBADO F05 Inicio de sesión abre el panel (200) — HTTP 200
+APROBADO F06 Sin vehículo no se puede publicar
+APROBADO F07 Registro de vehículo y licencia habilita la cuenta (201) — HTTP 201
+APROBADO F08 El vehículo y la licencia persisten al recargar — placa VJT 387, vence 16 / 12 / 2027
+APROBADO F09 Actualizar el vehículo responde 200 — HTTP 200
+APROBADO F10 Publicar trayecto (201) con fecha y hora correctas — HTTP 201, 2026-11-13 07:15
+APROBADO F11 Otro trayecto en la misma fecha y hora se rechaza (409) — HTTP 409
+APROBADO F12 La búsqueda muestra el trayecto publicado — HTTP 200
+APROBADO F13 Búsqueda sin coincidencias avisa «No hay resultados disponibles»
+APROBADO F14 El historial muestra el trayecto como «Pendiente» — HTTP 200
+APROBADO F15 Cerrar sesión responde 200 y vuelve al inicio de sesión — HTTP 200
+APROBADO F16 Sin sesión, una ruta protegida redirige al inicio de sesión — http://localhost:5173/login
+APROBADO F17 Sin errores 5xx ni errores de consola inesperados en el navegador
+
+Total: 17, aprobados: 17, fallidos: 0
+Cuenta de prueba: funcional.1794427234387@unicauca.edu.co

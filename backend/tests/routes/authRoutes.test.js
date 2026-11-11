@@ -1,4 +1,5 @@
 import { describe, test, expect, jest, beforeEach } from "@jest/globals";
+import { SALIDA } from "../helpers/database.js";
 import request from "supertest";
 
 const buscarPorCorreo = jest.fn();
@@ -17,6 +18,7 @@ const bcryptHashSync = jest.fn(() => "$2a$10$ausente");
 
 jest.unstable_mockModule("../../src/config/database.js", () => ({
   pool: { query: jest.fn() },
+  SALIDA,
 }));
 
 jest.unstable_mockModule("../../src/models/usuario.js", () => ({

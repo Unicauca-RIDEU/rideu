@@ -1,9 +1,11 @@
 import { describe, test, expect, jest, beforeEach } from "@jest/globals";
+import { SALIDA } from "../helpers/database.js";
 
 const query = jest.fn();
 
 jest.unstable_mockModule("../../src/config/database.js", () => ({
   pool: { query },
+  SALIDA,
 }));
 
 const {
@@ -56,9 +58,9 @@ describe("modelo usuario", () => {
 
     // Assert
     expect(usuario).toBeNull();
-    expect(query).toHaveBeenCalledWith(expect.stringContaining("WHERE correo = $1"), [
-      "nadie@unicauca.edu.co",
-    ]);
+    expect(query).toHaveBeenCalledWith(expect.stringContaining("WHERE correo = :correo"), {
+      correo: "nadie@unicauca.edu.co",
+    });
   });
 
   test("debería devolver credenciales cuando el correo existe", async () => {
@@ -104,7 +106,19 @@ describe("modelo usuario", () => {
 
     // Assert
     expect(resultado).toEqual(creado);
-    expect(query.mock.calls[0][1][4]).toBe(ESTADO_SIN_VERIFICAR);
+    const parametros = query.mock.calls[0][1];
+    expect(parametros.estado).toBe(ESTADO_SIN_VERIFICAR);
+    // Oracle no genera el UUID: lo crea la aplicación y lo envía en el INSERT.
+    expect(parametros.id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+    expect(parametros).toMatchObject({
+      nombre: "Ana",
+      correo: "ana@unicauca.edu.co",
+      contrasena_hash: "hash",
+      whatsapp: "+573001234567",
+      token_hash: "th",
+      token_expira: payload.tokenExpira,
+    });
+    expect(query.mock.calls[0][0]).toMatch(/RETURNING[\s\S]+INTO :r_id/);
   });
 
   test("debería eliminar un usuario por id", async () => {
@@ -115,7 +129,7 @@ describe("modelo usuario", () => {
     await eliminarUsuario("u1");
 
     // Assert
-    expect(query).toHaveBeenCalledWith("DELETE FROM usuarios WHERE id = $1", ["u1"]);
+    expect(query).toHaveBeenCalledWith("DELETE FROM usuarios WHERE id = :id", { id: "u1" });
   });
 
   test("debería marcar la cuenta como verificada con token válido", async () => {
@@ -133,6 +147,13 @@ describe("modelo usuario", () => {
 
     // Assert
     expect(resultado).toEqual({ ok: true, usuario });
+    const [sql, parametros] = query.mock.calls[0];
+    expect(sql).toContain("token_verificacion_expira > SYSTIMESTAMP");
+    expect(parametros).toMatchObject({
+      token_hash: hashToken("token-valido"),
+      estado_nuevo: ESTADO_VERIFICADA,
+      estado_actual: ESTADO_SIN_VERIFICAR,
+    });
   });
 
   test("debería reportar motivo invalido cuando el token no existe", async () => {

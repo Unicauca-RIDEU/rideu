@@ -1,7 +1,7 @@
 {
   "name": "rideu",
   "version": "1.0.0",
-  "description": "Página web de Ride U. El stack es React (Vite) en el frontend, Node.js con Express en el backend y PostgreSQL como base de datos.",
+  "description": "Página web de Ride U. El stack es React (Vite) en el frontend, Node.js con Express en el backend y Oracle Database como base de datos.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

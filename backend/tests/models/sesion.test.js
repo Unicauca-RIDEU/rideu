@@ -1,9 +1,11 @@
 import { describe, test, expect, jest, beforeEach } from "@jest/globals";
+import { SALIDA } from "../helpers/database.js";
 
 const query = jest.fn();
 
 jest.unstable_mockModule("../../src/config/database.js", () => ({
   pool: { query },
+  SALIDA,
 }));
 
 const { crearSesion, buscarUsuarioPorSesion, eliminarSesion } = await import(
@@ -29,7 +31,12 @@ describe("modelo sesion", () => {
     expect(expira.getTime()).toBeGreaterThan(antes + 6 * 24 * 60 * 60 * 1000);
     expect(query).toHaveBeenCalledWith(
       expect.stringContaining("INSERT INTO sesiones"),
-      ["usuario-1", hashToken(token), expect.any(Date)],
+      {
+        id: expect.stringMatching(/^[0-9a-f-]{36}$/),
+        usuario_id: "usuario-1",
+        token_hash: hashToken(token),
+        expira: expect.any(Date),
+      },
     );
   });
 
@@ -40,9 +47,9 @@ describe("modelo sesion", () => {
 
     expect(query).toHaveBeenCalledWith(
       expect.stringContaining("DELETE FROM sesiones"),
-      ["usuario-1"],
+      { usuario_id: "usuario-1" },
     );
-    expect(query.mock.calls[0][0]).toContain("expira <= NOW()");
+    expect(query.mock.calls[0][0]).toContain("expira <= SYSTIMESTAMP");
   });
 
   test("debería crear la sesión aunque falle el borrado de las vencidas", async () => {
@@ -61,9 +68,9 @@ describe("modelo sesion", () => {
 
     await eliminarSesion("token-sesion");
 
-    expect(query).toHaveBeenCalledWith(expect.stringContaining("DELETE FROM sesiones"), [
-      hashToken("token-sesion"),
-    ]);
+    expect(query).toHaveBeenCalledWith(expect.stringContaining("DELETE FROM sesiones"), {
+      token_hash: hashToken("token-sesion"),
+    });
   });
 
   test("debería devolver el usuario si el token de sesión es válido", async () => {
@@ -81,7 +88,8 @@ describe("modelo sesion", () => {
 
     // Assert
     expect(encontrado).toEqual(usuario);
-    expect(query.mock.calls[0][1][0]).toBe(hashToken("token-sesion"));
+    expect(query.mock.calls[0][1]).toEqual({ token_hash: hashToken("token-sesion") });
+    expect(query.mock.calls[0][0]).toContain("s.expira > SYSTIMESTAMP");
   });
 
   test("debería devolver null si el token de sesión no existe o expiró", async () => {

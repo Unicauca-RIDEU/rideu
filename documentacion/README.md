@@ -14,6 +14,12 @@ Material de gestión, diseño y pruebas del proyecto.
 
 Dependencias: HU01 → HU02 → HU03 → HU04 → HU05 · HU06 → HU07 → HU08 · HU07 → HU10 y HU11 · HU04 → HU11 · HU05 y HU07 → HU09.
 
+## Documentación técnica
+
+| Documento | Contenido |
+| --- | --- |
+| [Migración a Oracle](migracion-oracle/) | Cambio de PostgreSQL a Oracle Database: equivalencias del modelo y de las consultas, errores encontrados, pruebas ejecutadas y pendientes |
+
 ## Documentos del proyecto
 
 | Carpeta | Contenido | Versión vigente |

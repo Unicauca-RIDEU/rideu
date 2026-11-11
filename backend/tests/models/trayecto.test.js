@@ -1,9 +1,11 @@
 import { describe, test, expect, jest, beforeEach } from "@jest/globals";
+import { SALIDA } from "../helpers/database.js";
 
 const query = jest.fn();
 
 jest.unstable_mockModule("../../src/config/database.js", () => ({
   pool: { query },
+  SALIDA,
 }));
 
 const {
@@ -44,17 +46,21 @@ describe("modelo trayecto", () => {
     // Assert
     expect(ESTADO_DISPONIBLE).toBe("Disponible");
     expect(creado).toEqual(fila);
-    expect(query).toHaveBeenCalledWith(expect.stringContaining("INSERT INTO trayectos"), [
-      datos.conductorId,
-      datos.vehiculoId,
-      datos.sedeDestinoId,
-      datos.origen,
-      datos.fecha,
-      datos.hora,
-      datos.cupos,
-      datos.aporteSugerido,
-      "Disponible",
-    ]);
+    expect(query).toHaveBeenCalledWith(
+      expect.stringContaining("INSERT INTO trayectos"),
+      expect.objectContaining({
+        id: expect.stringMatching(/^[0-9a-f-]{36}$/),
+        conductor_id: datos.conductorId,
+        vehiculo_id: datos.vehiculoId,
+        sede_destino_id: datos.sedeDestinoId,
+        origen: datos.origen,
+        fecha: datos.fecha,
+        hora: datos.hora,
+        cupos: datos.cupos,
+        aporte_sugerido: datos.aporteSugerido,
+        estado: "Disponible",
+      }),
+    );
   });
 
   test("debería iniciar los cupos disponibles iguales a los cupos ofrecidos (HU06)", async () => {
@@ -64,10 +70,10 @@ describe("modelo trayecto", () => {
     // Act
     await crearTrayecto(datos);
 
-    // Assert: la columna cupos_disponibles reutiliza el parámetro $7 (cupos)
+    // Assert: la columna cupos_disponibles reutiliza el parámetro :cupos
     const sql = query.mock.calls[0][0];
     expect(sql).toMatch(/estado,\s*cupos_disponibles\s*\)/);
-    expect(sql).toContain("VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $7)");
+    expect(sql).toMatch(/:cupos,\s*:aporte_sugerido,\s*:estado,\s*:cupos\s*\)/);
   });
 
   test("debería usar el cliente de base de datos recibido (transacción)", async () => {
@@ -83,7 +89,7 @@ describe("modelo trayecto", () => {
   });
 
   test("debería detectar un trayecto «Disponible» del conductor en la misma fecha y hora", async () => {
-    query.mockResolvedValueOnce({ rows: [{ existe: true }] });
+    query.mockResolvedValueOnce({ rows: [{ existe: 1 }] });
 
     const existe = await existeTrayectoEnHorario({
       conductorId: "conductor-1",
@@ -94,11 +100,16 @@ describe("modelo trayecto", () => {
     expect(existe).toBe(true);
     const [sql, parametros] = query.mock.calls[0];
     expect(sql).toContain("FROM trayectos");
-    expect(parametros).toEqual(["conductor-1", "2030-05-20", "07:00", ESTADO_DISPONIBLE]);
+    expect(parametros).toEqual({
+      conductor_id: "conductor-1",
+      fecha: "2030-05-20",
+      hora: "07:00",
+      estado: ESTADO_DISPONIBLE,
+    });
   });
 
   test("debería indicar que no hay trayecto en ese horario", async () => {
-    query.mockResolvedValueOnce({ rows: [{ existe: false }] });
+    query.mockResolvedValueOnce({ rows: [{ existe: 0 }] });
 
     const existe = await existeTrayectoEnHorario({
       conductorId: "conductor-1",
@@ -120,9 +131,12 @@ describe("modelo trayecto", () => {
 
       expect(trayectos).toEqual(filas);
       const [sql, parametros] = query.mock.calls[0];
-      expect(sql).toContain("WHERE t.conductor_id = $1");
+      expect(sql).toContain("WHERE t.conductor_id = :conductor_id");
       expect(sql).toContain("ORDER BY t.fecha DESC, t.hora DESC");
-      expect(parametros).toEqual(["conductor-1", "2026-11-10 09:00"]);
+      expect(parametros).toEqual({
+        conductor_id: "conductor-1",
+        ahora_colombia: "2026-11-10 09:00",
+      });
     });
 
     test("criterio 1: debería marcar «Completado» el trayecto cuya salida ya pasó y «Pendiente» el resto", async () => {
@@ -131,7 +145,9 @@ describe("modelo trayecto", () => {
       await listarTrayectosDeConductor(filtros);
 
       const [sql] = query.mock.calls[0];
-      expect(sql).toContain("(t.fecha + t.hora) <= $2::timestamp THEN 'Completado'");
+      expect(sql).toMatch(
+        /t\.hora, 'YYYY-MM-DD HH24:MI'\) <= TO_DATE\(:ahora_colombia, 'YYYY-MM-DD HH24:MI'\)\s+THEN 'Completado'/,
+      );
       expect(sql).toContain("ELSE 'Pendiente'");
       expect(sql).toContain("AS estado_historial");
     });
@@ -163,7 +179,7 @@ describe("modelo trayecto", () => {
     const [sql, parametros] = query.mock.calls[0];
     expect(sql).toContain("FROM vehiculos");
     expect(sql).toContain("FROM licencias");
-    expect(parametros).toEqual([datos.conductorId]);
+    expect(parametros).toEqual({ id: datos.conductorId });
   });
 
   test("debería devolver null si el usuario no existe", async () => {
@@ -195,7 +211,13 @@ describe("modelo trayecto", () => {
 
       // Assert
       const [, parametros] = query.mock.calls[0];
-      expect(parametros).toEqual(["Disponible", 1, "2026-11-05", "06:30", "2026-11-04 07:00"]);
+      expect(parametros).toEqual({
+        estado: "Disponible",
+        sede_destino_id: 1,
+        fecha: "2026-11-05",
+        hora_desde: "06:30",
+        ahora_colombia: "2026-11-04 07:00",
+      });
     });
 
     test("criterio 3: debería excluir los trayectos sin cupos disponibles", async () => {
@@ -219,7 +241,9 @@ describe("modelo trayecto", () => {
 
       await buscarTrayectosDisponibles(filtros);
 
-      expect(query.mock.calls[0][0]).toContain("(t.fecha + t.hora) > $5::timestamp");
+      expect(query.mock.calls[0][0]).toContain(
+        "t.hora, 'YYYY-MM-DD HH24:MI') > TO_DATE(:ahora_colombia, 'YYYY-MM-DD HH24:MI')",
+      );
     });
 
     test("debería devolver una lista vacía si no hay coincidencias", async () => {

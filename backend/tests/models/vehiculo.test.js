@@ -1,4 +1,5 @@
 import { describe, test, expect, jest, beforeEach } from "@jest/globals";
+import { SALIDA } from "../helpers/database.js";
 
 const query = jest.fn();
 const clienteQuery = jest.fn();
@@ -7,6 +8,7 @@ const connect = jest.fn();
 
 jest.unstable_mockModule("../../src/config/database.js", () => ({
   pool: { query, connect },
+  SALIDA,
 }));
 
 const { guardarVehiculoYLicencia, buscarVehiculosPorUsuario, eliminarVehiculo } = await import(
@@ -44,8 +46,28 @@ function transaccion({ estado = "Verificada", existe = true, habilita = true } =
   });
 }
 
+// Pasos de la transacción en orden: la primera palabra de cada consulta y el cierre.
+// En Oracle no hay BEGIN: la transacción termina con commit() o rollback() de la conexión.
+let pasos = [];
+
 function sentencias() {
-  return clienteQuery.mock.calls.map(([sql]) => sql.trim().split(/\s+/)[0]);
+  return pasos;
+}
+
+function clienteDeTransaccion() {
+  return {
+    query: (sql, parametros) => {
+      pasos.push(sql.trim().split(/\s+/)[0]);
+      return clienteQuery(sql, parametros);
+    },
+    commit: async () => {
+      pasos.push("COMMIT");
+    },
+    rollback: async () => {
+      pasos.push("ROLLBACK");
+    },
+    release,
+  };
 }
 
 describe("modelo vehiculo: guardarVehiculoYLicencia", () => {
@@ -54,7 +76,8 @@ describe("modelo vehiculo: guardarVehiculoYLicencia", () => {
     clienteQuery.mockReset();
     release.mockReset();
     connect.mockReset();
-    connect.mockResolvedValue({ query: clienteQuery, release });
+    pasos = [];
+    connect.mockResolvedValue(clienteDeTransaccion());
   });
 
   test("debería guardar vehículo y licencia y habilitar la cuenta en una transacción", async () => {
@@ -63,15 +86,19 @@ describe("modelo vehiculo: guardarVehiculoYLicencia", () => {
     const resultado = await guardarVehiculoYLicencia(datos);
 
     expect(resultado).toEqual({ ok: true, usuario: habilitado, vehiculo, licencia });
-    expect(sentencias()).toEqual(["BEGIN", "SELECT", "INSERT", "INSERT", "UPDATE", "COMMIT"]);
-    expect(clienteQuery).toHaveBeenCalledWith(expect.stringContaining("INSERT INTO vehiculos"), [
-      USUARIO_ID,
-      "FKU 284",
-      "Chevrolet",
-      "Onix 2022",
-      "Blanco",
-      4,
-    ]);
+    expect(sentencias()).toEqual(["SELECT", "INSERT", "INSERT", "UPDATE", "COMMIT"]);
+    expect(clienteQuery).toHaveBeenCalledWith(
+      expect.stringContaining("INSERT INTO vehiculos"),
+      expect.objectContaining({
+        id: expect.stringMatching(/^[0-9a-f-]{36}$/),
+        usuario_id: USUARIO_ID,
+        placa: "FKU 284",
+        marca: "Chevrolet",
+        modelo: "Onix 2022",
+        color: "Blanco",
+        capacidad_pasajeros: 4,
+      }),
+    );
     expect(release).toHaveBeenCalledTimes(1);
   });
 
@@ -81,7 +108,7 @@ describe("modelo vehiculo: guardarVehiculoYLicencia", () => {
     const resultado = await guardarVehiculoYLicencia(datos);
 
     expect(resultado).toEqual({ ok: false, motivo: "usuario_inexistente" });
-    expect(sentencias()).toEqual(["BEGIN", "SELECT", "ROLLBACK"]);
+    expect(sentencias()).toEqual(["SELECT", "ROLLBACK"]);
     expect(release).toHaveBeenCalledTimes(1);
   });
 
@@ -91,7 +118,7 @@ describe("modelo vehiculo: guardarVehiculoYLicencia", () => {
     const resultado = await guardarVehiculoYLicencia(datos);
 
     expect(resultado).toEqual({ ok: false, motivo: "no_verificada", estado: "Sin verificar" });
-    expect(sentencias()).toEqual(["BEGIN", "SELECT", "ROLLBACK"]);
+    expect(sentencias()).toEqual(["SELECT", "ROLLBACK"]);
   });
 
   test("debería deshacer si no se pudo cambiar el estado a «Habilitado»", async () => {
@@ -129,21 +156,27 @@ describe("modelo vehiculo: guardarVehiculoYLicencia", () => {
       vehiculo: vehiculoActualizado,
       licencia: licenciaActualizada,
     });
-    expect(sentencias()).toEqual(["BEGIN", "SELECT", "SELECT", "UPDATE", "UPDATE", "COMMIT"]);
+    expect(sentencias()).toEqual(["SELECT", "SELECT", "UPDATE", "UPDATE", "COMMIT"]);
     // Los dos UPDATE se limitan al usuario de la sesión.
-    expect(clienteQuery).toHaveBeenCalledWith(expect.stringContaining("UPDATE vehiculos"), [
-      USUARIO_ID,
-      "ABC 123",
-      "Chevrolet",
-      "Onix 2022",
-      "Blanco",
-      4,
-    ]);
-    expect(clienteQuery).toHaveBeenCalledWith(expect.stringContaining("UPDATE licencias"), [
-      USUARIO_ID,
-      "B1",
-      "2099-09-15",
-    ]);
+    expect(clienteQuery).toHaveBeenCalledWith(
+      expect.stringContaining("UPDATE vehiculos"),
+      expect.objectContaining({
+        usuario_id: USUARIO_ID,
+        placa: "ABC 123",
+        marca: "Chevrolet",
+        modelo: "Onix 2022",
+        color: "Blanco",
+        capacidad_pasajeros: 4,
+      }),
+    );
+    expect(clienteQuery).toHaveBeenCalledWith(
+      expect.stringContaining("UPDATE licencias"),
+      expect.objectContaining({
+        usuario_id: USUARIO_ID,
+        categoria: "B1",
+        fecha_vencimiento: "2099-09-15",
+      }),
+    );
     expect(release).toHaveBeenCalledTimes(1);
   });
 
@@ -162,7 +195,6 @@ describe("modelo vehiculo: guardarVehiculoYLicencia", () => {
     expect(resultado.vehiculo).toEqual(vehiculo);
     expect(resultado.licencia).toEqual(licencia);
     expect(sentencias()).toEqual([
-      "BEGIN",
       "SELECT",
       "SELECT",
       "UPDATE",
@@ -183,8 +215,10 @@ describe("modelo vehiculo: guardarVehiculoYLicencia", () => {
     const resultado = await guardarVehiculoYLicencia({ ...datos, capacidadPasajeros: 2 });
 
     expect(resultado).toEqual({ ok: false, motivo: "capacidad_insuficiente", cuposPublicados: 4 });
-    expect(sentencias()).toEqual(["BEGIN", "SELECT", "SELECT", "ROLLBACK"]);
-    expect(clienteQuery).toHaveBeenCalledWith(expect.stringContaining("MAX(t.cupos)"), [USUARIO_ID]);
+    expect(sentencias()).toEqual(["SELECT", "SELECT", "ROLLBACK"]);
+    expect(clienteQuery).toHaveBeenCalledWith(expect.stringContaining("MAX(t.cupos)"), {
+      usuario_id: USUARIO_ID,
+    });
     expect(release).toHaveBeenCalledTimes(1);
   });
 
@@ -207,7 +241,7 @@ describe("modelo vehiculo: guardarVehiculoYLicencia", () => {
   });
 
   test("debería deshacer y relanzar el error si la placa actualizada ya es de otro vehículo", async () => {
-    const duplicada = Object.assign(new Error("duplicada"), { code: "23505" });
+    const duplicada = Object.assign(new Error("duplicada"), { code: "ORA-00001" });
     clienteQuery.mockImplementation(async (sql) => {
       if (sql.includes("FOR UPDATE")) return { rows: [habilitado] };
       if (sql.includes("UPDATE vehiculos")) throw duplicada;
@@ -220,7 +254,7 @@ describe("modelo vehiculo: guardarVehiculoYLicencia", () => {
   });
 
   test("debería deshacer y relanzar el error si falla un INSERT", async () => {
-    const duplicada = Object.assign(new Error("duplicada"), { code: "23505" });
+    const duplicada = Object.assign(new Error("duplicada"), { code: "ORA-00001" });
     transaccion();
     clienteQuery.mockImplementation(async (sql) => {
       if (sql.includes("FOR UPDATE")) return { rows: [{ id: USUARIO_ID, estado: "Verificada" }] };
@@ -245,10 +279,10 @@ describe("modelos vehiculo y licencia: consultas simples", () => {
     expect(await buscarVehiculosPorUsuario(USUARIO_ID)).toEqual([vehiculo]);
     await eliminarVehiculo("v1");
 
-    expect(query).toHaveBeenNthCalledWith(1, expect.stringContaining("FROM vehiculos"), [
-      USUARIO_ID,
-    ]);
-    expect(query).toHaveBeenNthCalledWith(2, "DELETE FROM vehiculos WHERE id = $1", ["v1"]);
+    expect(query).toHaveBeenNthCalledWith(1, expect.stringContaining("FROM vehiculos"), {
+      usuario_id: USUARIO_ID,
+    });
+    expect(query).toHaveBeenNthCalledWith(2, "DELETE FROM vehiculos WHERE id = :id", { id: "v1" });
   });
 
   test("debería crear, listar y eliminar licencias", async () => {
@@ -266,11 +300,16 @@ describe("modelos vehiculo y licencia: consultas simples", () => {
     expect(await buscarLicenciasPorUsuario(USUARIO_ID)).toEqual([licencia]);
     await eliminarLicencia("l1");
 
-    expect(query).toHaveBeenNthCalledWith(1, expect.stringContaining("INSERT INTO licencias"), [
-      USUARIO_ID,
-      "B1",
-      "2099-09-15",
-    ]);
-    expect(query).toHaveBeenNthCalledWith(3, "DELETE FROM licencias WHERE id = $1", ["l1"]);
+    expect(query).toHaveBeenNthCalledWith(
+      1,
+      expect.stringContaining("INSERT INTO licencias"),
+      expect.objectContaining({
+        id: expect.stringMatching(/^[0-9a-f-]{36}$/),
+        usuario_id: USUARIO_ID,
+        categoria: "B1",
+        fecha_vencimiento: "2099-09-15",
+      }),
+    );
+    expect(query).toHaveBeenNthCalledWith(3, "DELETE FROM licencias WHERE id = :id", { id: "l1" });
   });
 });

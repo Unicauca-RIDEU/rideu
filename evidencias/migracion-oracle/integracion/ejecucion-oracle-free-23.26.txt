@@ -1,0 +1,129 @@
+
+> rideu-backend@0.1.0 test:integration
+> node --test src/**/*.test.js src/**/**/*.test.js
+
+TAP version 13
+# Subtest: el login con correo sin verificar responde 403 y no abre sesión
+ok 1 - el login con correo sin verificar responde 403 y no abre sesión
+  ---
+  duration_ms: 158.959409
+  type: 'test'
+  ...
+# Subtest: correo inexistente y contraseña incorrecta responden el mismo 401
+ok 2 - correo inexistente y contraseña incorrecta responden el mismo 401
+  ---
+  duration_ms: 97.593244
+  type: 'test'
+  ...
+# Subtest: Oracle responde y el esquema tiene las seis tablas y las siete sedes
+ok 3 - Oracle responde y el esquema tiene las seis tablas y las siete sedes
+  ---
+  duration_ms: 144.968288
+  type: 'test'
+  ...
+# Oracle AI Database 26ai Free Release 23.26.3.0.0 - Develop, Learn, and Run for Free
+# Subtest: flujo completo por la API: registro, sesión, vehículo, trayecto, búsqueda e historial
+ok 4 - flujo completo por la API: registro, sesión, vehículo, trayecto, búsqueda e historial
+  ---
+  duration_ms: 806.934699
+  type: 'test'
+  ...
+# Subtest: la transacción de vehículo y licencia se revierte completa si falla un paso
+ok 5 - la transacción de vehículo y licencia se revierte completa si falla un paso
+  ---
+  duration_ms: 227.242916
+  type: 'test'
+  ...
+# Subtest: las restricciones de integridad rechazan los datos inválidos
+ok 6 - las restricciones de integridad rechazan los datos inválidos
+  ---
+  duration_ms: 206.249593
+  type: 'test'
+  ...
+# Subtest: una sesión creada identifica al usuario verificado
+ok 7 - una sesión creada identifica al usuario verificado
+  ---
+  duration_ms: 146.250298
+  type: 'test'
+  ...
+# Subtest: el token válido verifica una sola vez
+ok 8 - el token válido verifica una sola vez
+  ---
+  duration_ms: 152.091084
+  type: 'test'
+  ...
+# Subtest: un token vencido no cambia el estado
+ok 9 - un token vencido no cambia el estado
+  ---
+  duration_ms: 16.085393
+  type: 'test'
+  ...
+# Subtest: arma el enlace de verificación con el token
+ok 10 - arma el enlace de verificación con el token
+  ---
+  duration_ms: 0.722044
+  type: 'test'
+  ...
+# Subtest: en modo consola escribe el enlace y no usa SMTP
+ok 11 - en modo consola escribe el enlace y no usa SMTP
+  ---
+  duration_ms: 0.390057
+  type: 'test'
+  ...
+# Subtest: en modo smtp exige host y remitente antes de enviar
+ok 12 - en modo smtp exige host y remitente antes de enviar
+  ---
+  duration_ms: 0.451599
+  type: 'test'
+  ...
+# Subtest: en modo smtp envía el enlace al correo institucional
+ok 13 - en modo smtp envía el enlace al correo institucional
+  ---
+  duration_ms: 0.191441
+  type: 'test'
+  ...
+# Subtest: acepta el correo institucional y normaliza los datos
+ok 14 - acepta el correo institucional y normaliza los datos
+  ---
+  duration_ms: 1.045065
+  type: 'test'
+  ...
+# Subtest: rechaza un dominio distinto al institucional
+ok 15 - rechaza un dominio distinto al institucional
+  ---
+  duration_ms: 0.795387
+  type: 'test'
+  ...
+# Subtest: rechaza un dominio que solo contiene unicauca.edu.co
+ok 16 - rechaza un dominio que solo contiene unicauca.edu.co
+  ---
+  duration_ms: 0.132118
+  type: 'test'
+  ...
+# Subtest: indica cada campo obligatorio que falta
+ok 17 - indica cada campo obligatorio que falta
+  ---
+  duration_ms: 1.373114
+  type: 'test'
+  ...
+# Subtest: rechaza una contraseña de menos de 8 caracteres
+ok 18 - rechaza una contraseña de menos de 8 caracteres
+  ---
+  duration_ms: 0.321415
+  type: 'test'
+  ...
+# Subtest: rechaza un WhatsApp que no es un celular colombiano
+ok 19 - rechaza un WhatsApp que no es un celular colombiano
+  ---
+  duration_ms: 0.191179
+  type: 'test'
+  ...
+1..19
+# tests 19
+# suites 0
+# pass 19
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1776.506102

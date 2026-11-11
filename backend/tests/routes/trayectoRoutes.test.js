@@ -1,4 +1,5 @@
 import { describe, test, expect, jest, beforeEach } from "@jest/globals";
+import { SALIDA } from "../helpers/database.js";
 import request from "supertest";
 
 const buscarUsuarioPorSesion = jest.fn();
@@ -11,6 +12,7 @@ const listarSedes = jest.fn();
 
 jest.unstable_mockModule("../../src/config/database.js", () => ({
   pool: { query: jest.fn(), connect: jest.fn() },
+  SALIDA,
 }));
 
 jest.unstable_mockModule("../../src/models/sesion.js", () => ({

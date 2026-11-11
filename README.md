@@ -2,7 +2,7 @@
 
 Aplicación web de trayectos compartidos para la comunidad de la Universidad del Cauca. El acceso es exclusivo con correo institucional `@unicauca.edu.co`.
 
-El stack es React (Vite) en el frontend, Node.js con Express en el backend y PostgreSQL como base de datos.
+El stack es React (Vite) en el frontend, Node.js con Express en el backend y Oracle Database como base de datos.
 
 ## Estado del proyecto
 
@@ -22,7 +22,9 @@ El backlog, las historias, los casos de prueba y el plan de riesgos están en [`
 
 - Node.js 20 o superior
 - npm 10 o superior
-- PostgreSQL 16 o superior
+- Oracle Database 19c o superior (sirven las ediciones gratuitas Oracle Database Free y Oracle XE 21c)
+
+El backend usa el driver oficial `oracledb` en modo Thin: no hace falta instalar Oracle Instant Client.
 
 ## Instalación
 
@@ -34,13 +36,42 @@ npm install --prefix backend
 npm install --prefix frontend
 ```
 
-Ajusta `DATABASE_URL` en `.env` y crea la base `rideu`. Luego crea las tablas:
+### Base de datos Oracle
 
-```bash
-npm run db:migrate --prefix backend
-```
+1. Ten una base Oracle en marcha. Para desarrollo sirve un contenedor de Oracle Database Free; por ejemplo:
 
-La migración ejecuta en orden todos los archivos de `backend/sql/` y se puede repetir sin perder datos.
+   ```bash
+   docker run -d --name rideu-oracle -p 1521:1521 -e ORACLE_PASSWORD=<contraseña-de-system> gvenzl/oracle-free:23-slim-faststart
+   ```
+
+2. Crea el usuario (esquema) `rideu`. Edita la contraseña en [`backend/sql/admin/crear_usuario.sql`](backend/sql/admin/crear_usuario.sql) sin guardar el cambio en Git y ejecútalo una sola vez como administrador, conectado a la base conectable (PDB):
+
+   ```bash
+   sqlplus system@localhost:1521/FREEPDB1 @backend/sql/admin/crear_usuario.sql
+   ```
+
+3. Completa en `.env` las variables de conexión:
+
+   | Variable | Descripción | Ejemplo |
+   | --- | --- | --- |
+   | `DB_USER` | Usuario de la aplicación | `rideu` |
+   | `DB_PASSWORD` | Contraseña de ese usuario | (no se sube al repositorio) |
+   | `DB_CONNECT_STRING` | `host:puerto/servicio` de la PDB | `localhost:1521/FREEPDB1` (Free), `localhost:1521/XEPDB1` (XE) |
+   | `DB_POOL_MIN`, `DB_POOL_MAX` | Opcionales: tamaño del pool de conexiones | `1` y `10` |
+
+4. Comprueba la conexión:
+
+   ```bash
+   npm run db:check --prefix backend
+   ```
+
+5. Crea las tablas:
+
+   ```bash
+   npm run db:migrate --prefix backend
+   ```
+
+La migración ejecuta en orden alfabético todos los archivos de `backend/sql/` (de `001_usuarios.sql` a `008_indices_claves_foraneas.sql`; la carpeta `admin/` no se incluye) y se puede repetir sin perder datos. Los mismos archivos se pueden ejecutar a mano con SQL*Plus o SQLcl en ese orden; en ese caso termina con `COMMIT`.
 
 ## Ejecución
 
@@ -72,6 +103,12 @@ Con informe de cobertura:
 
 ```bash
 npm run test:coverage --prefix backend
+```
+
+Pruebas de integración contra Oracle real (conexión, CRUD, relaciones, restricciones, transacciones y endpoints). Usan la conexión de `.env`, crean sus propios datos y los borran; si Oracle no está disponible se omiten:
+
+```bash
+npm run test:integration --prefix backend
 ```
 
 Comprobación del build del frontend:
@@ -117,13 +154,13 @@ Las rutas con sesión exigen el encabezado `Authorization: Bearer <token>`; el t
 ```text
 .
 ├── backend/              API en Node.js y Express
-│   ├── sql/                  Migraciones SQL numeradas
+│   ├── sql/                  Migraciones SQL numeradas (Oracle) y admin/ con la creación del usuario
 │   ├── src/
-│   │   ├── config/           Variables de entorno y conexión a PostgreSQL
+│   │   ├── config/           Variables de entorno y conexión a Oracle
 │   │   ├── controllers/      Manejo de cada petición HTTP
-│   │   ├── db/               Ejecución de las migraciones
+│   │   ├── db/               Migraciones, comprobación de la conexión y pruebas de integración
 │   │   ├── middleware/       Validación de la sesión
-│   │   ├── models/           Consultas a PostgreSQL
+│   │   ├── models/           Consultas a Oracle
 │   │   ├── routes/           Rutas HTTP
 │   │   ├── services/         Envío de correo
 │   │   ├── validation/       Reglas de validación de los datos

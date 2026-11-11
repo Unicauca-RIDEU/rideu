@@ -10,11 +10,14 @@ import {
   verificarCuenta,
 } from "./usuario.js";
 
+// Cierra el pool de Oracle al terminar para que el proceso de la prueba pueda salir.
+test.after(() => pool.end());
+
 test("una sesión creada identifica al usuario verificado", async (t) => {
   try {
-    await pool.query("SELECT 1");
+    await pool.query("SELECT 1 FROM dual");
   } catch {
-    t.skip("PostgreSQL no está disponible");
+    t.skip("Oracle no está disponible");
     return;
   }
 

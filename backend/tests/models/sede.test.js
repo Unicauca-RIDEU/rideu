@@ -1,9 +1,11 @@
 import { describe, test, expect, jest, beforeEach } from "@jest/globals";
+import { SALIDA } from "../helpers/database.js";
 
 const query = jest.fn();
 
 jest.unstable_mockModule("../../src/config/database.js", () => ({
   pool: { query },
+  SALIDA,
 }));
 
 const { listarSedes, buscarSedePorId } = await import("../../src/models/sede.js");
@@ -33,7 +35,7 @@ describe("modelo sede", () => {
     query.mockResolvedValueOnce({ rows: [sede] });
 
     expect(await buscarSedePorId(1)).toEqual(sede);
-    expect(query.mock.calls[0][1]).toEqual([1]);
+    expect(query.mock.calls[0][1]).toEqual({ id: 1 });
   });
 
   test("debería devolver null si la sede no existe", async () => {

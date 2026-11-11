@@ -10,11 +10,14 @@ import {
   verificarCuenta,
 } from "../models/usuario.js";
 
+// Cierra el pool de Oracle al terminar para que el proceso de la prueba pueda salir.
+test.after(() => pool.end());
+
 test("el login con correo sin verificar responde 403 y no abre sesión", async (t) => {
   try {
-    await pool.query("SELECT 1");
+    await pool.query("SELECT 1 FROM dual");
   } catch {
-    t.skip("PostgreSQL no está disponible");
+    t.skip("Oracle no está disponible");
     return;
   }
 
@@ -53,9 +56,9 @@ test("el login con correo sin verificar responde 403 y no abre sesión", async (
 
 test("correo inexistente y contraseña incorrecta responden el mismo 401", async (t) => {
   try {
-    await pool.query("SELECT 1");
+    await pool.query("SELECT 1 FROM dual");
   } catch {
-    t.skip("PostgreSQL no está disponible");
+    t.skip("Oracle no está disponible");
     return;
   }
 
@@ -106,6 +109,8 @@ function llamarLogin(body) {
 
 function contarSesiones(usuarioId) {
   return pool
-    .query("SELECT COUNT(*)::int AS total FROM sesiones WHERE usuario_id = $1", [usuarioId])
+    .query("SELECT COUNT(*) AS total FROM sesiones WHERE usuario_id = :usuario_id", {
+      usuario_id: usuarioId,
+    })
     .then((resultado) => resultado.rows[0].total);
 }
