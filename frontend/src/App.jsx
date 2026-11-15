@@ -6,6 +6,7 @@ import Login from "./pages/Login.jsx";
 import Panel from "./pages/Panel.jsx";
 import PublicarTrayecto from "./pages/PublicarTrayecto.jsx";
 import Registro from "./pages/Registro.jsx";
+import ReservarTrayecto from "./pages/ReservarTrayecto.jsx";
 import Vehiculo from "./pages/Vehiculo.jsx";
 import Verificacion from "./pages/Verificacion.jsx";
 
@@ -22,6 +23,7 @@ export default function App() {
           <Route path="/perfil/vehiculo" element={<Vehiculo />} />
           <Route path="/trayectos/publicar" element={<PublicarTrayecto />} />
           <Route path="/trayectos/buscar" element={<BuscarTrayecto />} />
+          <Route path="/trayectos/reservar" element={<ReservarTrayecto />} />
           <Route path="/historial" element={<Historial />} />
         </Route>
       </Routes>
