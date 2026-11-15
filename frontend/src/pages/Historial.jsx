@@ -138,6 +138,14 @@ export default function Historial() {
                         {reserva.conductor_nombre} · 1 cupo reservado · $
                         {formatoPesos.format(reserva.aporte_sugerido)} COP por persona
                       </p>
+                      {reserva.estado === "Confirmada" ? (
+                        <Link
+                          className="boton-contorno reservar-enlace"
+                          to={`/reservas/contacto-conductor?reserva=${encodeURIComponent(reserva.id)}`}
+                        >
+                          Contactar al conductor
+                        </Link>
+                      ) : null}
                     </article>
                   </li>
                 ))}

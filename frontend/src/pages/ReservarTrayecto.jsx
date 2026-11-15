@@ -250,6 +250,14 @@ function Acciones({ trayecto, confirmada, aviso, enviando, onConfirmar, rutaBusq
           <IconoFlecha />
           Ver mis reservas
         </Link>
+        {trayecto.reserva_id ? (
+          <Link
+            className="boton-contorno reservar-enlace"
+            to={`/reservas/contacto-conductor?reserva=${encodeURIComponent(trayecto.reserva_id)}`}
+          >
+            Contactar al conductor
+          </Link>
+        ) : null}
         {volver}
       </>
     );
