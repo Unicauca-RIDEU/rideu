@@ -1,9 +1,13 @@
 import { olvidarSesion, tokenSesion } from "./auth.js";
 
-// Contacto por WhatsApp (E05-HU10). El backend toma el usuario de la sesión.
+// Contacto por WhatsApp (E05-HU10 y E05-HU11). El backend toma el usuario de la sesión.
 
 export async function obtenerContactoConductor(reservaId) {
   return llamar(`/api/reservas/${encodeURIComponent(reservaId)}/contacto-conductor`);
+}
+
+export async function obtenerContactoPasajeros(trayectoId) {
+  return llamar(`/api/trayectos/${encodeURIComponent(trayectoId)}/pasajeros`);
 }
 
 async function llamar(ruta) {
