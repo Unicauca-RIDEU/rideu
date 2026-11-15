@@ -7,6 +7,8 @@ import { buscarTrayectos, obtenerSedes } from "../services/trayectos.js";
 // Los filtros viven en la URL para conservarlos al recargar o al volver desde otra pantalla.
 
 const NAV = ["Inicio", "Buscar", "Publicar", "Historial"];
+// Cada cuánto se repite la búsqueda en segundo plano para mostrar los cupos al día (E04-HU07).
+const INTERVALO_ACTUALIZACION_MS = 10000;
 const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
 const MESES_LARGOS = [
   "enero", "febrero", "marzo", "abril", "mayo", "junio",
@@ -77,8 +79,18 @@ export default function BuscarTrayecto() {
           });
         }
       });
+    // Mientras la pantalla siga abierta, la búsqueda se repite sin borrar los resultados:
+    // así los cupos que otras personas reservan se reflejan sin recargar la página.
+    const temporizador = setInterval(() => {
+      buscarTrayectos(actuales)
+        .then((respuesta) => {
+          if (activo && respuesta.ok) setBusqueda({ estado: "listo", ...respuesta });
+        })
+        .catch(() => {});
+    }, INTERVALO_ACTUALIZACION_MS);
     return () => {
       activo = false;
+      clearInterval(temporizador);
     };
   }, [consulta, intento, navigate]);
 
@@ -189,7 +201,7 @@ export default function BuscarTrayecto() {
 
         <div className="publicar-grid buscar-grid">
           <section aria-live="polite">
-            <Resultados busqueda={busqueda} onCambiarFiltros={cambiarFiltros} />
+            <Resultados busqueda={busqueda} onCambiarFiltros={cambiarFiltros} consulta={consulta} />
           </section>
 
           <aside className="perfil-lado">
@@ -217,7 +229,7 @@ export default function BuscarTrayecto() {
   );
 }
 
-function Resultados({ busqueda, onCambiarFiltros }) {
+function Resultados({ busqueda, onCambiarFiltros, consulta }) {
   if (busqueda.estado === "inicial") {
     return (
       <p className="pista-lado">Selecciona la sede, la fecha y la hora para ver los trayectos disponibles.</p>
@@ -257,13 +269,13 @@ function Resultados({ busqueda, onCambiarFiltros }) {
             <li key={trayecto.id}>
               <TarjetaTrayecto trayecto={trayecto} />
               <div className="acciones-trayecto">
-                <button className="boton-contorno" type="button" disabled title="Disponible próximamente (HU07)">
+                <Link className="boton-contorno reservar-enlace" to={rutaDeReserva(trayecto.id, consulta)}>
                   Ver trayecto
-                </button>
-                <button className="boton" type="button" disabled title="Disponible próximamente (HU07)">
+                </Link>
+                <Link className="boton" to={rutaDeReserva(trayecto.id, consulta)}>
                   <IconoFlecha />
                   Reservar
-                </button>
+                </Link>
               </div>
             </li>
           ))}
@@ -327,6 +339,13 @@ function IlustracionRuta() {
       <circle cx="225" cy="15" r="7" fill="#fff" stroke="#c9d6ea" strokeWidth="2" />
     </svg>
   );
+}
+
+// La pantalla de reserva recibe el trayecto y los filtros, para poder volver a esta búsqueda.
+function rutaDeReserva(trayectoId, consulta) {
+  const parametros = new URLSearchParams(consulta);
+  parametros.set("trayecto", trayectoId);
+  return `/trayectos/reservar?${parametros}`;
 }
 
 function hoyEnColombia() {
