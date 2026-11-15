@@ -86,6 +86,7 @@ export default function Historial() {
           <>
             <section aria-labelledby="historial-trayectos">
               <h3 id="historial-trayectos">Trayectos publicados ({trayectos.length})</h3>
+              {trayectos.length === 0 ? <p className="ayuda">Aún no has publicado trayectos.</p> : null}
               <ul className="buscar-resultados">
                 {trayectos.map((trayecto) => (
                   <li key={trayecto.id}>
@@ -116,6 +117,31 @@ export default function Historial() {
             <section aria-labelledby="historial-reservas">
               <h3 id="historial-reservas">Reservas ({reservas.length})</h3>
               {reservas.length === 0 ? <p className="ayuda">Aún no tienes reservas.</p> : null}
+              <ul className="buscar-resultados">
+                {reservas.map((reserva) => (
+                  <li key={reserva.id}>
+                    <article className="tarjeta tarjeta-previa">
+                      <div className="previa-cabecera">
+                        <strong>
+                          {reserva.fecha} · {reserva.hora}
+                        </strong>
+                        <p className={reserva.estado_historial === "Pendiente" ? "chip chip-ok" : "chip"}>
+                          <i />
+                          {reserva.estado_historial}
+                        </p>
+                      </div>
+                      <ol className="previa-ruta">
+                        <li>{reserva.origen}</li>
+                        <li>{reserva.sede_destino}</li>
+                      </ol>
+                      <p className="ayuda">
+                        {reserva.conductor_nombre} · 1 cupo reservado · $
+                        {formatoPesos.format(reserva.aporte_sugerido)} COP por persona
+                      </p>
+                    </article>
+                  </li>
+                ))}
+              </ul>
             </section>
           </>
         ) : null}

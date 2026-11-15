@@ -1082,6 +1082,68 @@ button, input, a { font: inherit; }
   color: #475467;
 }
 
+/* E04-HU07 · Reservar trayecto (/trayectos/reservar) */
+
+.reservar-detalle {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.reservar-detalle p {
+  margin: 0;
+  color: #475467;
+}
+
+.reservar-detalle .previa-cabecera h2 {
+  margin: 0;
+}
+
+.reservar-aporte {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.reservar-aporte strong {
+  color: var(--azul-oscuro);
+  font-size: 1.3rem;
+}
+
+.reservar-detalle .aviso {
+  margin: 0.4rem 0 0;
+}
+
+.reservar-detalle .aviso p {
+  margin-top: 0.3rem;
+  color: inherit;
+}
+
+/* Enlaces con aspecto de botón (los botones de contorno se pensaron para <button>). */
+.reservar-enlace {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.55rem;
+  text-decoration: none;
+}
+
+a.boton-contorno.reservar-enlace,
+button.boton-contorno.reservar-enlace {
+  color: var(--azul);
+  cursor: pointer;
+}
+
+.reservar-detalle .boton svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.reservar-detalle .boton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 @media (max-width: 900px) {
   .buscar-campos, .buscar-resultados { grid-template-columns: 1fr; }
   .boton-buscar { margin-top: 0; width: 100%; }

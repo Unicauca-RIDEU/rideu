@@ -9,7 +9,7 @@ try {
   const tablas = await pool.query("SELECT COUNT(*) AS total FROM user_tables");
   console.log(`Conexión correcta: ${version.rows[0].banner}`);
   console.log(`Usuario ${sesion.rows[0].usuario}, servicio ${sesion.rows[0].servicio}.`);
-  console.log(`Tablas en el esquema: ${tablas.rows[0].total} (6 después de npm run db:migrate).`);
+  console.log(`Tablas en el esquema: ${tablas.rows[0].total} (7 después de npm run db:migrate).`);
 } catch (error) {
   console.error(`No se pudo conectar a Oracle: ${error.message}`);
   process.exitCode = 1;
