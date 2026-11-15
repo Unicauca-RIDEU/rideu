@@ -108,6 +108,12 @@ export default function Historial() {
                         {trayecto.cupos} {trayecto.cupos === 1 ? "cupo" : "cupos"} · $
                         {formatoPesos.format(trayecto.aporte_sugerido)} COP por persona
                       </p>
+                      <Link
+                        className="boton-contorno reservar-enlace"
+                        to={`/trayectos/pasajeros/contacto?trayecto=${encodeURIComponent(trayecto.id)}`}
+                      >
+                        Contactar pasajeros
+                      </Link>
                     </article>
                   </li>
                 ))}

@@ -1158,6 +1158,52 @@ button.boton-contorno.reservar-enlace {
   background: #0e7166;
 }
 
+/* E05-HU11 · Contacto de pasajeros (/trayectos/pasajeros/contacto) */
+
+.contacto-lista {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0.3rem 0;
+  padding: 0;
+  list-style: none;
+}
+
+.contacto-lista li {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.contacto-nombre {
+  display: grid;
+  flex: 1;
+  min-width: 9rem;
+}
+
+.contacto-nombre small {
+  color: var(--texto-suave);
+}
+
+.contacto-lista .boton {
+  width: auto;
+  min-height: 2.7rem;
+  margin-top: 0;
+  padding: 0 1.3rem;
+}
+
+.contacto-actualizar {
+  min-height: 2.4rem;
+  padding: 0 1rem;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.contacto-actualizar:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
 @media (max-width: 900px) {
   .buscar-campos, .buscar-resultados { grid-template-columns: 1fr; }
   .boton-buscar { margin-top: 0; width: 100%; }

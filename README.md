@@ -13,7 +13,7 @@ El stack es React (Vite) en el frontend, Node.js con Express en el backend y Ora
 | Sprint 1 | 9 oct – 22 oct | HU01 Registro con correo institucional · HU02 Inicio de sesión validado | Implementadas |
 | Sprint 2 | 23 oct – 5 nov | HU03 Registrar vehículo y licencia · HU06 Buscar trayectos disponibles | Implementadas |
 | Sprint 3 | 6 nov – 19 nov | HU04 Publicar trayecto · HU09 Consultar historial de trayectos y reservas | En curso: HU04 evaluada; HU09 con el historial de trayectos hecho (las reservas llegan con HU07); correcciones y mejoras de HU01 a HU04 hechas |
-| Sprint 4 | 20 nov – 3 dic | HU07 Reservar cupo · HU10 y HU11 Contacto por WhatsApp | En curso: HU07 y HU10 implementadas (pruebas unitarias pendientes); HU11 pendiente |
+| Sprint 4 | 20 nov – 3 dic | HU07 Reservar cupo · HU10 y HU11 Contacto por WhatsApp | En curso: HU07, HU10 y HU11 implementadas; pruebas unitarias pendientes |
 | Sprint 5 | 4 dic – 17 dic | HU05 Editar o cancelar trayecto · HU08 Cancelar reserva | Pendientes |
 
 El backlog, las historias, los casos de prueba y el plan de riesgos están en [`documentacion/`](documentacion/). Las evidencias de las pruebas unitarias están en [`evidencias/`](evidencias/).
@@ -130,6 +130,7 @@ npm run build --prefix frontend
 | `/trayectos/buscar` | HU06 | Sí |
 | `/trayectos/reservar` | HU07 | Sí |
 | `/reservas/contacto-conductor` | HU10 | Sí |
+| `/trayectos/pasajeros/contacto` | HU11 | Sí |
 | `/historial` | HU09 | Sí |
 
 ## API
@@ -151,6 +152,7 @@ Las rutas con sesión exigen el encabezado `Authorization: Bearer <token>`; el t
 | `GET /api/sedes` | HU06 | Sí | Sedes de destino |
 | `GET /api/trayectos/:id` | HU07 | Sí | Detalle de un trayecto con sus cupos disponibles, para la pantalla de reserva |
 | `POST /api/trayectos/:id/reservas` | HU07 | Sí | Reserva un cupo para el usuario de la sesión y lo descuenta; sin cupos responde 409 «Cupos agotados» |
+| `GET /api/trayectos/:id/pasajeros` | HU11 | Sí | Enlaces `wa.me` de los pasajeros con reserva confirmada; solo para el conductor del trayecto (403 para los demás) |
 | `GET /api/reservas/:id/contacto-conductor` | HU10 | Sí | Enlace `wa.me` del conductor de una reserva confirmada del usuario; si el número no es válido, indica que el contacto no está disponible |
 | `GET /api/historial` | HU09 | Sí | Trayectos publicados y reservas del usuario, con estado «Pendiente» o «Completado» |
 
