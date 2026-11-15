@@ -4,6 +4,7 @@ import request from "supertest";
 
 const buscarUsuarioPorSesion = jest.fn();
 const listarTrayectosDeConductor = jest.fn();
+const listarReservasDePasajero = jest.fn();
 
 jest.unstable_mockModule("../../src/config/database.js", () => ({
   pool: { query: jest.fn(), connect: jest.fn() },
@@ -23,6 +24,14 @@ jest.unstable_mockModule("../../src/models/trayecto.js", () => ({
   crearTrayecto: jest.fn(),
   existeTrayectoEnHorario: jest.fn(),
   listarTrayectosDeConductor,
+}));
+
+// Las reservas del pasajero llegan con E04-HU07; aquí se simulan sin reservas.
+jest.unstable_mockModule("../../src/models/reserva.js", () => ({
+  ESTADO_CONFIRMADA: "Confirmada",
+  buscarDetalleTrayecto: jest.fn(),
+  confirmarReserva: jest.fn(),
+  listarReservasDePasajero,
 }));
 
 const { createApp } = await import("../../src/app.js");
@@ -69,6 +78,8 @@ describe("rutas /api/historial (Supertest)", () => {
     app = createApp();
     buscarUsuarioPorSesion.mockReset();
     listarTrayectosDeConductor.mockReset();
+    listarReservasDePasajero.mockReset();
+    listarReservasDePasajero.mockResolvedValue([]);
     buscarUsuarioPorSesion.mockImplementation(async (token) =>
       token === "token-valido" ? usuarioSesion : null,
     );
