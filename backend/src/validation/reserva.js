@@ -1,4 +1,4 @@
-// Validación de los identificadores que llegan en la URL de las reservas (E04-HU07).
+// Validación de los identificadores que llegan en la URL de las reservas (E04-HU07, E05-HU10).
 // Los identificadores son UUID que genera la aplicación.
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -13,4 +13,8 @@ export function validarIdentificador(valor, { campo, mensaje }) {
 
 export function validarIdTrayecto(valor) {
   return validarIdentificador(valor, { campo: "trayectoId", mensaje: "El trayecto no es válido." });
+}
+
+export function validarIdReserva(valor) {
+  return validarIdentificador(valor, { campo: "reservaId", mensaje: "La reserva no es válida." });
 }

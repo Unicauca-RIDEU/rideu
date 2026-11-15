@@ -1,6 +1,7 @@
 import express from "express";
 import { authRouter } from "./routes/authRoutes.js";
 import { historialRouter } from "./routes/historialRoutes.js";
+import { reservaRouter } from "./routes/reservaRoutes.js";
 import { sedeRouter } from "./routes/sedeRoutes.js";
 import { trayectoRouter } from "./routes/trayectoRoutes.js";
 import { vehiculoRouter } from "./routes/vehiculoRoutes.js";
@@ -13,6 +14,7 @@ export function createApp() {
   app.use("/api/trayectos", trayectoRouter);
   app.use("/api/sedes", sedeRouter);
   app.use("/api/historial", historialRouter);
+  app.use("/api/reservas", reservaRouter);
   app.use("/api", (_req, res) => {
     res.status(404).json({ mensaje: "La ruta solicitada no existe." });
   });

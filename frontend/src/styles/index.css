@@ -1144,6 +1144,20 @@ button.boton-contorno.reservar-enlace {
   cursor: not-allowed;
 }
 
+/* E05-HU10 · Contacto del conductor (/reservas/contacto-conductor) */
+
+.contacto-tarjeta {
+  max-width: 34rem;
+}
+
+.boton-whatsapp {
+  background: #128c7e;
+}
+
+.boton-whatsapp:hover {
+  background: #0e7166;
+}
+
 @media (max-width: 900px) {
   .buscar-campos, .buscar-resultados { grid-template-columns: 1fr; }
   .boton-buscar { margin-top: 0; width: 100%; }

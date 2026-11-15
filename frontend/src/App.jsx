@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import RutaProtegida from "./components/RutaProtegida.jsx";
 import BuscarTrayecto from "./pages/BuscarTrayecto.jsx";
+import ContactoConductor from "./pages/ContactoConductor.jsx";
 import Historial from "./pages/Historial.jsx";
 import Login from "./pages/Login.jsx";
 import Panel from "./pages/Panel.jsx";
@@ -24,6 +25,7 @@ export default function App() {
           <Route path="/trayectos/publicar" element={<PublicarTrayecto />} />
           <Route path="/trayectos/buscar" element={<BuscarTrayecto />} />
           <Route path="/trayectos/reservar" element={<ReservarTrayecto />} />
+          <Route path="/reservas/contacto-conductor" element={<ContactoConductor />} />
           <Route path="/historial" element={<Historial />} />
         </Route>
       </Routes>
