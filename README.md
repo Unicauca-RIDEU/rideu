@@ -71,7 +71,7 @@ npm install --prefix frontend
    npm run db:migrate --prefix backend
    ```
 
-La migración ejecuta en orden alfabético todos los archivos de `backend/sql/` (de `001_usuarios.sql` a `008_indices_claves_foraneas.sql`; la carpeta `admin/` no se incluye) y se puede repetir sin perder datos. Los mismos archivos se pueden ejecutar a mano con SQL*Plus o SQLcl en ese orden; en ese caso termina con `COMMIT`.
+La migración ejecuta en orden alfabético todos los archivos de `backend/sql/` (de `001_usuarios.sql` a `009_reservas.sql`; la carpeta `admin/` no se incluye) y se puede repetir sin perder datos. Los mismos archivos se pueden ejecutar a mano con SQL*Plus o SQLcl en ese orden; en ese caso termina con `COMMIT`.
 
 ## Ejecución
 

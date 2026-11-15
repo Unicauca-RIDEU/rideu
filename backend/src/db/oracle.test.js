@@ -97,7 +97,7 @@ async function contar(tabla, columna, valor) {
   return resultado.rows[0].total;
 }
 
-test("Oracle responde y el esquema tiene las seis tablas y las siete sedes", async (t) => {
+test("Oracle responde y el esquema tiene las siete tablas y las siete sedes", async (t) => {
   if (!(await oracleDisponible(t))) return;
 
   const version = await pool.query("SELECT banner FROM v$version");
@@ -106,7 +106,7 @@ test("Oracle responde y el esquema tiene las seis tablas y las siete sedes", asy
   const tablas = await pool.query("SELECT table_name FROM user_tables ORDER BY table_name");
   assert.deepEqual(
     tablas.rows.map((fila) => fila.table_name),
-    ["LICENCIAS", "SEDES", "SESIONES", "TRAYECTOS", "USUARIOS", "VEHICULOS"],
+    ["LICENCIAS", "RESERVAS", "SEDES", "SESIONES", "TRAYECTOS", "USUARIOS", "VEHICULOS"],
   );
 
   const sedes = await pool.query("SELECT id, nombre, ciudad FROM sedes ORDER BY id");
