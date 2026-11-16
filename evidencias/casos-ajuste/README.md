@@ -7,6 +7,7 @@ Evidencia fotográfica de las pruebas unitarias que fallaron en su primera ejecu
 | [sprint-01](sprint-01/) | CU-01 a CU-13 | HU01, HU02 |
 | [sprint-02](sprint-02/) | CU-14 a CU-19 | HU03, HU06 |
 | [sprint-03](sprint-03/) | CU-20 a CU-30 | HU01 a HU04 (correcciones y mejoras), HU09 |
+| [sprint-04](sprint-04/) | CU-31 y CU-32 | HU07 (pruebas del historial que fallaron al integrar las reservas) |
 
 Cada carpeta `CU-NN` contiene:
 
