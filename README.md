@@ -13,7 +13,7 @@ El stack es React (Vite) en el frontend, Node.js con Express en el backend y Ora
 | Sprint 1 | 9 oct – 22 oct | HU01 Registro con correo institucional · HU02 Inicio de sesión validado | Implementadas |
 | Sprint 2 | 23 oct – 5 nov | HU03 Registrar vehículo y licencia · HU06 Buscar trayectos disponibles | Implementadas |
 | Sprint 3 | 6 nov – 19 nov | HU04 Publicar trayecto · HU09 Consultar historial de trayectos y reservas | En curso: HU04 evaluada; HU09 con el historial de trayectos hecho (las reservas llegan con HU07); correcciones y mejoras de HU01 a HU04 hechas |
-| Sprint 4 | 20 nov – 3 dic | HU07 Reservar cupo · HU10 y HU11 Contacto por WhatsApp | En curso: HU07, HU10 y HU11 implementadas; pruebas unitarias pendientes |
+| Sprint 4 | 20 nov – 3 dic | HU07 Reservar cupo · HU10 y HU11 Contacto por WhatsApp | En curso: HU07, HU10 y HU11 implementadas, con pruebas unitarias; pruebas funcionales pendientes |
 | Sprint 5 | 4 dic – 17 dic | HU05 Editar o cancelar trayecto · HU08 Cancelar reserva | Pendientes |
 
 El backlog, las historias, los casos de prueba y el plan de riesgos están en [`documentacion/`](documentacion/). Las evidencias de las pruebas unitarias están en [`evidencias/`](evidencias/).
