@@ -24,7 +24,7 @@ Dependencias: HU01 → HU02 → HU03 → HU04 → HU05 · HU06 → HU07 → HU08
 
 | Carpeta | Contenido | Versión vigente |
 | --- | --- | --- |
-| [backlog](backlog/) | Product Backlog y Planning Poker | v1.6 |
+| [backlog](backlog/) | Product Backlog y Planning Poker | v1.7 |
 | [historias-usuario](historias-usuario/) | Historias de usuario y criterios de aceptación (Dado / Cuando / Entonces) | v1.3 |
 | [storymapping](storymapping/) | Mapa de historias de usuario | — |
 | [pruebas-funcionales](pruebas-funcionales/) | Casos de prueba funcionales, un documento Word y un registro Excel por sprint | Ver la tabla siguiente |

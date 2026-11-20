@@ -73,7 +73,7 @@ La configuración se lee de `.env` en la raíz (plantilla en `.env.example`).
 
 ## 6. Organización Scrum
 
-Documentos vigentes: Product Backlog v1.6 (`documentacion/backlog/`) e Historias de usuario v1.3 (`documentacion/historias-usuario/`), con criterios en formato Dado / Cuando / Entonces. Ante una diferencia entre ambos, se consulta al responsable antes de asumir.
+Documentos vigentes: Product Backlog v1.7 (`documentacion/backlog/`) e Historias de usuario v1.3 (`documentacion/historias-usuario/`), con criterios en formato Dado / Cuando / Entonces. Ante una diferencia entre ambos, se consulta al responsable antes de asumir.
 
 ### Plan de sprints
 
