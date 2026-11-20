@@ -91,14 +91,18 @@ export async function confirmarReserva({ trayectoId, pasajeroId, ahoraColombia }
       return { ok: false, motivo: "trayecto_no_disponible" };
     }
 
+    // Una reserva cancelada (E04-HU08) se reactiva al volver a reservar: la restricción
+    // reservas_pasajero_unico permite una sola fila por pasajero y trayecto.
     const previa = await cliente.query(
-      `SELECT COUNT(*) AS existe
+      `SELECT id, estado
        FROM reservas
        WHERE trayecto_id = :trayecto_id
-         AND pasajero_id = :pasajero_id`,
+         AND pasajero_id = :pasajero_id
+       FOR UPDATE`,
       { trayecto_id: trayectoId, pasajero_id: pasajeroId },
     );
-    if (previa.rows[0]?.existe > 0) {
+    const anterior = previa.rows[0];
+    if (anterior && anterior.estado !== ESTADO_CANCELADA) {
       await cliente.rollback();
       return { ok: false, motivo: "reserva_duplicada" };
     }
@@ -117,6 +121,27 @@ export async function confirmarReserva({ trayectoId, pasajeroId, ahoraColombia }
     if (descuento.rowCount !== 1) {
       await cliente.rollback();
       return { ok: false, motivo: "sin_cupos" };
+    }
+
+    if (anterior) {
+      const reactivada = await cliente.query(
+        `UPDATE reservas
+         SET estado = :estado
+         WHERE id = :id
+         RETURNING id, trayecto_id, pasajero_id, estado, creado_en
+         INTO :r_id, :r_trayecto_id, :r_pasajero_id, :r_estado, :r_creado_en`,
+        {
+          id: anterior.id,
+          estado: ESTADO_CONFIRMADA,
+          r_id: SALIDA.texto,
+          r_trayecto_id: SALIDA.texto,
+          r_pasajero_id: SALIDA.texto,
+          r_estado: SALIDA.texto,
+          r_creado_en: SALIDA.instante,
+        },
+      );
+      await cliente.commit();
+      return { ok: true, reserva: reactivada.rows[0] };
     }
 
     const creada = await cliente.query(
@@ -183,4 +208,123 @@ export async function listarReservasDePasajero({ pasajeroId, ahoraColombia }) {
     },
   );
   return resultado.rows;
+}
+
+// Pantalla /reservas/cancelar (E04-HU08): reservas confirmadas del pasajero, de la salida
+// más próxima a la más lejana. iniciado = 1 si el trayecto ya salió (no se puede cancelar).
+// ahoraColombia es la fecha y hora actual de Colombia como 'AAAA-MM-DD HH:MM'.
+export async function listarReservasConfirmadas({ pasajeroId, ahoraColombia }) {
+  const resultado = await pool.query(
+    `SELECT r.id,
+            r.estado,
+            t.id AS trayecto_id,
+            TO_CHAR(t.fecha, 'YYYY-MM-DD') AS fecha,
+            t.hora,
+            t.origen,
+            s.nombre AS sede_destino,
+            t.aporte_sugerido,
+            u.nombre AS conductor_nombre,
+            CASE
+              WHEN ${SALIDA_DEL_TRAYECTO} <= TO_DATE(:ahora_colombia, 'YYYY-MM-DD HH24:MI')
+                THEN 1
+              ELSE 0
+            END AS iniciado
+     FROM reservas r
+     JOIN trayectos t ON t.id = r.trayecto_id
+     JOIN sedes s ON s.id = t.sede_destino_id
+     JOIN usuarios u ON u.id = t.conductor_id
+     WHERE r.pasajero_id = :pasajero_id
+       AND r.estado = :estado
+     ORDER BY t.fecha, t.hora`,
+    { pasajero_id: pasajeroId, estado: ESTADO_CONFIRMADA, ahora_colombia: ahoraColombia },
+  );
+  return resultado.rows;
+}
+
+// Cancela la reserva del pasajero (E04-HU08) en una sola transacción: la reserva queda
+// «Cancelada» y su cupo vuelve a estar disponible en el trayecto.
+// Bloquea la reserva y el trayecto con FOR UPDATE para no cruzarse con otra reserva o cancelación.
+// Devuelve { ok: true, reserva, trayecto, conductor } o { ok: false, motivo }.
+export async function cancelarReserva({ reservaId, pasajeroId, ahoraColombia }) {
+  const cliente = await pool.connect();
+  try {
+    const bloqueada = await cliente.query(
+      `SELECT r.id,
+              r.pasajero_id,
+              r.estado,
+              t.id AS trayecto_id,
+              TO_CHAR(t.fecha, 'YYYY-MM-DD') AS fecha,
+              t.hora,
+              t.origen,
+              s.nombre AS sede_destino,
+              t.cupos,
+              t.cupos_disponibles,
+              c.nombre AS conductor_nombre,
+              c.correo AS conductor_correo,
+              CASE
+                WHEN ${SALIDA_DEL_TRAYECTO} > TO_DATE(:ahora_colombia, 'YYYY-MM-DD HH24:MI')
+                  THEN 1
+                ELSE 0
+              END AS vigente
+       FROM reservas r
+       JOIN trayectos t ON t.id = r.trayecto_id
+       JOIN sedes s ON s.id = t.sede_destino_id
+       JOIN usuarios c ON c.id = t.conductor_id
+       WHERE r.id = :id
+       FOR UPDATE OF r.estado, t.cupos_disponibles`,
+      { id: reservaId, ahora_colombia: ahoraColombia },
+    );
+    const fila = bloqueada.rows[0];
+    const motivo = !fila
+      ? "reserva_inexistente"
+      : fila.pasajero_id !== pasajeroId
+        ? "reserva_ajena"
+        : fila.estado !== ESTADO_CONFIRMADA
+          ? "reserva_cancelada"
+          : fila.vigente !== 1
+            ? "trayecto_iniciado"
+            : null;
+    if (motivo) {
+      await cliente.rollback();
+      return { ok: false, motivo };
+    }
+
+    await cliente.query(
+      `UPDATE reservas
+       SET estado = :estado
+       WHERE id = :id`,
+      { id: reservaId, estado: ESTADO_CANCELADA },
+    );
+    const liberado = await cliente.query(
+      `UPDATE trayectos
+       SET cupos_disponibles = cupos_disponibles + 1
+       WHERE id = :id
+         AND cupos_disponibles < cupos`,
+      { id: fila.trayecto_id },
+    );
+    if (liberado.rowCount !== 1) {
+      throw new Error("Los cupos del trayecto no coinciden con sus reservas confirmadas.");
+    }
+    await cliente.commit();
+
+    return {
+      ok: true,
+      reserva: { id: fila.id, estado: ESTADO_CANCELADA },
+      trayecto: {
+        id: fila.trayecto_id,
+        fecha: fila.fecha,
+        hora: fila.hora,
+        origen: fila.origen,
+        sede_destino: fila.sede_destino,
+        cupos: fila.cupos,
+        cupos_disponibles: fila.cupos_disponibles + 1,
+      },
+      conductor: { nombre: fila.conductor_nombre, correo: fila.conductor_correo },
+    };
+  } catch (error) {
+    await cliente.rollback();
+    throw error;
+  } finally {
+    await cliente.release();
+  }
 }

@@ -10,6 +10,16 @@ export async function reservarCupo(trayectoId) {
   return llamar(`/api/trayectos/${encodeURIComponent(trayectoId)}/reservas`, { method: "POST" });
 }
 
+// Cancelación de reservas (E04-HU08). El backend toma el pasajero de la sesión.
+
+export async function obtenerMisReservas() {
+  return llamar("/api/reservas");
+}
+
+export async function cancelarReserva(reservaId) {
+  return llamar(`/api/reservas/${encodeURIComponent(reservaId)}/cancelacion`, { method: "POST" });
+}
+
 async function llamar(ruta, opciones = {}) {
   const respuesta = await fetch(ruta, {
     ...opciones,
