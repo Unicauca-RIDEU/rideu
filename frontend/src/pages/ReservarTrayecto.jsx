@@ -274,6 +274,17 @@ function Acciones({ trayecto, confirmada, aviso, enviando, onConfirmar, rutaBusq
     );
   }
 
+  if (trayecto.estado === "Cancelado") {
+    return (
+      <>
+        <p className="aviso aviso-error" role="alert">
+          El conductor canceló este trayecto y ya no admite reservas.
+        </p>
+        {volver}
+      </>
+    );
+  }
+
   if (!trayecto.vigente) {
     return (
       <>
@@ -311,14 +322,15 @@ function Acciones({ trayecto, confirmada, aviso, enviando, onConfirmar, rutaBusq
 function TarjetaTrayecto({ trayecto }) {
   const reservas = trayecto.cupos_reservados;
   const disponibles = trayecto.cupos_disponibles;
-  const disponible = trayecto.vigente && disponibles > 0;
+  const cancelado = trayecto.estado === "Cancelado";
+  const disponible = !cancelado && trayecto.vigente && disponibles > 0;
   return (
     <article className="tarjeta tarjeta-previa">
       <div className="previa-cabecera">
         <strong>{fechaCorta(trayecto.fecha, trayecto.hora)}</strong>
         <p className={disponible ? "chip chip-ok" : "chip"}>
           <i />
-          {disponible ? "Disponible" : disponibles > 0 ? "Finalizado" : "Agotado"}
+          {cancelado ? "Cancelado" : disponible ? "Disponible" : disponibles > 0 ? "Finalizado" : "Agotado"}
         </p>
       </div>
       <ol className="previa-ruta">

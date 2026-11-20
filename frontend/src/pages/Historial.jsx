@@ -108,12 +108,22 @@ export default function Historial() {
                         {trayecto.cupos} {trayecto.cupos === 1 ? "cupo" : "cupos"} · $
                         {formatoPesos.format(trayecto.aporte_sugerido)} COP por persona
                       </p>
-                      <Link
-                        className="boton-contorno reservar-enlace"
-                        to={`/trayectos/pasajeros/contacto?trayecto=${encodeURIComponent(trayecto.id)}`}
-                      >
-                        Contactar pasajeros
-                      </Link>
+                      {trayecto.estado_historial === "Pendiente" ? (
+                        <Link
+                          className="boton-contorno reservar-enlace"
+                          to={`/trayectos/editar?trayecto=${encodeURIComponent(trayecto.id)}`}
+                        >
+                          Editar o cancelar
+                        </Link>
+                      ) : null}
+                      {trayecto.estado_historial !== "Cancelado" ? (
+                        <Link
+                          className="boton-contorno reservar-enlace"
+                          to={`/trayectos/pasajeros/contacto?trayecto=${encodeURIComponent(trayecto.id)}`}
+                        >
+                          Contactar pasajeros
+                        </Link>
+                      ) : null}
                     </article>
                   </li>
                 ))}

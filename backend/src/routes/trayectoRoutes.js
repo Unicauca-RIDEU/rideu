@@ -1,7 +1,10 @@
 import { Router } from "express";
 import {
   buscarTrayectos,
+  cancelarTrayectoPublicado,
   datosPublicacion,
+  editarTrayecto,
+  misTrayectos,
   publicarTrayecto,
 } from "../controllers/trayectoController.js";
 import { contactoPasajeros } from "../controllers/contactoController.js";
@@ -13,6 +16,10 @@ export const trayectoRouter = Router();
 trayectoRouter.get("/publicacion", requiereSesion, datosPublicacion);
 trayectoRouter.get("/", requiereSesion, buscarTrayectos);
 trayectoRouter.post("/", requiereSesion, publicarTrayecto);
+// Edición y cancelación de trayectos (E02-HU05). /mios va antes de /:id para que :id no lo capture.
+trayectoRouter.get("/mios", requiereSesion, misTrayectos);
+trayectoRouter.patch("/:id", requiereSesion, editarTrayecto);
+trayectoRouter.post("/:id/cancelacion", requiereSesion, cancelarTrayectoPublicado);
 // Reserva de cupos (E04-HU07). Van después de /publicacion para que :id no lo capture.
 trayectoRouter.get("/:id", requiereSesion, detalleTrayecto);
 trayectoRouter.post("/:id/reservas", requiereSesion, reservarCupo);
