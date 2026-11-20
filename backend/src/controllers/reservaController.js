@@ -1,5 +1,11 @@
-import { buscarDetalleTrayecto, confirmarReserva } from "../models/reserva.js";
-import { validarIdTrayecto } from "../validation/reserva.js";
+import {
+  buscarDetalleTrayecto,
+  cancelarReserva,
+  confirmarReserva,
+  listarReservasConfirmadas,
+} from "../models/reserva.js";
+import { enviarCorreoReservaCancelada } from "../services/correo.js";
+import { validarIdReserva, validarIdTrayecto } from "../validation/reserva.js";
 import { momentoEnColombia } from "../validation/trayecto.js";
 
 // Reserva de cupos (E04-HU07).
@@ -119,5 +125,86 @@ export async function reservarCupo(req, res) {
   } catch (error) {
     console.error("Error al reservar el cupo:", error);
     return res.status(500).json({ mensaje: "No se pudo confirmar la reserva." });
+  }
+}
+
+// Cancelación de reservas (E04-HU08).
+// Solo el pasajero de la reserva (req.usuario) puede cancelarla, y solo antes de que el trayecto inicie.
+
+export const MENSAJE_SIN_RESERVAS = "No tienes reservas confirmadas.";
+export const MENSAJE_TRAYECTO_INICIADO =
+  "No puedes cancelar la reserva porque el trayecto ya inició.";
+
+const RECHAZOS_CANCELACION = {
+  reserva_inexistente: { status: 404, codigo: "RESERVA_INEXISTENTE", mensaje: "La reserva no existe." },
+  reserva_ajena: {
+    status: 403,
+    codigo: "RESERVA_AJENA",
+    mensaje: "Solo el pasajero de la reserva puede cancelarla.",
+  },
+  reserva_cancelada: { status: 409, codigo: "RESERVA_CANCELADA", mensaje: "Esta reserva ya fue cancelada." },
+  trayecto_iniciado: { status: 409, codigo: "TRAYECTO_INICIADO", mensaje: MENSAJE_TRAYECTO_INICIADO },
+};
+
+// GET /api/reservas — reservas confirmadas del usuario de la sesión, para /reservas/cancelar.
+export async function misReservas(req, res) {
+  try {
+    const filas = await listarReservasConfirmadas({
+      pasajeroId: req.usuario.id,
+      ahoraColombia: momentoEnColombia(),
+    });
+    return res.status(200).json({
+      mensaje: filas.length === 0 ? MENSAJE_SIN_RESERVAS : null,
+      total: filas.length,
+      reservas: filas.map((fila) => ({ ...fila, iniciado: fila.iniciado === 1 })),
+    });
+  } catch (error) {
+    console.error("Error al consultar las reservas:", error);
+    return res.status(500).json({ mensaje: "No se pudieron cargar tus reservas." });
+  }
+}
+
+// POST /api/reservas/:id/cancelacion — cancela la reserva, libera el cupo y avisa al conductor.
+// Si el correo no se puede enviar, la cancelación se mantiene y la respuesta lo indica.
+export async function cancelarReservaPropia(req, res) {
+  const validacion = validarIdReserva(req.params.id);
+  if (!validacion.ok) {
+    return res.status(400).json({ mensaje: validacion.mensaje, errores: validacion.errores });
+  }
+
+  try {
+    const resultado = await cancelarReserva({
+      reservaId: validacion.datos.id,
+      pasajeroId: req.usuario.id,
+      ahoraColombia: momentoEnColombia(),
+    });
+    if (!resultado.ok) {
+      const rechazo = RECHAZOS_CANCELACION[resultado.motivo];
+      return res.status(rechazo.status).json({ codigo: rechazo.codigo, mensaje: rechazo.mensaje });
+    }
+
+    let conductorNotificado = true;
+    try {
+      await enviarCorreoReservaCancelada({
+        ...resultado.conductor,
+        pasajero: req.usuario.nombre,
+        trayecto: resultado.trayecto,
+      });
+    } catch (error) {
+      conductorNotificado = false;
+      console.error(`No se pudo avisar al conductor ${resultado.conductor.correo}:`, error);
+    }
+
+    return res.status(200).json({
+      mensaje: conductorNotificado
+        ? "Reserva cancelada. Tu cupo quedó libre y avisamos al conductor por correo."
+        : "Reserva cancelada. Tu cupo quedó libre, pero no se pudo avisar al conductor por correo.",
+      reserva: resultado.reserva,
+      trayecto: resultado.trayecto,
+      conductorNotificado,
+    });
+  } catch (error) {
+    console.error("Error al cancelar la reserva:", error);
+    return res.status(500).json({ mensaje: "No se pudo cancelar la reserva." });
   }
 }

@@ -37,7 +37,7 @@ describe("modelo reserva", () => {
       const reserva = { id: "r1", trayecto_id: TRAYECTO, pasajero_id: PASAJERO, estado: "Confirmada" };
       cliente.query
         .mockResolvedValueOnce(bloqueado())
-        .mockResolvedValueOnce({ rows: [{ existe: 0 }] })
+        .mockResolvedValueOnce({ rows: [] })
         .mockResolvedValueOnce({ rowCount: 1 })
         .mockResolvedValueOnce({ rows: [reserva] });
 
@@ -67,7 +67,7 @@ describe("modelo reserva", () => {
 
     test("criterio 3: debería bloquear la fila del trayecto para atender una solicitud a la vez", async () => {
       cliente.query.mockResolvedValueOnce(bloqueado({ cupos_disponibles: 0 }));
-      cliente.query.mockResolvedValueOnce({ rows: [{ existe: 0 }] });
+      cliente.query.mockResolvedValueOnce({ rows: [] });
 
       await confirmarReserva(entrada);
 
@@ -80,7 +80,7 @@ describe("modelo reserva", () => {
     test("criterio 2: debería rechazar la reserva si el trayecto no tiene cupos", async () => {
       cliente.query
         .mockResolvedValueOnce(bloqueado({ cupos_disponibles: 0 }))
-        .mockResolvedValueOnce({ rows: [{ existe: 0 }] });
+        .mockResolvedValueOnce({ rows: [] });
 
       const resultado = await confirmarReserva(entrada);
 
@@ -94,7 +94,7 @@ describe("modelo reserva", () => {
     test("criterio 3: debería rechazar si el descuento ya no encuentra cupo", async () => {
       cliente.query
         .mockResolvedValueOnce(bloqueado({ cupos_disponibles: 1 }))
-        .mockResolvedValueOnce({ rows: [{ existe: 0 }] })
+        .mockResolvedValueOnce({ rows: [] })
         .mockResolvedValueOnce({ rowCount: 0 });
 
       const resultado = await confirmarReserva(entrada);
@@ -129,7 +129,7 @@ describe("modelo reserva", () => {
     });
 
     test("debería rechazar una segunda reserva del mismo pasajero sin descontar cupo", async () => {
-      cliente.query.mockResolvedValueOnce(bloqueado()).mockResolvedValueOnce({ rows: [{ existe: 1 }] });
+      cliente.query.mockResolvedValueOnce(bloqueado()).mockResolvedValueOnce({ rows: [{ id: "r0", estado: "Confirmada" }] });
 
       expect(await confirmarReserva(entrada)).toEqual({ ok: false, motivo: "reserva_duplicada" });
       expect(cliente.query).toHaveBeenCalledTimes(2);
@@ -142,11 +142,12 @@ describe("modelo reserva", () => {
       });
       cliente.query
         .mockResolvedValueOnce(bloqueado())
-        .mockResolvedValueOnce({ rows: [{ existe: 0 }] })
+        .mockResolvedValueOnce({ rows: [] })
         .mockResolvedValueOnce({ rowCount: 1 })
         .mockRejectedValueOnce(error);
 
       expect(await confirmarReserva(entrada)).toEqual({ ok: false, motivo: "reserva_duplicada" });
+      expect(cliente.query).toHaveBeenCalledTimes(4);
       expect(cliente.rollback).toHaveBeenCalledTimes(1);
       expect(cliente.release).toHaveBeenCalledTimes(1);
     });

@@ -52,6 +52,10 @@ export default function Panel() {
             <strong>Mis trayectos</strong>
             <small>Edita o cancela tus trayectos</small>
           </Link>
+          <Link className="acceso-publicar" to="/reservas/cancelar">
+            <strong>Mis reservas</strong>
+            <small>Cancela una reserva y libera tu cupo</small>
+          </Link>
           <Link className="acceso-publicar" to="/historial">
             <strong>Historial</strong>
             <small>Tus trayectos y reservas</small>

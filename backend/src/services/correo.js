@@ -76,6 +76,44 @@ export async function enviarCorreoTrayectoCancelado(
   });
 }
 
+// Aviso al conductor de que un pasajero canceló su reserva y se liberó un cupo (E04-HU08).
+// trayecto: { fecha: 'AAAA-MM-DD', hora: 'HH:MM', origen, sede_destino, cupos_disponibles }.
+export async function enviarCorreoReservaCancelada(
+  { nombre, correo, pasajero, trayecto },
+  dependencias = {},
+) {
+  const config = dependencias.config ?? env;
+  const log = dependencias.log ?? console.log;
+  const ruta = `${trayecto.origen} → ${trayecto.sede_destino}`;
+  const salida = `${trayecto.fecha} a las ${trayecto.hora}`;
+  const disponibles = trayecto.cupos_disponibles;
+  const cupos = disponibles === 1 ? "1 cupo disponible" : `${disponibles} cupos disponibles`;
+  const mensaje = {
+    from: config.mailFrom,
+    to: correo,
+    subject: "Un pasajero canceló su reserva en Ride U",
+    text: [
+      `Hola ${nombre}.`,
+      "",
+      `${pasajero} canceló su reserva en tu trayecto:`,
+      `${ruta}, ${salida}.`,
+      "",
+      `Se liberó 1 cupo. Ahora el trayecto tiene ${cupos}.`,
+    ].join("\n"),
+    html: `<p>Hola ${escapeHtml(nombre)}.</p>
+<p>${escapeHtml(pasajero)} canceló su reserva en tu trayecto:</p>
+<p><strong>${escapeHtml(ruta)}</strong>, ${escapeHtml(salida)}.</p>
+<p>Se liberó 1 cupo. Ahora el trayecto tiene ${escapeHtml(cupos)}.</p>`,
+  };
+
+  await entregar(mensaje, {
+    ...dependencias,
+    config,
+    log,
+    resumen: `[Ride U] Aviso de reserva cancelada para ${correo}: ${pasajero} liberó 1 cupo en ${ruta}, ${salida}.`,
+  });
+}
+
 // En modo console solo imprime el resumen; en modo smtp envía el mensaje.
 async function entregar(mensaje, { config, log, resumen, enviarSmtp }) {
   if (config.mailMode === "console") {

@@ -258,6 +258,14 @@ function Acciones({ trayecto, confirmada, aviso, enviando, onConfirmar, rutaBusq
             Contactar al conductor
           </Link>
         ) : null}
+        {trayecto.reserva_id ? (
+          <Link
+            className="boton-contorno reservar-enlace"
+            to={`/reservas/cancelar?reserva=${encodeURIComponent(trayecto.reserva_id)}`}
+          >
+            Cancelar reserva
+          </Link>
+        ) : null}
         {volver}
       </>
     );

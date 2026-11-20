@@ -22,9 +22,12 @@ jest.unstable_mockModule("../../src/models/sesion.js", () => ({
 
 jest.unstable_mockModule("../../src/models/reserva.js", () => ({
   ESTADO_CONFIRMADA: "Confirmada",
+  ESTADO_CANCELADA: "Cancelada",
   buscarDetalleTrayecto,
   confirmarReserva,
   listarReservasDePasajero: jest.fn(),
+  listarReservasConfirmadas: jest.fn(),
+  cancelarReserva: jest.fn(),
 }));
 
 jest.unstable_mockModule("../../src/models/contacto.js", () => ({

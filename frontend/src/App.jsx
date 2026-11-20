@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import RutaProtegida from "./components/RutaProtegida.jsx";
 import BuscarTrayecto from "./pages/BuscarTrayecto.jsx";
+import CancelarReserva from "./pages/CancelarReserva.jsx";
 import ContactoConductor from "./pages/ContactoConductor.jsx";
 import ContactoPasajeros from "./pages/ContactoPasajeros.jsx";
 import EditarTrayecto from "./pages/EditarTrayecto.jsx";
@@ -29,6 +30,7 @@ export default function App() {
           <Route path="/trayectos/buscar" element={<BuscarTrayecto />} />
           <Route path="/trayectos/reservar" element={<ReservarTrayecto />} />
           <Route path="/trayectos/pasajeros/contacto" element={<ContactoPasajeros />} />
+          <Route path="/reservas/cancelar" element={<CancelarReserva />} />
           <Route path="/reservas/contacto-conductor" element={<ContactoConductor />} />
           <Route path="/historial" element={<Historial />} />
         </Route>

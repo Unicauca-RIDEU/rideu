@@ -162,6 +162,14 @@ export default function Historial() {
                           Contactar al conductor
                         </Link>
                       ) : null}
+                      {reserva.estado === "Confirmada" && reserva.estado_historial === "Pendiente" ? (
+                        <Link
+                          className="boton-contorno reservar-enlace"
+                          to={`/reservas/cancelar?reserva=${encodeURIComponent(reserva.id)}`}
+                        >
+                          Cancelar reserva
+                        </Link>
+                      ) : null}
                     </article>
                   </li>
                 ))}
