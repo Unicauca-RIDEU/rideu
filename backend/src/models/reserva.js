@@ -1,8 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { SALIDA, pool } from "../config/database.js";
-import { ESTADO_DISPONIBLE } from "./trayecto.js";
+import { ESTADO_CANCELADA, ESTADO_CONFIRMADA, ESTADO_DISPONIBLE } from "./estados.js";
 
-export const ESTADO_CONFIRMADA = "Confirmada";
+export { ESTADO_CANCELADA, ESTADO_CONFIRMADA };
 
 // Momento de salida del trayecto: fecha (DATE a las 00:00) más hora («HH24:MI»).
 const SALIDA_DEL_TRAYECTO =
@@ -150,7 +150,8 @@ export async function confirmarReserva({ trayectoId, pasajeroId, ahoraColombia }
 }
 
 // Historial (E04-HU09): reservas del usuario, de la salida más reciente a la más antigua.
-// Una reserva cuyo trayecto ya salió se muestra como «Completado».
+// Una reserva cancelada (por el pasajero o porque el conductor canceló el trayecto)
+// se muestra como «Cancelada». Si no, una reserva cuyo trayecto ya salió se muestra como «Completado».
 // ahoraColombia es la fecha y hora actual de Colombia como 'AAAA-MM-DD HH:MM'.
 export async function listarReservasDePasajero({ pasajeroId, ahoraColombia }) {
   const resultado = await pool.query(
@@ -164,6 +165,7 @@ export async function listarReservasDePasajero({ pasajeroId, ahoraColombia }) {
             t.aporte_sugerido,
             u.nombre AS conductor_nombre,
             CASE
+              WHEN r.estado = :estado_cancelada THEN 'Cancelada'
               WHEN ${SALIDA_DEL_TRAYECTO} <= TO_DATE(:ahora_colombia, 'YYYY-MM-DD HH24:MI')
                 THEN 'Completado'
               ELSE 'Pendiente'
@@ -174,7 +176,11 @@ export async function listarReservasDePasajero({ pasajeroId, ahoraColombia }) {
      JOIN usuarios u ON u.id = t.conductor_id
      WHERE r.pasajero_id = :pasajero_id
      ORDER BY t.fecha DESC, t.hora DESC`,
-    { pasajero_id: pasajeroId, ahora_colombia: ahoraColombia },
+    {
+      pasajero_id: pasajeroId,
+      ahora_colombia: ahoraColombia,
+      estado_cancelada: ESTADO_CANCELADA,
+    },
   );
   return resultado.rows;
 }

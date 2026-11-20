@@ -14,6 +14,29 @@ export async function publicarTrayecto(datos) {
   });
 }
 
+// Edición y cancelación de trayectos (E02-HU05). El backend toma el conductor de la sesión.
+
+export async function obtenerMisTrayectos() {
+  return llamar("/api/trayectos/mios");
+}
+
+export async function editarTrayecto(trayectoId, datos) {
+  return llamar(`/api/trayectos/${encodeURIComponent(trayectoId)}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(datos),
+  });
+}
+
+// Con reservas confirmadas, el backend exige confirmar: true.
+export async function cancelarTrayecto(trayectoId, { confirmar = false } = {}) {
+  return llamar(`/api/trayectos/${encodeURIComponent(trayectoId)}/cancelacion`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ confirmar }),
+  });
+}
+
 // Búsqueda de trayectos (E03-HU06).
 
 export async function obtenerSedes() {

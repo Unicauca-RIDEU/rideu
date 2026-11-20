@@ -1,7 +1,14 @@
 import { randomUUID } from "node:crypto";
 import { SALIDA, pool } from "../config/database.js";
+import { motivoParaNoModificar } from "../validation/trayecto.js";
+import {
+  ESTADO_CANCELADA,
+  ESTADO_CANCELADO,
+  ESTADO_CONFIRMADA,
+  ESTADO_DISPONIBLE,
+} from "./estados.js";
 
-export const ESTADO_DISPONIBLE = "Disponible";
+export { ESTADO_CANCELADO, ESTADO_DISPONIBLE };
 
 // Momento de salida del trayecto: fecha (DATE a las 00:00) más hora («HH24:MI»).
 const SALIDA_DEL_TRAYECTO =
@@ -97,16 +104,21 @@ export async function crearTrayecto({
 }
 
 // Un conductor no puede tener dos trayectos «Disponible» que salgan en la misma fecha y hora.
-export async function existeTrayectoEnHorario({ conductorId, fecha, hora }) {
+// Al editar un trayecto (E02-HU05), excluirId deja fuera el propio trayecto.
+export async function existeTrayectoEnHorario({ conductorId, fecha, hora, excluirId }) {
+  const binds = { conductor_id: conductorId, fecha, hora, estado: ESTADO_DISPONIBLE };
+  if (excluirId) {
+    binds.excluir_id = excluirId;
+  }
   const resultado = await pool.query(
     `SELECT COUNT(*) AS existe
      FROM trayectos
      WHERE conductor_id = :conductor_id
        AND fecha = TO_DATE(:fecha, 'YYYY-MM-DD')
        AND hora = :hora
-       AND estado = :estado
+       AND estado = :estado${excluirId ? "\n       AND id <> :excluir_id" : ""}
        AND ROWNUM = 1`,
-    { conductor_id: conductorId, fecha, hora, estado: ESTADO_DISPONIBLE },
+    binds,
   );
   return resultado.rows[0]?.existe === 1;
 }
@@ -150,8 +162,8 @@ export async function buscarTrayectosDisponibles({ sedeDestinoId, fecha, horaDes
 }
 
 // Historial (E04-HU09): trayectos publicados por el usuario, del más reciente al más antiguo.
-// Un trayecto cuya fecha y hora de salida ya pasaron se muestra como «Completado».
-// Cuando E02-HU05 agregue el estado «Cancelado», debe evaluarse antes que la fecha.
+// Un trayecto cancelado (E02-HU05) se muestra como «Cancelado», aunque su salida ya haya pasado.
+// Si no, un trayecto cuya fecha y hora de salida ya pasaron se muestra como «Completado».
 // ahoraColombia es la fecha y hora actual de Colombia como 'AAAA-MM-DD HH:MM'.
 export async function listarTrayectosDeConductor({ conductorId, ahoraColombia }) {
   const resultado = await pool.query(
@@ -164,6 +176,7 @@ export async function listarTrayectosDeConductor({ conductorId, ahoraColombia })
             t.cupos_disponibles,
             t.aporte_sugerido,
             CASE
+              WHEN t.estado = :estado_cancelado THEN 'Cancelado'
               WHEN ${SALIDA_DEL_TRAYECTO} <= TO_DATE(:ahora_colombia, 'YYYY-MM-DD HH24:MI')
                 THEN 'Completado'
               ELSE 'Pendiente'
@@ -172,9 +185,198 @@ export async function listarTrayectosDeConductor({ conductorId, ahoraColombia })
      JOIN sedes s ON s.id = t.sede_destino_id
      WHERE t.conductor_id = :conductor_id
      ORDER BY t.fecha DESC, t.hora DESC`,
-    { conductor_id: conductorId, ahora_colombia: ahoraColombia },
+    {
+      conductor_id: conductorId,
+      ahora_colombia: ahoraColombia,
+      estado_cancelado: ESTADO_CANCELADO,
+    },
   );
   return resultado.rows;
+}
+
+// Pantalla /trayectos/editar (E02-HU05): trayectos del conductor que aún se pueden editar
+// o cancelar («Disponible» y que no han salido), del más próximo al más lejano.
+// vehiculo_capacidad permite calcular el máximo de cupos del trayecto.
+export async function listarTrayectosEditables({ conductorId, ahoraColombia }) {
+  const resultado = await pool.query(
+    `SELECT t.id,
+            TO_CHAR(t.fecha, 'YYYY-MM-DD') AS fecha,
+            t.hora,
+            t.origen,
+            s.nombre AS sede_destino,
+            t.cupos,
+            t.cupos_disponibles,
+            t.cupos - t.cupos_disponibles AS cupos_reservados,
+            t.aporte_sugerido,
+            t.estado,
+            v.capacidad_pasajeros AS vehiculo_capacidad
+     FROM trayectos t
+     JOIN sedes s ON s.id = t.sede_destino_id
+     JOIN vehiculos v ON v.id = t.vehiculo_id
+     WHERE t.conductor_id = :conductor_id
+       AND t.estado = :estado
+       AND ${SALIDA_DEL_TRAYECTO} > TO_DATE(:ahora_colombia, 'YYYY-MM-DD HH24:MI')
+     ORDER BY t.fecha, t.hora`,
+    { conductor_id: conductorId, estado: ESTADO_DISPONIBLE, ahora_colombia: ahoraColombia },
+  );
+  return resultado.rows;
+}
+
+// Trayecto que el conductor quiere editar (E02-HU05), con lo necesario para validar el cambio.
+// vigente = 1 si aún no ha salido.
+export async function buscarTrayectoParaEdicion({ trayectoId, ahoraColombia }) {
+  const resultado = await pool.query(
+    `SELECT t.id,
+            t.conductor_id,
+            TO_CHAR(t.fecha, 'YYYY-MM-DD') AS fecha,
+            t.hora,
+            t.cupos,
+            t.cupos_disponibles,
+            t.cupos - t.cupos_disponibles AS cupos_reservados,
+            t.estado,
+            v.capacidad_pasajeros AS vehiculo_capacidad,
+            CASE
+              WHEN ${SALIDA_DEL_TRAYECTO} > TO_DATE(:ahora_colombia, 'YYYY-MM-DD HH24:MI')
+                THEN 1
+              ELSE 0
+            END AS vigente
+     FROM trayectos t
+     JOIN vehiculos v ON v.id = t.vehiculo_id
+     WHERE t.id = :id`,
+    { id: trayectoId, ahora_colombia: ahoraColombia },
+  );
+  return resultado.rows[0] ?? null;
+}
+
+// Guarda la nueva fecha, hora y cupos de un trayecto (E02-HU05) en una sola sentencia.
+// Los cupos disponibles se recalculan conservando las reservas ya confirmadas.
+// Las condiciones del WHERE repiten las reglas para que una reserva o la salida del trayecto
+// que ocurran mientras tanto no dejen datos inconsistentes: en ese caso no cambia ninguna fila.
+// Devuelve true si el trayecto se actualizó.
+export async function actualizarTrayecto({
+  trayectoId,
+  conductorId,
+  fecha,
+  hora,
+  cupos,
+  ahoraColombia,
+}) {
+  const resultado = await pool.query(
+    `UPDATE trayectos t
+     SET t.fecha = TO_DATE(:fecha, 'YYYY-MM-DD'),
+         t.hora = :hora,
+         t.cupos_disponibles = :cupos - (t.cupos - t.cupos_disponibles),
+         t.cupos = :cupos
+     WHERE t.id = :id
+       AND t.conductor_id = :conductor_id
+       AND t.estado = :estado
+       AND t.cupos - t.cupos_disponibles <= :cupos
+       AND ${SALIDA_DEL_TRAYECTO} > TO_DATE(:ahora_colombia, 'YYYY-MM-DD HH24:MI')`,
+    {
+      id: trayectoId,
+      conductor_id: conductorId,
+      fecha,
+      hora,
+      cupos,
+      estado: ESTADO_DISPONIBLE,
+      ahora_colombia: ahoraColombia,
+    },
+  );
+  return resultado.rowCount === 1;
+}
+
+// Cancela un trayecto (E02-HU05) en una sola transacción.
+// La fila del trayecto se bloquea con FOR UPDATE: mientras tanto nadie puede reservar en él.
+// Si tiene reservas confirmadas y confirmar no es true, no cambia nada y devuelve
+// cuántos pasajeros se verían afectados. Al confirmar, el trayecto queda «Cancelado»,
+// sus reservas quedan «Cancelada» y sus cupos vuelven a estar libres.
+// Devuelve { ok: true, trayecto, pasajeros } o { ok: false, motivo, pasajerosAfectados? }.
+export async function cancelarTrayecto({ trayectoId, conductorId, ahoraColombia, confirmar }) {
+  const cliente = await pool.connect();
+  try {
+    const bloqueado = await cliente.query(
+      `SELECT t.id,
+              t.conductor_id,
+              t.estado,
+              TO_CHAR(t.fecha, 'YYYY-MM-DD') AS fecha,
+              t.hora,
+              t.origen,
+              s.nombre AS sede_destino,
+              CASE
+                WHEN ${SALIDA_DEL_TRAYECTO} > TO_DATE(:ahora_colombia, 'YYYY-MM-DD HH24:MI')
+                  THEN 1
+                ELSE 0
+              END AS vigente
+       FROM trayectos t
+       JOIN sedes s ON s.id = t.sede_destino_id
+       WHERE t.id = :id
+       FOR UPDATE OF t.estado`,
+      { id: trayectoId, ahora_colombia: ahoraColombia },
+    );
+    const trayecto = bloqueado.rows[0];
+    const rechazo = motivoParaNoModificar(trayecto, conductorId);
+    if (rechazo) {
+      await cliente.rollback();
+      return { ok: false, motivo: rechazo };
+    }
+
+    const afectados = await cliente.query(
+      `SELECT r.id AS reserva_id,
+              u.nombre,
+              u.correo
+       FROM reservas r
+       JOIN usuarios u ON u.id = r.pasajero_id
+       WHERE r.trayecto_id = :trayecto_id
+         AND r.estado = :estado
+       ORDER BY r.creado_en, r.id`,
+      { trayecto_id: trayectoId, estado: ESTADO_CONFIRMADA },
+    );
+    const pasajeros = afectados.rows;
+    if (pasajeros.length > 0 && confirmar !== true) {
+      await cliente.rollback();
+      return { ok: false, motivo: "requiere_confirmacion", pasajerosAfectados: pasajeros.length };
+    }
+
+    await cliente.query(
+      `UPDATE trayectos
+       SET estado = :estado,
+           cupos_disponibles = cupos
+       WHERE id = :id`,
+      { id: trayectoId, estado: ESTADO_CANCELADO },
+    );
+    if (pasajeros.length > 0) {
+      await cliente.query(
+        `UPDATE reservas
+         SET estado = :estado_cancelada
+         WHERE trayecto_id = :trayecto_id
+           AND estado = :estado_confirmada`,
+        {
+          trayecto_id: trayectoId,
+          estado_cancelada: ESTADO_CANCELADA,
+          estado_confirmada: ESTADO_CONFIRMADA,
+        },
+      );
+    }
+    await cliente.commit();
+
+    return {
+      ok: true,
+      trayecto: {
+        id: trayecto.id,
+        fecha: trayecto.fecha,
+        hora: trayecto.hora,
+        origen: trayecto.origen,
+        sede_destino: trayecto.sede_destino,
+        estado: ESTADO_CANCELADO,
+      },
+      pasajeros: pasajeros.map(({ nombre, correo }) => ({ nombre, correo })),
+    };
+  } catch (error) {
+    await cliente.rollback();
+    throw error;
+  } finally {
+    await cliente.release();
+  }
 }
 
 // Estado de la cuenta, vehículo y licencia del usuario en una sola consulta.

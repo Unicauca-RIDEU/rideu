@@ -3,6 +3,7 @@ import RutaProtegida from "./components/RutaProtegida.jsx";
 import BuscarTrayecto from "./pages/BuscarTrayecto.jsx";
 import ContactoConductor from "./pages/ContactoConductor.jsx";
 import ContactoPasajeros from "./pages/ContactoPasajeros.jsx";
+import EditarTrayecto from "./pages/EditarTrayecto.jsx";
 import Historial from "./pages/Historial.jsx";
 import Login from "./pages/Login.jsx";
 import Panel from "./pages/Panel.jsx";
@@ -24,6 +25,7 @@ export default function App() {
           <Route path="/panel" element={<Panel />} />
           <Route path="/perfil/vehiculo" element={<Vehiculo />} />
           <Route path="/trayectos/publicar" element={<PublicarTrayecto />} />
+          <Route path="/trayectos/editar" element={<EditarTrayecto />} />
           <Route path="/trayectos/buscar" element={<BuscarTrayecto />} />
           <Route path="/trayectos/reservar" element={<ReservarTrayecto />} />
           <Route path="/trayectos/pasajeros/contacto" element={<ContactoPasajeros />} />

@@ -43,6 +43,7 @@ jest.unstable_mockModule("../../src/models/sesion.js", () => ({
 
 jest.unstable_mockModule("../../src/services/correo.js", () => ({
   enviarCorreoVerificacion,
+  enviarCorreoTrayectoCancelado: jest.fn(),
 }));
 
 jest.unstable_mockModule("bcryptjs", () => ({

@@ -31,9 +31,56 @@ export async function enviarCorreoVerificacion(
 <p>El enlace vence en 24 horas.</p>`,
   };
 
+  await entregar(mensaje, {
+    ...dependencias,
+    config,
+    log,
+    resumen: `[Ride U] Enlace de verificación para ${correo}: ${enlace}`,
+  });
+  return { enlace };
+}
+
+// Aviso al pasajero de que el conductor canceló el trayecto y su reserva (E02-HU05).
+// trayecto: { fecha: 'AAAA-MM-DD', hora: 'HH:MM', origen, sede_destino }.
+export async function enviarCorreoTrayectoCancelado(
+  { nombre, correo, trayecto },
+  dependencias = {},
+) {
+  const config = dependencias.config ?? env;
+  const log = dependencias.log ?? console.log;
+  const ruta = `${trayecto.origen} → ${trayecto.sede_destino}`;
+  const salida = `${trayecto.fecha} a las ${trayecto.hora}`;
+  const mensaje = {
+    from: config.mailFrom,
+    to: correo,
+    subject: "Tu trayecto de Ride U fue cancelado",
+    text: [
+      `Hola ${nombre}.`,
+      "",
+      "El conductor canceló el trayecto en el que tenías una reserva:",
+      `${ruta}, ${salida}.`,
+      "",
+      "Tu reserva quedó cancelada. Puedes buscar otro trayecto en Ride U.",
+    ].join("\n"),
+    html: `<p>Hola ${escapeHtml(nombre)}.</p>
+<p>El conductor canceló el trayecto en el que tenías una reserva:</p>
+<p><strong>${escapeHtml(ruta)}</strong>, ${escapeHtml(salida)}.</p>
+<p>Tu reserva quedó cancelada. Puedes buscar otro trayecto en Ride U.</p>`,
+  };
+
+  await entregar(mensaje, {
+    ...dependencias,
+    config,
+    log,
+    resumen: `[Ride U] Aviso de trayecto cancelado para ${correo}: ${ruta}, ${salida}.`,
+  });
+}
+
+// En modo console solo imprime el resumen; en modo smtp envía el mensaje.
+async function entregar(mensaje, { config, log, resumen, enviarSmtp }) {
   if (config.mailMode === "console") {
-    log(`[Ride U] Enlace de verificación para ${correo}: ${enlace}`);
-    return { enlace };
+    log(resumen);
+    return;
   }
 
   if (config.mailMode !== "smtp") {
@@ -43,9 +90,8 @@ export async function enviarCorreoVerificacion(
     throw new Error("Faltan SMTP_HOST o MAIL_FROM.");
   }
 
-  const enviar = dependencias.enviarSmtp ?? enviarPorSmtp;
+  const enviar = enviarSmtp ?? enviarPorSmtp;
   await enviar(mensaje, config);
-  return { enlace };
 }
 
 async function enviarPorSmtp(mensaje, config) {

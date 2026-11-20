@@ -14,7 +14,7 @@ El stack es React (Vite) en el frontend, Node.js con Express en el backend y Ora
 | Sprint 2 | 23 oct – 5 nov | HU03 Registrar vehículo y licencia · HU06 Buscar trayectos disponibles | Implementadas |
 | Sprint 3 | 6 nov – 19 nov | HU04 Publicar trayecto · HU09 Consultar historial de trayectos y reservas | En curso: HU04 evaluada; HU09 con el historial de trayectos hecho (las reservas llegan con HU07); correcciones y mejoras de HU01 a HU04 hechas |
 | Sprint 4 | 20 nov – 3 dic | HU07 Reservar cupo · HU10 y HU11 Contacto por WhatsApp | En curso: HU07, HU10 y HU11 implementadas, con pruebas unitarias; pruebas funcionales pendientes |
-| Sprint 5 | 4 dic – 17 dic | HU05 Editar o cancelar trayecto · HU08 Cancelar reserva | Pendientes |
+| Sprint 5 | 4 dic – 17 dic | HU05 Editar o cancelar trayecto · HU08 Cancelar reserva | En curso: HU05 implementada, con pruebas unitarias; pruebas contra Oracle y funcionales pendientes. HU08 pendiente |
 
 El backlog, las historias, los casos de prueba y el plan de riesgos están en [`documentacion/`](documentacion/). Las evidencias de las pruebas unitarias están en [`evidencias/`](evidencias/).
 
@@ -127,6 +127,7 @@ npm run build --prefix frontend
 | `/panel` | HU02 | Sí |
 | `/perfil/vehiculo` | HU03 | Sí |
 | `/trayectos/publicar` | HU04 | Sí |
+| `/trayectos/editar` | HU05 | Sí |
 | `/trayectos/buscar` | HU06 | Sí |
 | `/trayectos/reservar` | HU07 | Sí |
 | `/reservas/contacto-conductor` | HU10 | Sí |
@@ -150,6 +151,9 @@ Las rutas con sesión exigen el encabezado `Authorization: Bearer <token>`; el t
 | `POST /api/trayectos` | HU04 | Sí | Publica un trayecto; rechaza otro del mismo conductor en la misma fecha y hora |
 | `GET /api/trayectos?sedeDestinoId=&fecha=&horaDesde=` | HU06 | Sí | Trayectos disponibles con cupos, ordenados por hora de salida |
 | `GET /api/sedes` | HU06 | Sí | Sedes de destino |
+| `GET /api/trayectos/mios` | HU05 | Sí | Trayectos vigentes del conductor de la sesión, con sus reservas y el máximo de cupos |
+| `PATCH /api/trayectos/:id` | HU05 | Sí | Cambia la fecha, la hora o los cupos de un trayecto vigente propio; los cupos no pueden quedar por debajo de las reservas |
+| `POST /api/trayectos/:id/cancelacion` | HU05 | Sí | Cancela un trayecto vigente propio; con reservas exige `{ "confirmar": true }` (si no, 409 con los pasajeros afectados), cancela las reservas y avisa por correo a cada pasajero |
 | `GET /api/trayectos/:id` | HU07 | Sí | Detalle de un trayecto con sus cupos disponibles, para la pantalla de reserva |
 | `POST /api/trayectos/:id/reservas` | HU07 | Sí | Reserva un cupo para el usuario de la sesión y lo descuenta; sin cupos responde 409 «Cupos agotados» |
 | `GET /api/trayectos/:id/pasajeros` | HU11 | Sí | Enlaces `wa.me` de los pasajeros con reserva confirmada; solo para el conductor del trayecto (403 para los demás) |

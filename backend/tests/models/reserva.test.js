@@ -205,6 +205,7 @@ describe("modelo reserva", () => {
       expect(query).toHaveBeenCalledWith(expect.stringContaining("WHERE r.pasajero_id = :pasajero_id"), {
         pasajero_id: PASAJERO,
         ahora_colombia: AHORA,
+        estado_cancelada: "Cancelada",
       });
     });
   });

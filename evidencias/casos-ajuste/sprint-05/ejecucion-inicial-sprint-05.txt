@@ -1,0 +1,431 @@
+
+> rideu-backend@0.1.0 test
+> cross-env NODE_OPTIONS=--experimental-vm-modules jest --runInBand
+
+(node:594) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+FAIL tests/routes/trayectoRoutes.test.js
+  ● Test suite failed to run
+
+    SyntaxError: The requested module '../models/trayecto.js' does not provide an export named 'actualizarTrayecto'
+
+      36 | }));
+      37 |
+    > 38 | const { createApp } = await import("../../src/app.js");
+         |                       ^
+      39 | const { fechaEnColombia } = await import("../../src/validation/trayecto.js");
+      40 |
+      41 | const UN_DIA = 24 * 60 * 60 * 1000;
+
+      at EsmLoader.linkAndEvaluateModule (node_modules/jest-runtime/build/index.js:1989:7)
+      at tests/routes/trayectoRoutes.test.js:38:23
+
+FAIL tests/routes/reservaRoutes.test.js
+  ● Test suite failed to run
+
+    SyntaxError: The requested module './reserva.js' does not provide an export named 'ESTADO_CANCELADA'
+
+      34 | }));
+      35 |
+    > 36 | const { createApp } = await import("../../src/app.js");
+         |                       ^
+      37 |
+      38 | const TRAYECTO = "3f2b8c1e-9d4a-4e7b-8a61-5c0d2e9f7b13";
+      39 | const RESERVA = "7a1c5d2e-3b4f-4a6b-9c8d-0e1f2a3b4c5d";
+
+      at EsmLoader.linkAndEvaluateModule (node_modules/jest-runtime/build/index.js:1989:7)
+      at tests/routes/reservaRoutes.test.js:36:23
+
+FAIL tests/routes/vehiculoRoutes.test.js
+  ● Test suite failed to run
+
+    SyntaxError: The requested module '../models/trayecto.js' does not provide an export named 'actualizarTrayecto'
+
+      31 | }));
+      32 |
+    > 33 | const { createApp } = await import("../../src/app.js");
+         |                       ^
+      34 |
+      35 | const usuarioSesion = {
+      36 |   id: "11111111-1111-4111-8111-111111111111",
+
+      at EsmLoader.linkAndEvaluateModule (node_modules/jest-runtime/build/index.js:1989:7)
+      at tests/routes/vehiculoRoutes.test.js:33:23
+
+FAIL tests/routes/historialRoutes.test.js
+  ● Test suite failed to run
+
+    SyntaxError: The requested module '../models/trayecto.js' does not provide an export named 'actualizarTrayecto'
+
+      35 | }));
+      36 |
+    > 37 | const { createApp } = await import("../../src/app.js");
+         |                       ^
+      38 |
+      39 | const usuarioSesion = {
+      40 |   id: "11111111-1111-4111-8111-111111111111",
+
+      at EsmLoader.linkAndEvaluateModule (node_modules/jest-runtime/build/index.js:1989:7)
+      at tests/routes/historialRoutes.test.js:37:23
+
+FAIL tests/routes/authRoutes.test.js
+  ● Test suite failed to run
+
+    SyntaxError: The requested module '../models/trayecto.js' does not provide an export named 'buscarPerfilConductor'
+
+      54 | }));
+      55 |
+    > 56 | const { createApp } = await import("../../src/app.js");
+         |                       ^
+      57 |
+      58 | const registroValido = {
+      59 |   nombre: "Ana Pérez",
+
+      at EsmLoader.linkAndEvaluateModule (node_modules/jest-runtime/build/index.js:1989:7)
+      at tests/routes/authRoutes.test.js:56:23
+
+  console.error
+    Error al enviar el correo de verificación: Error: SMTP caído
+        at Object.<anonymous> (/home/user/rideu/backend/tests/controllers/authController.test.js:128:48)
+        at Promise.finally.completed (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1834:28)
+        at new Promise (<anonymous>)
+        at callAsyncCircusFn (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1774:10)
+        at _callCircusTest (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1167:40)
+        at _runTestInContext (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1103:3)
+        at runTestWithContext (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:996:5)
+        at _runTestsForDescribeBlockOnce (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1008:11)
+        at _runTestsForDescribeBlock (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:824:5)
+        at _runTestsForDescribeBlockOnce (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1003:11)
+        at _runTestsForDescribeBlock (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:824:5)
+        at run (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:789:3)
+        at runAndTransformResultsToJestFormat (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:2300:21)
+        at jestAdapter (/home/user/rideu/backend/node_modules/jest-circus/build/runner.js:111:19)
+        at runTestInternal (/home/user/rideu/backend/node_modules/jest-runner/build/index.js:247:16)
+        at runTest (/home/user/rideu/backend/node_modules/jest-runner/build/index.js:315:7)
+
+      53 |         console.error("No se pudo deshacer el registro tras fallar el correo:", borrado);
+      54 |       });
+    > 55 |       console.error("Error al enviar el correo de verificación:", error);
+         |               ^
+      56 |       return res.status(500).json({
+      57 |         mensaje: "No se pudo enviar el correo de verificación. Inténtalo de nuevo.",
+      58 |       });
+
+      at registrar (src/controllers/authController.js:55:15)
+      at Object.<anonymous> (tests/controllers/authController.test.js:133:5)
+
+FAIL tests/models/reserva.test.js
+  ● modelo reserva › listarReservasDePasajero › debería listar solo las reservas del pasajero indicado
+
+    expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+    - Expected
+    + Received
+
+      "SELECT r.id,
+                r.estado,
+                t.id AS trayecto_id,
+                TO_CHAR(t.fecha, 'YYYY-MM-DD') AS fecha,
+                t.hora,
+                t.origen,
+                s.nombre AS sede_destino,
+                t.aporte_sugerido,
+                u.nombre AS conductor_nombre,
+                CASE
+                  WHEN r.estado = :estado_cancelada THEN 'Cancelada'
+                  WHEN TO_DATE(TO_CHAR(t.fecha, 'YYYY-MM-DD') || ' ' || t.hora, 'YYYY-MM-DD HH24:MI') <= TO_DATE(:ahora_colombia, 'YYYY-MM-DD HH24:MI')
+                    THEN 'Completado'
+                  ELSE 'Pendiente'
+                END AS estado_historial
+         FROM reservas r
+         JOIN trayectos t ON t.id = r.trayecto_id
+         JOIN sedes s ON s.id = t.sede_destino_id
+         JOIN usuarios u ON u.id = t.conductor_id
+         WHERE r.pasajero_id = :pasajero_id
+         ORDER BY t.fecha DESC, t.hora DESC",
+      Object {
+        "ahora_colombia": "2026-11-20 06:00",
+    +   "estado_cancelada": "Cancelada",
+        "pasajero_id": "11111111-1111-4111-8111-111111111111",
+      },
+
+    Number of calls: 1
+
+      203 |
+      204 |       expect(reservas).toEqual(filas);
+    > 205 |       expect(query).toHaveBeenCalledWith(expect.stringContaining("WHERE r.pasajero_id = :pasajero_id"), {
+          |                     ^
+      206 |         pasajero_id: PASAJERO,
+      207 |         ahora_colombia: AHORA,
+      208 |       });
+
+      at Object.<anonymous> (tests/models/reserva.test.js:205:21)
+
+FAIL tests/models/trayecto.test.js
+  ● modelo trayecto › listarTrayectosDeConductor (HU09) › criterio 1: debería listar solo los trayectos del conductor, del más reciente al más antiguo
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 0
+    + Received  + 1
+
+      Object {
+        "ahora_colombia": "2026-11-10 09:00",
+        "conductor_id": "conductor-1",
+    +   "estado_cancelado": "Cancelado",
+      }
+
+      134 |       expect(sql).toContain("WHERE t.conductor_id = :conductor_id");
+      135 |       expect(sql).toContain("ORDER BY t.fecha DESC, t.hora DESC");
+    > 136 |       expect(parametros).toEqual({
+          |                          ^
+      137 |         conductor_id: "conductor-1",
+      138 |         ahora_colombia: "2026-11-10 09:00",
+      139 |       });
+
+      at Object.<anonymous> (tests/models/trayecto.test.js:136:26)
+
+  ● modelo trayecto › debería devolver el perfil del conductor con vehículo y licencia
+
+    TypeError: buscarPerfilConductor is not a function
+
+      173 |
+      174 |     // Act
+    > 175 |     const encontrado = await buscarPerfilConductor(datos.conductorId);
+          |                              ^
+      176 |
+      177 |     // Assert
+      178 |     expect(encontrado).toEqual(perfil);
+
+      at Object.<anonymous> (tests/models/trayecto.test.js:175:30)
+
+  ● modelo trayecto › debería devolver null si el usuario no existe
+
+    TypeError: buscarPerfilConductor is not a function
+
+      185 |   test("debería devolver null si el usuario no existe", async () => {
+      186 |     query.mockResolvedValueOnce({ rows: [] });
+    > 187 |     expect(await buscarPerfilConductor("no-existe")).toBeNull();
+          |                  ^
+      188 |   });
+      189 |
+      190 |   describe("buscarTrayectosDisponibles (HU06)", () => {
+
+      at Object.<anonymous> (tests/models/trayecto.test.js:187:18)
+
+  console.error
+    Error al validar la sesión: Error: DB caída
+        at Object.<anonymous> (/home/user/rideu/backend/tests/middleware/requiereSesion.test.js:92:46)
+        at Promise.finally.completed (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1834:28)
+        at new Promise (<anonymous>)
+        at callAsyncCircusFn (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1774:10)
+        at _callCircusTest (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1167:40)
+        at _runTestInContext (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1103:3)
+        at runTestWithContext (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:996:5)
+        at _runTestsForDescribeBlockOnce (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1008:11)
+        at _runTestsForDescribeBlock (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:824:5)
+        at _runTestsForDescribeBlockOnce (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1003:11)
+        at _runTestsForDescribeBlock (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:824:5)
+        at run (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:789:3)
+        at runAndTransformResultsToJestFormat (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:2300:21)
+        at jestAdapter (/home/user/rideu/backend/node_modules/jest-circus/build/runner.js:111:19)
+        at runTestInternal (/home/user/rideu/backend/node_modules/jest-runner/build/index.js:247:16)
+        at runTest (/home/user/rideu/backend/node_modules/jest-runner/build/index.js:315:7)
+
+      16 |     return next();
+      17 |   } catch (error) {
+    > 18 |     console.error("Error al validar la sesión:", error);
+         |             ^
+      19 |     return res.status(500).json({ mensaje: "No se pudo validar la sesión." });
+      20 |   }
+      21 | }
+
+      at requiereSesion (src/middleware/requiereSesion.js:18:13)
+      at Object.<anonymous> (tests/middleware/requiereSesion.test.js:97:5)
+
+Summary of all failing tests
+FAIL tests/routes/trayectoRoutes.test.js
+  ● Test suite failed to run
+
+    SyntaxError: The requested module '../models/trayecto.js' does not provide an export named 'actualizarTrayecto'
+
+      36 | }));
+      37 |
+    > 38 | const { createApp } = await import("../../src/app.js");
+         |                       ^
+      39 | const { fechaEnColombia } = await import("../../src/validation/trayecto.js");
+      40 |
+      41 | const UN_DIA = 24 * 60 * 60 * 1000;
+
+      at EsmLoader.linkAndEvaluateModule (node_modules/jest-runtime/build/index.js:1989:7)
+      at tests/routes/trayectoRoutes.test.js:38:23
+
+FAIL tests/routes/reservaRoutes.test.js
+  ● Test suite failed to run
+
+    SyntaxError: The requested module './reserva.js' does not provide an export named 'ESTADO_CANCELADA'
+
+      34 | }));
+      35 |
+    > 36 | const { createApp } = await import("../../src/app.js");
+         |                       ^
+      37 |
+      38 | const TRAYECTO = "3f2b8c1e-9d4a-4e7b-8a61-5c0d2e9f7b13";
+      39 | const RESERVA = "7a1c5d2e-3b4f-4a6b-9c8d-0e1f2a3b4c5d";
+
+      at EsmLoader.linkAndEvaluateModule (node_modules/jest-runtime/build/index.js:1989:7)
+      at tests/routes/reservaRoutes.test.js:36:23
+
+FAIL tests/routes/vehiculoRoutes.test.js
+  ● Test suite failed to run
+
+    SyntaxError: The requested module '../models/trayecto.js' does not provide an export named 'actualizarTrayecto'
+
+      31 | }));
+      32 |
+    > 33 | const { createApp } = await import("../../src/app.js");
+         |                       ^
+      34 |
+      35 | const usuarioSesion = {
+      36 |   id: "11111111-1111-4111-8111-111111111111",
+
+      at EsmLoader.linkAndEvaluateModule (node_modules/jest-runtime/build/index.js:1989:7)
+      at tests/routes/vehiculoRoutes.test.js:33:23
+
+FAIL tests/routes/historialRoutes.test.js
+  ● Test suite failed to run
+
+    SyntaxError: The requested module '../models/trayecto.js' does not provide an export named 'actualizarTrayecto'
+
+      35 | }));
+      36 |
+    > 37 | const { createApp } = await import("../../src/app.js");
+         |                       ^
+      38 |
+      39 | const usuarioSesion = {
+      40 |   id: "11111111-1111-4111-8111-111111111111",
+
+      at EsmLoader.linkAndEvaluateModule (node_modules/jest-runtime/build/index.js:1989:7)
+      at tests/routes/historialRoutes.test.js:37:23
+
+FAIL tests/routes/authRoutes.test.js
+  ● Test suite failed to run
+
+    SyntaxError: The requested module '../models/trayecto.js' does not provide an export named 'buscarPerfilConductor'
+
+      54 | }));
+      55 |
+    > 56 | const { createApp } = await import("../../src/app.js");
+         |                       ^
+      57 |
+      58 | const registroValido = {
+      59 |   nombre: "Ana Pérez",
+
+      at EsmLoader.linkAndEvaluateModule (node_modules/jest-runtime/build/index.js:1989:7)
+      at tests/routes/authRoutes.test.js:56:23
+
+FAIL tests/models/reserva.test.js
+  ● modelo reserva › listarReservasDePasajero › debería listar solo las reservas del pasajero indicado
+
+    expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+    - Expected
+    + Received
+
+      "SELECT r.id,
+                r.estado,
+                t.id AS trayecto_id,
+                TO_CHAR(t.fecha, 'YYYY-MM-DD') AS fecha,
+                t.hora,
+                t.origen,
+                s.nombre AS sede_destino,
+                t.aporte_sugerido,
+                u.nombre AS conductor_nombre,
+                CASE
+                  WHEN r.estado = :estado_cancelada THEN 'Cancelada'
+                  WHEN TO_DATE(TO_CHAR(t.fecha, 'YYYY-MM-DD') || ' ' || t.hora, 'YYYY-MM-DD HH24:MI') <= TO_DATE(:ahora_colombia, 'YYYY-MM-DD HH24:MI')
+                    THEN 'Completado'
+                  ELSE 'Pendiente'
+                END AS estado_historial
+         FROM reservas r
+         JOIN trayectos t ON t.id = r.trayecto_id
+         JOIN sedes s ON s.id = t.sede_destino_id
+         JOIN usuarios u ON u.id = t.conductor_id
+         WHERE r.pasajero_id = :pasajero_id
+         ORDER BY t.fecha DESC, t.hora DESC",
+      Object {
+        "ahora_colombia": "2026-11-20 06:00",
+    +   "estado_cancelada": "Cancelada",
+        "pasajero_id": "11111111-1111-4111-8111-111111111111",
+      },
+
+    Number of calls: 1
+
+      203 |
+      204 |       expect(reservas).toEqual(filas);
+    > 205 |       expect(query).toHaveBeenCalledWith(expect.stringContaining("WHERE r.pasajero_id = :pasajero_id"), {
+          |                     ^
+      206 |         pasajero_id: PASAJERO,
+      207 |         ahora_colombia: AHORA,
+      208 |       });
+
+      at Object.<anonymous> (tests/models/reserva.test.js:205:21)
+
+FAIL tests/models/trayecto.test.js
+  ● modelo trayecto › listarTrayectosDeConductor (HU09) › criterio 1: debería listar solo los trayectos del conductor, del más reciente al más antiguo
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 0
+    + Received  + 1
+
+      Object {
+        "ahora_colombia": "2026-11-10 09:00",
+        "conductor_id": "conductor-1",
+    +   "estado_cancelado": "Cancelado",
+      }
+
+      134 |       expect(sql).toContain("WHERE t.conductor_id = :conductor_id");
+      135 |       expect(sql).toContain("ORDER BY t.fecha DESC, t.hora DESC");
+    > 136 |       expect(parametros).toEqual({
+          |                          ^
+      137 |         conductor_id: "conductor-1",
+      138 |         ahora_colombia: "2026-11-10 09:00",
+      139 |       });
+
+      at Object.<anonymous> (tests/models/trayecto.test.js:136:26)
+
+  ● modelo trayecto › debería devolver el perfil del conductor con vehículo y licencia
+
+    TypeError: buscarPerfilConductor is not a function
+
+      173 |
+      174 |     // Act
+    > 175 |     const encontrado = await buscarPerfilConductor(datos.conductorId);
+          |                              ^
+      176 |
+      177 |     // Assert
+      178 |     expect(encontrado).toEqual(perfil);
+
+      at Object.<anonymous> (tests/models/trayecto.test.js:175:30)
+
+  ● modelo trayecto › debería devolver null si el usuario no existe
+
+    TypeError: buscarPerfilConductor is not a function
+
+      185 |   test("debería devolver null si el usuario no existe", async () => {
+      186 |     query.mockResolvedValueOnce({ rows: [] });
+    > 187 |     expect(await buscarPerfilConductor("no-existe")).toBeNull();
+          |                  ^
+      188 |   });
+      189 |
+      190 |   describe("buscarTrayectosDisponibles (HU06)", () => {
+
+      at Object.<anonymous> (tests/models/trayecto.test.js:187:18)
+
+
+Test Suites: 7 failed, 18 passed, 25 total
+Tests:       4 failed, 308 passed, 312 total
+Snapshots:   0 total
+Time:        2.486 s, estimated 3 s
+Ran all test suites.

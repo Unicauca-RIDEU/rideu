@@ -153,6 +153,71 @@ export function validarTrayecto(body, { cuposMaximos = CUPOS_MAXIMOS, ahora = ne
   };
 }
 
+// Estado del trayecto que admite cambios; es el mismo valor que ESTADO_DISPONIBLE del modelo.
+const TRAYECTO_DISPONIBLE = "Disponible";
+
+// Motivo por el que el conductor no puede editar ni cancelar el trayecto (E02-HU05), o null si puede.
+// trayecto: { conductor_id, estado, vigente } con vigente = 1 si aún no ha salido.
+export function motivoParaNoModificar(trayecto, conductorId) {
+  if (!trayecto) return "trayecto_inexistente";
+  if (trayecto.conductor_id !== conductorId) return "trayecto_ajeno";
+  if (trayecto.estado !== TRAYECTO_DISPONIBLE) return "trayecto_cancelado";
+  if (trayecto.vigente !== 1) return "trayecto_iniciado";
+  return null;
+}
+
+// Edición de un trayecto vigente (E02-HU05): el conductor cambia la fecha, la hora o los cupos.
+// Los cupos no pueden ser menos que los ya reservados ni más que el máximo del vehículo.
+export function validarEdicionTrayecto(
+  body,
+  { cuposMaximos = CUPOS_MAXIMOS, cuposReservados = 0, ahora = new Date() } = {},
+) {
+  if (body === null || typeof body !== "object" || Array.isArray(body)) {
+    const mensaje = "El cuerpo de la solicitud debe incluir la fecha, la hora y los cupos.";
+    return rechazar(mensaje, [{ campo: "body", mensaje }]);
+  }
+
+  const errores = [];
+  const fecha = texto(body.fecha);
+  const hora = texto(body.hora);
+  const { cupos } = body;
+
+  const fechaValida = validarFecha(fecha, errores);
+  const horaValida = validarHora(hora, errores);
+  if (fechaValida && horaValida && !esFutura(fecha, hora, ahora)) {
+    errores.push({
+      campo: "fecha",
+      mensaje: "La fecha y la hora de salida deben ser posteriores al momento actual.",
+    });
+  }
+
+  if (estaVacio(cupos)) {
+    errores.push({ campo: "cupos", mensaje: "Los cupos son obligatorios." });
+  } else if (!Number.isInteger(cupos)) {
+    errores.push({ campo: "cupos", mensaje: "Los cupos deben ser un número entero." });
+  } else if (cupos <= 0) {
+    errores.push({ campo: "cupos", mensaje: "Ingresa al menos 1 cupo." });
+  } else if (cupos > cuposMaximos) {
+    errores.push({ campo: "cupos", mensaje: `La capacidad máxima es ${cuposMaximos}.` });
+  } else if (cupos < cuposReservados) {
+    errores.push({
+      campo: "cupos",
+      mensaje:
+        cuposReservados === 1
+          ? "El trayecto tiene 1 reserva confirmada: ofrece al menos 1 cupo."
+          : `El trayecto tiene ${cuposReservados} reservas confirmadas: ofrece al menos ${cuposReservados} cupos.`,
+    });
+  }
+
+  if (errores.length > 0) {
+    return rechazar(
+      errores.length === 1 ? errores[0].mensaje : "Revisa la fecha, la hora y los cupos.",
+      errores,
+    );
+  }
+  return { ok: true, datos: { fecha, hora, cupos } };
+}
+
 function validarFecha(fecha, errores) {
   if (!fecha) {
     errores.push({ campo: "fecha", mensaje: "La fecha es obligatoria." });

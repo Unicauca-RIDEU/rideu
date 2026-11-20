@@ -136,6 +136,7 @@ describe("modelo trayecto", () => {
       expect(parametros).toEqual({
         conductor_id: "conductor-1",
         ahora_colombia: "2026-11-10 09:00",
+        estado_cancelado: "Cancelado",
       });
     });
 
