@@ -542,3 +542,155 @@ test("las restricciones de integridad rechazan los datos inválidos", async (t) 
     await eliminarUsuario(cuenta.id);
   }
 });
+
+// E02-HU05: edición y cancelación de un trayecto contra Oracle real, por la API.
+test("edición y cancelación de trayectos (HU05): reservas, cupos y estados", async (t) => {
+  if (!(await oracleDisponible(t))) return;
+  const ids = [];
+  const avisos = [];
+  const original = console.log;
+  try {
+    const conductor = await crearCuentaConSesion("hu05.conductor");
+    ids.push(conductor.id);
+    const pasajeros = [];
+    for (const prefijo of ["hu05.pasajero1", "hu05.pasajero2"]) {
+      const pasajero = await crearCuentaConSesion(prefijo);
+      ids.push(pasajero.id);
+      pasajeros.push(pasajero);
+    }
+    const vehiculo = await request(app)
+      .post("/api/vehiculos")
+      .set("Authorization", conductor.sesion)
+      .send(datosVehiculo());
+    assert.equal(vehiculo.status, 201);
+
+    const publicar = (hora) =>
+      request(app).post("/api/trayectos").set("Authorization", conductor.sesion).send({
+        origen: "Bello Horizonte",
+        sedeDestinoId: 1,
+        fecha: fechaFutura(2),
+        hora,
+        cupos: 3,
+        aporteSugerido: 2500,
+      });
+    const conReservas = (await publicar("07:30")).body.trayecto.id;
+    const sinReservas = (await publicar("09:00")).body.trayecto.id;
+    for (const pasajero of pasajeros) {
+      const reserva = await request(app)
+        .post(`/api/trayectos/${conReservas}/reservas`)
+        .set("Authorization", pasajero.sesion);
+      assert.equal(reserva.status, 201);
+    }
+
+    // Lista de trayectos vigentes del conductor.
+    const mios = await request(app).get("/api/trayectos/mios").set("Authorization", conductor.sesion);
+    assert.equal(mios.status, 200);
+    assert.deepEqual(
+      mios.body.trayectos.map((fila) => [fila.hora, fila.cupos_reservados, fila.cupos_maximos]),
+      [["07:30", 2, 4], ["09:00", 0, 4]],
+    );
+
+    // Criterio 3: editar fecha, hora y cupos; no se puede bajar de las reservas.
+    const pocos = await request(app)
+      .patch(`/api/trayectos/${conReservas}`)
+      .set("Authorization", conductor.sesion)
+      .send({ fecha: fechaFutura(3), hora: "08:15", cupos: 1 });
+    assert.equal(pocos.status, 400);
+    const choque = await request(app)
+      .patch(`/api/trayectos/${conReservas}`)
+      .set("Authorization", conductor.sesion)
+      .send({ fecha: fechaFutura(2), hora: "09:00", cupos: 3 });
+    assert.equal(choque.status, 409);
+    const ajeno = await request(app)
+      .patch(`/api/trayectos/${conReservas}`)
+      .set("Authorization", pasajeros[0].sesion)
+      .send({ fecha: fechaFutura(3), hora: "08:15", cupos: 2 });
+    assert.equal(ajeno.status, 403);
+    const editado = await request(app)
+      .patch(`/api/trayectos/${conReservas}`)
+      .set("Authorization", conductor.sesion)
+      .send({ fecha: fechaFutura(3), hora: "08:15", cupos: 2 });
+    assert.equal(editado.status, 200);
+    const fila = await pool.query(
+      `SELECT TO_CHAR(fecha, 'YYYY-MM-DD') AS fecha, hora, cupos, cupos_disponibles
+       FROM trayectos WHERE id = :id`,
+      { id: conReservas },
+    );
+    assert.deepEqual(fila.rows[0], { fecha: fechaFutura(3), hora: "08:15", cupos: 2, cupos_disponibles: 0 });
+    const busqueda = await request(app)
+      .get("/api/trayectos")
+      .set("Authorization", pasajeros[0].sesion)
+      .query({ sedeDestinoId: 1, fecha: fechaFutura(3), horaDesde: "00:00" });
+    assert.ok(!busqueda.body.trayectos.some((trayecto) => trayecto.id === conReservas), "sin cupos no aparece");
+
+    // Criterio 1: sin reservas se cancela de inmediato y sale de la búsqueda.
+    const cancelado = await request(app)
+      .post(`/api/trayectos/${sinReservas}/cancelacion`)
+      .set("Authorization", conductor.sesion);
+    assert.equal(cancelado.status, 200);
+    assert.equal(cancelado.body.pasajerosAfectados, 0);
+    const despues = await request(app)
+      .get("/api/trayectos")
+      .set("Authorization", pasajeros[0].sesion)
+      .query({ sedeDestinoId: 1, fecha: fechaFutura(2), horaDesde: "00:00" });
+    assert.ok(!despues.body.trayectos.some((trayecto) => trayecto.id === sinReservas));
+    const repetido = await request(app)
+      .post(`/api/trayectos/${sinReservas}/cancelacion`)
+      .set("Authorization", conductor.sesion);
+    assert.equal(repetido.status, 409);
+
+    // Criterio 2: con reservas pide confirmación y, al confirmar, cancela todo y avisa por correo.
+    const sinConfirmar = await request(app)
+      .post(`/api/trayectos/${conReservas}/cancelacion`)
+      .set("Authorization", conductor.sesion)
+      .send({});
+    assert.equal(sinConfirmar.status, 409);
+    assert.equal(sinConfirmar.body.pasajerosAfectados, 2);
+    assert.equal(await contarReservas(conReservas, "Confirmada"), 2);
+
+    console.log = (...partes) => avisos.push(partes.join(" "));
+    const confirmado = await request(app)
+      .post(`/api/trayectos/${conReservas}/cancelacion`)
+      .set("Authorization", conductor.sesion)
+      .send({ confirmar: true });
+    console.log = original;
+    assert.equal(confirmado.status, 200);
+    assert.equal(confirmado.body.pasajerosNotificados, 2);
+    assert.equal(await contarReservas(conReservas, "Cancelada"), 2);
+    for (const pasajero of pasajeros) {
+      assert.ok(avisos.some((linea) => linea.includes(`trayecto cancelado para ${pasajero.correo}`)));
+    }
+    const estado = await pool.query("SELECT estado, cupos, cupos_disponibles FROM trayectos WHERE id = :id", {
+      id: conReservas,
+    });
+    assert.deepEqual(estado.rows[0], { estado: "Cancelado", cupos: 2, cupos_disponibles: 2 });
+
+    // Historial del conductor y del pasajero con los estados de cancelación.
+    const historialConductor = await request(app).get("/api/historial").set("Authorization", conductor.sesion);
+    assert.deepEqual(
+      historialConductor.body.trayectos.map((trayecto) => trayecto.estado_historial),
+      ["Cancelado", "Cancelado"],
+    );
+    const historialPasajero = await request(app).get("/api/historial").set("Authorization", pasajeros[0].sesion);
+    assert.equal(historialPasajero.body.reservas[0].estado_historial, "Cancelada");
+
+    // Un trayecto cancelado no admite reservas.
+    const nuevaReserva = await request(app)
+      .post(`/api/trayectos/${conReservas}/reservas`)
+      .set("Authorization", pasajeros[0].sesion);
+    assert.equal(nuevaReserva.status, 409);
+  } finally {
+    console.log = original;
+    for (const id of ids) {
+      await eliminarUsuario(id);
+    }
+  }
+});
+
+async function contarReservas(trayectoId, estado) {
+  const resultado = await pool.query(
+    "SELECT COUNT(*) AS total FROM reservas WHERE trayecto_id = :trayecto_id AND estado = :estado",
+    { trayecto_id: trayectoId, estado },
+  );
+  return resultado.rows[0].total;
+}

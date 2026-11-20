@@ -23,11 +23,16 @@ jest.unstable_mockModule("../../src/models/sesion.js", () => ({
 
 jest.unstable_mockModule("../../src/models/trayecto.js", () => ({
   ESTADO_DISPONIBLE: "Disponible",
+  ESTADO_CANCELADO: "Cancelado",
   buscarPerfilConductor,
   listarTrayectosDeConductor: jest.fn(),
   crearTrayecto,
   existeTrayectoEnHorario,
   buscarTrayectosDisponibles,
+  listarTrayectosEditables: jest.fn(),
+  buscarTrayectoParaEdicion: jest.fn(),
+  actualizarTrayecto: jest.fn(),
+  cancelarTrayecto: jest.fn(),
 }));
 
 jest.unstable_mockModule("../../src/models/sede.js", () => ({
