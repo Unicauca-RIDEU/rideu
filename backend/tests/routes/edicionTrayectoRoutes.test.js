@@ -38,6 +38,7 @@ jest.unstable_mockModule("../../src/models/trayecto.js", () => ({
 jest.unstable_mockModule("../../src/services/correo.js", () => ({
   enviarCorreoVerificacion: jest.fn(),
   enviarCorreoTrayectoCancelado,
+  enviarCorreoReservaCancelada: jest.fn(),
 }));
 
 const { createApp } = await import("../../src/app.js");

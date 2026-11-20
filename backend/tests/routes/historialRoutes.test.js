@@ -34,9 +34,12 @@ jest.unstable_mockModule("../../src/models/trayecto.js", () => ({
 // Las reservas del pasajero llegan con E04-HU07; aquí se simulan sin reservas.
 jest.unstable_mockModule("../../src/models/reserva.js", () => ({
   ESTADO_CONFIRMADA: "Confirmada",
+  ESTADO_CANCELADA: "Cancelada",
   buscarDetalleTrayecto: jest.fn(),
   confirmarReserva: jest.fn(),
   listarReservasDePasajero,
+  listarReservasConfirmadas: jest.fn(),
+  cancelarReserva: jest.fn(),
 }));
 
 const { createApp } = await import("../../src/app.js");

@@ -1,0 +1,385 @@
+
+> rideu-backend@0.1.0 test
+> cross-env NODE_OPTIONS=--experimental-vm-modules jest --runInBand
+
+(node:1112) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+FAIL tests/routes/reservaRoutes.test.js
+  ● Test suite failed to run
+
+    SyntaxError: The requested module '../models/reserva.js' does not provide an export named 'cancelarReserva'
+
+      34 | }));
+      35 |
+    > 36 | const { createApp } = await import("../../src/app.js");
+         |                       ^
+      37 |
+      38 | const TRAYECTO = "3f2b8c1e-9d4a-4e7b-8a61-5c0d2e9f7b13";
+      39 | const RESERVA = "7a1c5d2e-3b4f-4a6b-9c8d-0e1f2a3b4c5d";
+
+      at EsmLoader.linkAndEvaluateModule (node_modules/jest-runtime/build/index.js:1989:7)
+      at tests/routes/reservaRoutes.test.js:36:23
+
+  console.error
+    Error al consultar vehículo y licencia: Error: sin conexión
+        at Object.<anonymous> (/home/user/rideu/backend/tests/routes/vehiculoRoutes.test.js:269:51)
+        at Promise.finally.completed (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1834:28)
+        at new Promise (<anonymous>)
+        at callAsyncCircusFn (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1774:10)
+        at _callCircusTest (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1167:40)
+        at processTicksAndRejections (node:internal/process/task_queues:103:5)
+        at _runTestInContext (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1103:3)
+        at runTestWithContext (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:996:5)
+        at _runTestsForDescribeBlockOnce (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1008:11)
+        at _runTestsForDescribeBlock (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:824:5)
+        at _runTestsForDescribeBlockOnce (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1003:11)
+        at _runTestsForDescribeBlock (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:824:5)
+        at _runTestsForDescribeBlockOnce (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1003:11)
+        at _runTestsForDescribeBlock (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:824:5)
+        at run (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:789:3)
+        at runAndTransformResultsToJestFormat (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:2300:21)
+        at jestAdapter (/home/user/rideu/backend/node_modules/jest-circus/build/runner.js:111:19)
+        at runTestInternal (/home/user/rideu/backend/node_modules/jest-runner/build/index.js:247:16)
+        at runTest (/home/user/rideu/backend/node_modules/jest-runner/build/index.js:315:7)
+
+      77 |     });
+      78 |   } catch (error) {
+    > 79 |     console.error("Error al consultar vehículo y licencia:", error);
+         |             ^
+      80 |     return res.status(500).json({ mensaje: "No se pudieron cargar el vehículo y la licencia." });
+      81 |   }
+      82 | }
+
+      at obtenerVehiculoYLicencia (src/controllers/vehiculoController.js:79:13)
+
+FAIL tests/routes/edicionTrayectoRoutes.test.js
+  ● Test suite failed to run
+
+    SyntaxError: The requested module '../services/correo.js' does not provide an export named 'enviarCorreoReservaCancelada'
+
+      41 | }));
+      42 |
+    > 43 | const { createApp } = await import("../../src/app.js");
+         |                       ^
+      44 | const { fechaEnColombia } = await import("../../src/validation/trayecto.js");
+      45 |
+      46 | // Edición y cancelación de trayectos (E02-HU05).
+
+      at EsmLoader.linkAndEvaluateModule (node_modules/jest-runtime/build/index.js:1989:7)
+      at tests/routes/edicionTrayectoRoutes.test.js:43:23
+
+FAIL tests/routes/historialRoutes.test.js
+  ● Test suite failed to run
+
+    SyntaxError: The requested module '../models/reserva.js' does not provide an export named 'cancelarReserva'
+
+      40 | }));
+      41 |
+    > 42 | const { createApp } = await import("../../src/app.js");
+         |                       ^
+      43 |
+      44 | const usuarioSesion = {
+      45 |   id: "11111111-1111-4111-8111-111111111111",
+
+      at EsmLoader.linkAndEvaluateModule (node_modules/jest-runtime/build/index.js:1989:7)
+      at tests/routes/historialRoutes.test.js:42:23
+
+FAIL tests/routes/authRoutes.test.js
+  ● Test suite failed to run
+
+    SyntaxError: The requested module '../services/correo.js' does not provide an export named 'enviarCorreoReservaCancelada'
+
+      55 | }));
+      56 |
+    > 57 | const { createApp } = await import("../../src/app.js");
+         |                       ^
+      58 |
+      59 | const registroValido = {
+      60 |   nombre: "Ana Pérez",
+
+      at EsmLoader.linkAndEvaluateModule (node_modules/jest-runtime/build/index.js:1989:7)
+      at tests/routes/authRoutes.test.js:57:23
+
+FAIL tests/models/reserva.test.js
+  ● modelo reserva › confirmarReserva › criterio 1: debería descontar un cupo y crear la reserva confirmada en una transacción
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 7
+    + Received  + 2
+
+      Object {
+    -   "ok": true,
+    -   "reserva": Object {
+    -     "estado": "Confirmada",
+    -     "id": "r1",
+    -     "pasajero_id": "11111111-1111-4111-8111-111111111111",
+    -     "trayecto_id": "3f2b8c1e-9d4a-4e7b-8a61-5c0d2e9f7b13",
+    -   },
+    +   "motivo": "reserva_duplicada",
+    +   "ok": false,
+      }
+
+      45 |
+      46 |       expect(ESTADO_CONFIRMADA).toBe("Confirmada");
+    > 47 |       expect(resultado).toEqual({ ok: true, reserva });
+         |                         ^
+      48 |       expect(cliente.query).toHaveBeenNthCalledWith(
+      49 |         3,
+      50 |         expect.stringContaining("SET cupos_disponibles = cupos_disponibles - 1"),
+
+      at Object.<anonymous> (tests/models/reserva.test.js:47:25)
+
+  ● modelo reserva › confirmarReserva › criterio 2: debería rechazar la reserva si el trayecto no tiene cupos
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 1
+
+      Object {
+    -   "motivo": "sin_cupos",
+    +   "motivo": "reserva_duplicada",
+        "ok": false,
+      }
+
+      85 |       const resultado = await confirmarReserva(entrada);
+      86 |
+    > 87 |       expect(resultado).toEqual({ ok: false, motivo: "sin_cupos" });
+         |                         ^
+      88 |       expect(cliente.query).toHaveBeenCalledTimes(2);
+      89 |       expect(cliente.rollback).toHaveBeenCalledTimes(1);
+      90 |       expect(cliente.commit).not.toHaveBeenCalled();
+
+      at Object.<anonymous> (tests/models/reserva.test.js:87:25)
+
+  ● modelo reserva › confirmarReserva › criterio 3: debería rechazar si el descuento ya no encuentra cupo
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 1
+
+      Object {
+    -   "motivo": "sin_cupos",
+    +   "motivo": "reserva_duplicada",
+        "ok": false,
+      }
+
+      100 |       const resultado = await confirmarReserva(entrada);
+      101 |
+    > 102 |       expect(resultado).toEqual({ ok: false, motivo: "sin_cupos" });
+          |                         ^
+      103 |       expect(cliente.query).toHaveBeenCalledTimes(3);
+      104 |       expect(cliente.commit).not.toHaveBeenCalled();
+      105 |     });
+
+      at Object.<anonymous> (tests/models/reserva.test.js:102:25)
+
+  console.error
+    Error al enviar el correo de verificación: Error: SMTP caído
+        at Object.<anonymous> (/home/user/rideu/backend/tests/controllers/authController.test.js:128:48)
+        at Promise.finally.completed (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1834:28)
+        at new Promise (<anonymous>)
+        at callAsyncCircusFn (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1774:10)
+        at _callCircusTest (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1167:40)
+        at _runTestInContext (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1103:3)
+        at runTestWithContext (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:996:5)
+        at _runTestsForDescribeBlockOnce (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1008:11)
+        at _runTestsForDescribeBlock (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:824:5)
+        at _runTestsForDescribeBlockOnce (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1003:11)
+        at _runTestsForDescribeBlock (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:824:5)
+        at run (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:789:3)
+        at runAndTransformResultsToJestFormat (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:2300:21)
+        at jestAdapter (/home/user/rideu/backend/node_modules/jest-circus/build/runner.js:111:19)
+        at runTestInternal (/home/user/rideu/backend/node_modules/jest-runner/build/index.js:247:16)
+        at runTest (/home/user/rideu/backend/node_modules/jest-runner/build/index.js:315:7)
+
+      53 |         console.error("No se pudo deshacer el registro tras fallar el correo:", borrado);
+      54 |       });
+    > 55 |       console.error("Error al enviar el correo de verificación:", error);
+         |               ^
+      56 |       return res.status(500).json({
+      57 |         mensaje: "No se pudo enviar el correo de verificación. Inténtalo de nuevo.",
+      58 |       });
+
+      at registrar (src/controllers/authController.js:55:15)
+      at Object.<anonymous> (tests/controllers/authController.test.js:133:5)
+
+  console.error
+    Error al validar la sesión: Error: DB caída
+        at Object.<anonymous> (/home/user/rideu/backend/tests/middleware/requiereSesion.test.js:92:46)
+        at Promise.finally.completed (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1834:28)
+        at new Promise (<anonymous>)
+        at callAsyncCircusFn (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1774:10)
+        at _callCircusTest (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1167:40)
+        at _runTestInContext (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1103:3)
+        at runTestWithContext (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:996:5)
+        at _runTestsForDescribeBlockOnce (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1008:11)
+        at _runTestsForDescribeBlock (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:824:5)
+        at _runTestsForDescribeBlockOnce (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:1003:11)
+        at _runTestsForDescribeBlock (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:824:5)
+        at run (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:789:3)
+        at runAndTransformResultsToJestFormat (/home/user/rideu/backend/node_modules/jest-circus/build/jestAdapterInit.js:2300:21)
+        at jestAdapter (/home/user/rideu/backend/node_modules/jest-circus/build/runner.js:111:19)
+        at runTestInternal (/home/user/rideu/backend/node_modules/jest-runner/build/index.js:247:16)
+        at runTest (/home/user/rideu/backend/node_modules/jest-runner/build/index.js:315:7)
+
+      16 |     return next();
+      17 |   } catch (error) {
+    > 18 |     console.error("Error al validar la sesión:", error);
+         |             ^
+      19 |     return res.status(500).json({ mensaje: "No se pudo validar la sesión." });
+      20 |   }
+      21 | }
+
+      at requiereSesion (src/middleware/requiereSesion.js:18:13)
+      at Object.<anonymous> (tests/middleware/requiereSesion.test.js:97:5)
+
+Summary of all failing tests
+FAIL tests/routes/reservaRoutes.test.js
+  ● Test suite failed to run
+
+    SyntaxError: The requested module '../models/reserva.js' does not provide an export named 'cancelarReserva'
+
+      34 | }));
+      35 |
+    > 36 | const { createApp } = await import("../../src/app.js");
+         |                       ^
+      37 |
+      38 | const TRAYECTO = "3f2b8c1e-9d4a-4e7b-8a61-5c0d2e9f7b13";
+      39 | const RESERVA = "7a1c5d2e-3b4f-4a6b-9c8d-0e1f2a3b4c5d";
+
+      at EsmLoader.linkAndEvaluateModule (node_modules/jest-runtime/build/index.js:1989:7)
+      at tests/routes/reservaRoutes.test.js:36:23
+
+FAIL tests/routes/edicionTrayectoRoutes.test.js
+  ● Test suite failed to run
+
+    SyntaxError: The requested module '../services/correo.js' does not provide an export named 'enviarCorreoReservaCancelada'
+
+      41 | }));
+      42 |
+    > 43 | const { createApp } = await import("../../src/app.js");
+         |                       ^
+      44 | const { fechaEnColombia } = await import("../../src/validation/trayecto.js");
+      45 |
+      46 | // Edición y cancelación de trayectos (E02-HU05).
+
+      at EsmLoader.linkAndEvaluateModule (node_modules/jest-runtime/build/index.js:1989:7)
+      at tests/routes/edicionTrayectoRoutes.test.js:43:23
+
+FAIL tests/routes/historialRoutes.test.js
+  ● Test suite failed to run
+
+    SyntaxError: The requested module '../models/reserva.js' does not provide an export named 'cancelarReserva'
+
+      40 | }));
+      41 |
+    > 42 | const { createApp } = await import("../../src/app.js");
+         |                       ^
+      43 |
+      44 | const usuarioSesion = {
+      45 |   id: "11111111-1111-4111-8111-111111111111",
+
+      at EsmLoader.linkAndEvaluateModule (node_modules/jest-runtime/build/index.js:1989:7)
+      at tests/routes/historialRoutes.test.js:42:23
+
+FAIL tests/routes/authRoutes.test.js
+  ● Test suite failed to run
+
+    SyntaxError: The requested module '../services/correo.js' does not provide an export named 'enviarCorreoReservaCancelada'
+
+      55 | }));
+      56 |
+    > 57 | const { createApp } = await import("../../src/app.js");
+         |                       ^
+      58 |
+      59 | const registroValido = {
+      60 |   nombre: "Ana Pérez",
+
+      at EsmLoader.linkAndEvaluateModule (node_modules/jest-runtime/build/index.js:1989:7)
+      at tests/routes/authRoutes.test.js:57:23
+
+FAIL tests/models/reserva.test.js
+  ● modelo reserva › confirmarReserva › criterio 1: debería descontar un cupo y crear la reserva confirmada en una transacción
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 7
+    + Received  + 2
+
+      Object {
+    -   "ok": true,
+    -   "reserva": Object {
+    -     "estado": "Confirmada",
+    -     "id": "r1",
+    -     "pasajero_id": "11111111-1111-4111-8111-111111111111",
+    -     "trayecto_id": "3f2b8c1e-9d4a-4e7b-8a61-5c0d2e9f7b13",
+    -   },
+    +   "motivo": "reserva_duplicada",
+    +   "ok": false,
+      }
+
+      45 |
+      46 |       expect(ESTADO_CONFIRMADA).toBe("Confirmada");
+    > 47 |       expect(resultado).toEqual({ ok: true, reserva });
+         |                         ^
+      48 |       expect(cliente.query).toHaveBeenNthCalledWith(
+      49 |         3,
+      50 |         expect.stringContaining("SET cupos_disponibles = cupos_disponibles - 1"),
+
+      at Object.<anonymous> (tests/models/reserva.test.js:47:25)
+
+  ● modelo reserva › confirmarReserva › criterio 2: debería rechazar la reserva si el trayecto no tiene cupos
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 1
+
+      Object {
+    -   "motivo": "sin_cupos",
+    +   "motivo": "reserva_duplicada",
+        "ok": false,
+      }
+
+      85 |       const resultado = await confirmarReserva(entrada);
+      86 |
+    > 87 |       expect(resultado).toEqual({ ok: false, motivo: "sin_cupos" });
+         |                         ^
+      88 |       expect(cliente.query).toHaveBeenCalledTimes(2);
+      89 |       expect(cliente.rollback).toHaveBeenCalledTimes(1);
+      90 |       expect(cliente.commit).not.toHaveBeenCalled();
+
+      at Object.<anonymous> (tests/models/reserva.test.js:87:25)
+
+  ● modelo reserva › confirmarReserva › criterio 3: debería rechazar si el descuento ya no encuentra cupo
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 1
+
+      Object {
+    -   "motivo": "sin_cupos",
+    +   "motivo": "reserva_duplicada",
+        "ok": false,
+      }
+
+      100 |       const resultado = await confirmarReserva(entrada);
+      101 |
+    > 102 |       expect(resultado).toEqual({ ok: false, motivo: "sin_cupos" });
+          |                         ^
+      103 |       expect(cliente.query).toHaveBeenCalledTimes(3);
+      104 |       expect(cliente.commit).not.toHaveBeenCalled();
+      105 |     });
+
+      at Object.<anonymous> (tests/models/reserva.test.js:102:25)
+
+
+Test Suites: 5 failed, 23 passed, 28 total
+Tests:       3 failed, 360 passed, 363 total
+Snapshots:   0 total
+Time:        2.865 s, estimated 3 s
+Ran all test suites.
