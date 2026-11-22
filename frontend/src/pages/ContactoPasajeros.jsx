@@ -65,7 +65,7 @@ export default function ContactoPasajeros() {
   }
 
   const volver = (
-    <Link className="boton-contorno reservar-enlace" to="/historial">
+    <Link className="boton-contorno reservar-enlace" to="/historial?vista=conductor">
       Volver a mis trayectos
     </Link>
   );
@@ -75,7 +75,7 @@ export default function ContactoPasajeros() {
       <EncabezadoSesion usuario={usuario} activo="Historial" />
 
       <main className="perfil-cuerpo">
-        <Link className="volver" to="/historial">
+        <Link className="volver" to="/historial?vista=conductor">
           ← Volver a mis trayectos
         </Link>
         <h1>Contacto de pasajeros</h1>

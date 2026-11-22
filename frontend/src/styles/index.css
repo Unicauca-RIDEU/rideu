@@ -1629,3 +1629,112 @@ button.boton-contorno.reservar-enlace {
 @media (max-width: 520px) {
   .reservar-datos div { grid-template-columns: 1fr; gap: 0.1rem; }
 }
+
+/* Paso 3 del rediseño · Historial, Cancelar reserva y Editar trayecto */
+
+.pestanas {
+  display: inline-flex;
+  gap: 0.3rem;
+  margin: 0.2rem 0 1.4rem;
+  padding: 0.3rem;
+  border-radius: 999px;
+  background: #e9eef7;
+}
+
+.pestana {
+  padding: 0.55rem 1.1rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #475467;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pestana:hover { color: var(--azul-oscuro); }
+
+.pestana:focus-visible { outline: 2px solid var(--azul); outline-offset: 2px; }
+
+.pestana[aria-selected="true"] {
+  background: white;
+  color: var(--azul-oscuro);
+  box-shadow: 0 1px 3px rgb(16 24 40 / 12%);
+}
+
+.pestana-cantidad {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.5rem;
+  margin-left: 0.25rem;
+  padding: 0 0.4rem;
+  border-radius: 999px;
+  background: var(--cielo);
+  color: var(--azul-oscuro);
+  font-size: 0.8rem;
+}
+
+.historial-grupo + .historial-grupo { margin-top: 2rem; }
+
+.historial-titulo {
+  margin: 0 0 0.9rem;
+  font-size: 1.15rem;
+}
+
+.historial-titulo span {
+  color: var(--texto-suave);
+  font-weight: 600;
+}
+
+.buscar-resultados.historial-lista {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+}
+
+.viaje-detalle {
+  margin: 0;
+  color: var(--texto-suave);
+  font-size: 0.92rem;
+}
+
+.tarjeta-viaje .tarjeta-acciones { margin-top: 0.2rem; }
+
+.enlaces-tarjeta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.2rem 1.2rem;
+}
+
+.enlace-secundario {
+  justify-self: center;
+  padding: 0.3rem;
+  color: var(--azul);
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.enlace-secundario:hover { text-decoration: underline; }
+
+.lista-seleccion { grid-template-columns: 1fr; }
+
+.lado-fijo {
+  position: sticky;
+  top: 1rem;
+}
+
+.boton-contorno-peligro {
+  border-color: #f5c2bd;
+}
+
+.boton-contorno.reservar-enlace.boton-contorno-peligro { color: var(--error); }
+
+.boton-contorno-peligro:hover:not(:disabled) { background: var(--error-fondo); }
+
+@media (max-width: 900px) {
+  .lado-fijo { position: static; scroll-margin-top: 1rem; }
+}
+
+@media (max-width: 520px) {
+  .pestanas { display: flex; }
+  .pestana { flex: 1; padding: 0.55rem 0.4rem; font-size: 0.92rem; white-space: nowrap; }
+}

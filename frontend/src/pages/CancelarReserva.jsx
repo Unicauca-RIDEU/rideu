@@ -1,21 +1,25 @@
-import { useCallback, useEffect, useState } from "react";
-import { Link, useNavigate, useOutletContext, useSearchParams } from "react-router-dom";
-import { IconoCheck } from "../components/Iconos.jsx";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate, useOutletContext, useSearchParams } from "react-router-dom";
+import { Aviso, Boton, Cargando, DialogoConfirmar, EncabezadoPagina, EstadoVacio, Tarjeta } from "@/components/ui";
 import { cancelarReserva, obtenerMisReservas } from "../services/reservas.js";
 import Pie from "../components/Pie.jsx";
 import EncabezadoSesion from "../components/EncabezadoSesion.jsx";
+import TarjetaViaje from "../components/TarjetaViaje.jsx";
+import { fechaLarga, hora12, pesos } from "../components/formatoTrayecto.js";
+import { usarEnfoqueEnMovil, volverDesde } from "../components/navegacionViajes.js";
 
 // Cancelación de reservas (E04-HU08) · /reservas/cancelar[?reserva=<id>]
 // El pasajero elige una de sus reservas confirmadas, pulsa «Cancelar reserva» y confirma.
 // El backend libera el cupo y avisa al conductor por correo. Si el trayecto ya inició,
 // la cancelación no se permite y se explica el motivo.
 
-const formatoPesos = new Intl.NumberFormat("es-CO");
 const MENSAJE_INICIADO = "No puedes cancelar la reserva porque el trayecto ya inició.";
 
 export default function CancelarReserva() {
   const { usuario } = useOutletContext();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [volver] = useState(() => volverDesde(location.state, "pasajero"));
   const [parametros, setParametros] = useSearchParams();
   const seleccionId = parametros.get("reserva") ?? "";
   const [carga, setCarga] = useState({ estado: "cargando", reservas: [] });
@@ -23,9 +27,11 @@ export default function CancelarReserva() {
   const [aviso, setAviso] = useState(null);
   const [resultado, setResultado] = useState(null);
   const [enviando, setEnviando] = useState(false);
+  const detalle = useRef(null);
 
   const reservas = carga.reservas;
   const seleccionada = reservas.find((reserva) => reserva.id === seleccionId) ?? null;
+  usarEnfoqueEnMovil(detalle, seleccionada?.id);
 
   const cargar = useCallback(async () => {
     try {
@@ -104,38 +110,29 @@ export default function CancelarReserva() {
       <EncabezadoSesion usuario={usuario} activo="Historial" />
 
       <main className="perfil-cuerpo">
-        <Link className="volver" to="/panel">
-          ← Volver al panel
-        </Link>
-        <h1>Cancelar reserva</h1>
-        <p className="perfil-intro">Si no vas a viajar, libera tu cupo para otro compañero.</p>
+        <EncabezadoPagina
+          titulo="Cancelar reserva"
+          intro="Si no vas a viajar, libera tu cupo para otro compañero."
+          volver={volver}
+        />
 
         {resultado ? (
-          <p className="nota-ok nota-publicado" role="status">
-            <span className="nota-icono" aria-hidden="true">
-              <IconoCheck />
-            </span>
+          <Aviso tono="exito" icono>
             {resultado.mensaje} {textoDisponibles(resultado.trayecto)}
-          </p>
+          </Aviso>
         ) : null}
 
-        {carga.estado === "cargando" ? <p className="pista-lado">Cargando tus reservas…</p> : null}
+        {carga.estado === "cargando" ? <Cargando>Cargando tus reservas…</Cargando> : null}
 
         {carga.estado === "error" ? (
-          <p className="aviso aviso-error" role="alert">
-            {carga.mensaje || "No se pudieron cargar tus reservas."}
-          </p>
+          <Aviso tono="error">{carga.mensaje || "No se pudieron cargar tus reservas."}</Aviso>
         ) : null}
 
         {carga.estado === "listo" && reservas.length === 0 ? (
-          <>
-            <p className="aviso" role="status">
-              {carga.mensaje || "No tienes reservas confirmadas."}
-            </p>
-            <Link className="boton boton-cambiar" to="/trayectos/buscar">
-              Buscar trayecto
-            </Link>
-          </>
+          <EstadoVacio
+            mensaje={carga.mensaje || "No tienes reservas confirmadas."}
+            accion={{ texto: "Buscar trayecto", to: "/trayectos/buscar" }}
+          />
         ) : null}
 
         {carga.estado === "listo" && reservas.length > 0 ? (
@@ -144,108 +141,77 @@ export default function CancelarReserva() {
               <h2 id="mis-reservas" className="titulo-lado">
                 Tus reservas confirmadas ({reservas.length})
               </h2>
-              <ul className="buscar-resultados">
-                {reservas.map((reserva) => (
-                  <li key={reserva.id}>
-                    <TarjetaReserva
-                      reserva={reserva}
-                      activa={reserva.id === seleccionId}
-                      onSeleccionar={() => seleccionar(reserva.id)}
-                    />
-                  </li>
-                ))}
+              <ul className="buscar-resultados lista-seleccion">
+                {reservas.map((reserva) => {
+                  const activa = reserva.id === seleccionId;
+                  return (
+                    <li key={reserva.id}>
+                      <TarjetaViaje
+                        viaje={reserva}
+                        estado={reserva.iniciado ? "Iniciado" : "Confirmada"}
+                        tono={reserva.iniciado ? "neutro" : "exito"}
+                        detalle={`${reserva.conductor_nombre} · 1 cupo · ${pesos(reserva.aporte_sugerido)} COP`}
+                        activa={activa}
+                        acciones={
+                          <Boton
+                            variante={activa ? "primario" : "secundario"}
+                            onClick={() => seleccionar(reserva.id)}
+                            aria-pressed={activa}
+                          >
+                            {activa ? "Seleccionada" : "Seleccionar"}
+                          </Boton>
+                        }
+                      />
+                    </li>
+                  );
+                })}
               </ul>
             </section>
 
-            <aside className="perfil-lado">
+            <aside className="perfil-lado lado-fijo" ref={detalle}>
               {!seleccionada ? (
                 <p className="pista-lado">Selecciona la reserva que quieres cancelar.</p>
               ) : (
-                <section className="tarjeta reservar-detalle" aria-live="polite">
-                  <h2>Reserva seleccionada</h2>
+                <Tarjeta titulo="Reserva seleccionada" className="reservar-detalle" aria-live="polite">
                   <p>
                     <strong>
                       {seleccionada.origen} → {seleccionada.sede_destino}
                     </strong>
                   </p>
                   <p>
-                    {seleccionada.fecha} · Salida a las {seleccionada.hora}
+                    {fechaLarga(seleccionada.fecha)} · Salida a las {hora12(seleccionada.hora)}
                   </p>
                   <p>Conductor: {seleccionada.conductor_nombre}</p>
 
-                  {aviso ? (
-                    <p className="aviso aviso-error" role="alert">
-                      {aviso}
-                    </p>
-                  ) : null}
+                  {aviso ? <Aviso tono="error">{aviso}</Aviso> : null}
 
-                  {confirmando ? (
-                    <div className="aviso aviso-error" role="alertdialog" aria-labelledby="confirmar-reserva">
-                      <strong id="confirmar-reserva">¿Seguro que quieres cancelar esta reserva?</strong>
-                      <p>Tu cupo quedará libre para otro pasajero y avisaremos al conductor por correo.</p>
-                      <button className="boton reservar-enlace" type="button" onClick={confirmar} disabled={enviando}>
-                        {enviando ? "Cancelando…" : "Sí, cancelar reserva"}
-                      </button>
-                      <button
-                        className="boton-contorno reservar-enlace"
-                        type="button"
-                        onClick={() => setConfirmando(false)}
-                        disabled={enviando}
-                      >
-                        No, mantenerla
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      className="boton-contorno reservar-enlace"
-                      type="button"
-                      onClick={pedirCancelacion}
-                      disabled={enviando}
-                    >
-                      Cancelar reserva
-                    </button>
-                  )}
-                </section>
+                  <Boton variante="peligro" onClick={pedirCancelacion} disabled={enviando}>
+                    Cancelar reserva
+                  </Boton>
+                  <p className="pista-lado">Te pediremos confirmación antes de cancelarla.</p>
+                </Tarjeta>
               )}
             </aside>
           </div>
         ) : null}
+
+        <DialogoConfirmar
+          abierto={confirmando}
+          titulo="¿Seguro que quieres cancelar esta reserva?"
+          textoConfirmar="Sí, cancelar reserva"
+          textoEnviando="Cancelando…"
+          textoCancelar="No, mantenerla"
+          peligro
+          enviando={enviando}
+          onConfirmar={confirmar}
+          onCancelar={() => setConfirmando(false)}
+        >
+          <p>Tu cupo quedará libre para otro pasajero y avisaremos al conductor por correo.</p>
+        </DialogoConfirmar>
       </main>
 
       <Pie />
     </div>
-  );
-}
-
-function TarjetaReserva({ reserva, activa, onSeleccionar }) {
-  return (
-    <article className="tarjeta tarjeta-previa">
-      <div className="previa-cabecera">
-        <strong>
-          {reserva.fecha} · {reserva.hora}
-        </strong>
-        <p className={reserva.iniciado ? "chip" : "chip chip-ok"}>
-          <i />
-          {reserva.iniciado ? "Iniciado" : "Confirmada"}
-        </p>
-      </div>
-      <ol className="previa-ruta">
-        <li>{reserva.origen}</li>
-        <li>{reserva.sede_destino}</li>
-      </ol>
-      <p className="ayuda">
-        {reserva.conductor_nombre} · 1 cupo reservado · ${formatoPesos.format(reserva.aporte_sugerido)} COP por
-        persona
-      </p>
-      <button
-        className={activa ? "boton reservar-enlace" : "boton-contorno reservar-enlace"}
-        type="button"
-        onClick={onSeleccionar}
-        aria-pressed={activa}
-      >
-        {activa ? "Seleccionada" : "Seleccionar"}
-      </button>
-    </article>
   );
 }
 
