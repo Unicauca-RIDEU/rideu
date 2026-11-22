@@ -2,11 +2,12 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useOutletContext, useSearchParams } from "react-router-dom";
 import { IconoAuto, IconoTelefono } from "../components/Iconos.jsx";
 import { obtenerContactoPasajeros } from "../services/contacto.js";
+import Pie from "../components/Pie.jsx";
+import EnlacesNavegacion from "../components/EnlacesNavegacion.jsx";
 
 // Contacto de los pasajeros por WhatsApp (E05-HU11) · /trayectos/pasajeros/contacto?trayecto=<id>
 // Solo el conductor del trayecto ve la lista, y solo con los pasajeros de reserva confirmada.
 
-const NAV = ["Inicio", "Buscar", "Publicar", "Historial"];
 const MESES_LARGOS = [
   "enero", "febrero", "marzo", "abril", "mayo", "junio",
   "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
@@ -84,11 +85,7 @@ export default function ContactoPasajeros() {
           </span>
         </Link>
         <div className="perfil-nav">
-          {NAV.map((item) => (
-            <span key={item} className={item === "Historial" ? "nav-activo" : undefined}>
-              {item}
-            </span>
-          ))}
+          <EnlacesNavegacion activo="Historial" />
           <span className="perfil-usuario">
             <span className="avatar" aria-hidden="true">
               {iniciales(nombre)}
@@ -102,7 +99,6 @@ export default function ContactoPasajeros() {
         <Link className="volver" to="/historial">
           ← Volver a mis trayectos
         </Link>
-        <p className="perfil-ruta">/trayectos/pasajeros/contacto</p>
         <h1>Contacto de pasajeros</h1>
         <p className="perfil-intro">Coordina el encuentro con tus pasajeros por WhatsApp.</p>
 
@@ -183,10 +179,7 @@ export default function ContactoPasajeros() {
         ) : null}
       </main>
 
-      <footer className="pie">
-        <p>RideU · Hecho para la comunidad Unicauca</p>
-        <p>¿Necesitas ayuda? · Privacidad y condiciones</p>
-      </footer>
+      <Pie />
     </div>
   );
 }

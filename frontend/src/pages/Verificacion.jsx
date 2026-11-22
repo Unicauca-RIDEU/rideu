@@ -45,7 +45,7 @@ export default function Verificacion() {
   }, [token]);
 
   return (
-    <AuthLayout titulo={RELATO_VERIFICACION.titulo} texto={RELATO_VERIFICACION.texto}>
+    <AuthLayout titulo={RELATO_VERIFICACION.titulo} texto={RELATO_VERIFICACION.texto} compacto>
       {estado === "exito" ? (
         <ResultadoExito correo={correo} />
       ) : (

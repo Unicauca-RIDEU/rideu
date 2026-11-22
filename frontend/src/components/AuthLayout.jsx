@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { IconoAuto, IconoEscudo, IconoPersona, IconoRuta } from "./Iconos.jsx";
+import Pie from "./Pie.jsx";
 
 const RELATO_POR_DEFECTO = {
   titulo: (
@@ -12,7 +13,9 @@ const RELATO_POR_DEFECTO = {
   texto: "Comparte tus trayectos por Popayán con personas de la Universidad del Cauca.",
 };
 
-export default function AuthLayout({ children, titulo, texto }) {
+// «compacto» muestra solo el mensaje principal: el bloque completo (mapa y beneficios)
+// se reserva para el registro, donde la persona conoce RideU por primera vez.
+export default function AuthLayout({ children, titulo, texto, compacto = false }) {
   const relatoTitulo = titulo ?? RELATO_POR_DEFECTO.titulo;
   const relatoTexto = texto ?? RELATO_POR_DEFECTO.texto;
 
@@ -35,37 +38,38 @@ export default function AuthLayout({ children, titulo, texto }) {
       </header>
 
       <main className="contenido">
-        <section className="relato">
+        <section className={compacto ? "relato relato-compacto" : "relato"}>
           <p className="kicker kicker-claro">
             <IconoRuta />
             Juntos hacemos camino
           </p>
           <h1>{relatoTitulo}</h1>
           <p className="relato-texto">{relatoTexto}</p>
-          <MapaTrayecto />
-          <ul className="beneficios">
-            <li>
-              <span>
-                <IconoEscudo />
-              </span>
-              Correos institucionales verificados
-            </li>
-            <li>
-              <span>
-                <IconoPersona />
-              </span>
-              Más compañía en cada trayecto
-            </li>
-          </ul>
+          {compacto ? null : (
+            <>
+              <MapaTrayecto />
+              <ul className="beneficios">
+                <li>
+                  <span>
+                    <IconoEscudo />
+                  </span>
+                  Correos institucionales verificados
+                </li>
+                <li>
+                  <span>
+                    <IconoPersona />
+                  </span>
+                  Más compañía en cada trayecto
+                </li>
+              </ul>
+            </>
+          )}
           <p className="lugar">Popayán, Cauca · Comunidad en movimiento</p>
         </section>
         <section className="panel">{children}</section>
       </main>
 
-      <footer className="pie">
-        <p>RideU · Hecho para la comunidad Unicauca</p>
-        <p>¿Necesitas ayuda? · Privacidad y condiciones</p>
-      </footer>
+      <Pie />
     </div>
   );
 }

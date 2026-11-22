@@ -2,11 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useOutletContext, useSearchParams } from "react-router-dom";
 import { IconoAuto, IconoCheck, IconoFlecha } from "../components/Iconos.jsx";
 import { obtenerTrayecto, reservarCupo } from "../services/reservas.js";
+import Pie from "../components/Pie.jsx";
+import EnlacesNavegacion from "../components/EnlacesNavegacion.jsx";
 
 // Reserva de un cupo (E04-HU07) · /trayectos/reservar?trayecto=<id>
 // La URL conserva los filtros de la búsqueda para poder volver a ella sin perderlos.
 
-const NAV = ["Inicio", "Buscar", "Publicar", "Historial"];
 const FILTROS = ["sedeDestinoId", "fecha", "horaDesde"];
 const INTERVALO_ACTUALIZACION_MS = 5000;
 const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
@@ -115,11 +116,7 @@ export default function ReservarTrayecto() {
           </span>
         </Link>
         <div className="perfil-nav">
-          {NAV.map((item) => (
-            <span key={item} className={item === "Buscar" ? "nav-activo" : undefined}>
-              {item}
-            </span>
-          ))}
+          <EnlacesNavegacion activo="Buscar" />
           <span className="perfil-usuario">
             <span className="avatar" aria-hidden="true">
               {iniciales(nombre)}
@@ -133,7 +130,6 @@ export default function ReservarTrayecto() {
         <Link className="volver" to="/panel">
           ← Volver al panel
         </Link>
-        <p className="perfil-ruta">/trayectos/reservar</p>
         <h1>Reservar trayecto</h1>
         <p className="perfil-intro">Revisa los detalles antes de confirmar tu lugar.</p>
 
@@ -219,10 +215,7 @@ export default function ReservarTrayecto() {
         ) : null}
       </main>
 
-      <footer className="pie">
-        <p>RideU · Hecho para la comunidad Unicauca</p>
-        <p>¿Necesitas ayuda? · Privacidad y condiciones</p>
-      </footer>
+      <Pie />
     </div>
   );
 }

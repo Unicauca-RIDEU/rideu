@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useOutletContext, useSearchParams } from "react-router-dom";
 import { IconoAuto, IconoTelefono } from "../components/Iconos.jsx";
 import { obtenerContactoConductor } from "../services/contacto.js";
+import Pie from "../components/Pie.jsx";
+import EnlacesNavegacion from "../components/EnlacesNavegacion.jsx";
 
 // Contacto del conductor por WhatsApp (E05-HU10) · /reservas/contacto-conductor?reserva=<id>
 // RideU solo abre el enlace wa.me: la conversación ocurre en WhatsApp y no se almacena.
 
-const NAV = ["Inicio", "Buscar", "Publicar", "Historial"];
 const MESES_LARGOS = [
   "enero", "febrero", "marzo", "abril", "mayo", "junio",
   "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
@@ -75,11 +76,7 @@ export default function ContactoConductor() {
           </span>
         </Link>
         <div className="perfil-nav">
-          {NAV.map((item) => (
-            <span key={item} className={item === "Historial" ? "nav-activo" : undefined}>
-              {item}
-            </span>
-          ))}
+          <EnlacesNavegacion activo="Historial" />
           <span className="perfil-usuario">
             <span className="avatar" aria-hidden="true">
               {iniciales(nombre)}
@@ -93,7 +90,6 @@ export default function ContactoConductor() {
         <Link className="volver" to="/historial">
           ← Volver a mis reservas
         </Link>
-        <p className="perfil-ruta">/reservas/contacto-conductor</p>
         <h1>Contacto del conductor</h1>
         <p className="perfil-intro">Coordina el punto de encuentro por WhatsApp.</p>
 
@@ -152,10 +148,7 @@ export default function ContactoConductor() {
         ) : null}
       </main>
 
-      <footer className="pie">
-        <p>RideU · Hecho para la comunidad Unicauca</p>
-        <p>¿Necesitas ayuda? · Privacidad y condiciones</p>
-      </footer>
+      <Pie />
     </div>
   );
 }

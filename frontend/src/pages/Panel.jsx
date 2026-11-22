@@ -1,6 +1,7 @@
 import { Link, useNavigate, useOutletContext } from "react-router-dom";
-import { IconoAuto, IconoEscudo } from "../components/Iconos.jsx";
 import { cerrarSesion } from "../services/auth.js";
+import Pie from "../components/Pie.jsx";
+import EncabezadoSesion from "../components/EncabezadoSesion.jsx";
 
 export default function Panel() {
   const { usuario } = useOutletContext();
@@ -14,21 +15,7 @@ export default function Panel() {
 
   return (
     <div className="pantalla">
-      <header className="barra">
-        <Link to="/panel" className="marca">
-          <span className="marca-icono">
-            <IconoAuto />
-          </span>
-          <span>
-            <strong>RideU</strong>
-            <small>Universidad del Cauca</small>
-          </span>
-        </Link>
-        <p className="exclusivo">
-          <IconoEscudo />
-          {usuario?.correo}
-        </p>
-      </header>
+      <EncabezadoSesion usuario={usuario} activo="Inicio" />
 
       <main className="panel-principal">
         <p className="kicker">Panel principal</p>
@@ -63,10 +50,7 @@ export default function Panel() {
         </div>
       </main>
 
-      <footer className="pie">
-        <p>RideU · Hecho para la comunidad Unicauca</p>
-        <p>¿Necesitas ayuda? · Privacidad y condiciones</p>
-      </footer>
+      <Pie />
     </div>
   );
 }
