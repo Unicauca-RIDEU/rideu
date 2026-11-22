@@ -1366,3 +1366,88 @@ button.boton-contorno.reservar-enlace {
 }
 
 .nav-enlace.nav-activo { color: var(--azul); }
+
+/* Componentes base (src/components/ui). Solo agregan estilos; no cambian las clases existentes. */
+
+:root {
+  --radio: 1.15rem;
+  --sombra: 0 12px 32px rgb(16 24 40 / 14%);
+  --foco: 0 0 0 3px rgb(0 96 249 / 12%);
+}
+
+.boton-peligro { background: var(--error); }
+
+.boton-peligro:hover { background: #912018; }
+
+.tarjeta-activa {
+  border-color: var(--azul);
+  box-shadow: var(--foco);
+}
+
+.tarjeta-acciones {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.chip-error {
+  color: var(--error);
+  background: var(--error-fondo);
+}
+
+.chip-error i { background: var(--error); }
+
+.aviso-con-icono {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+}
+
+.aviso-con-icono .nota-icono {
+  border-color: currentColor;
+  color: inherit;
+}
+
+.aviso-titulo { display: block; }
+
+.estado-vacio {
+  display: grid;
+  gap: 0.6rem;
+  justify-items: start;
+}
+
+.dialogo {
+  width: min(26rem, calc(100vw - 2rem));
+  padding: 1.4rem 1.4rem 1.2rem;
+  border: 0;
+  border-radius: var(--radio);
+  color: inherit;
+  box-shadow: var(--sombra);
+}
+
+.dialogo::backdrop { background: rgb(16 24 40 / 45%); }
+
+.dialogo h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.dialogo-texto {
+  margin-top: 0.5rem;
+  color: var(--texto-suave);
+}
+
+.dialogo-texto p { margin: 0; }
+
+.dialogo-acciones {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+  margin-top: 1.2rem;
+}
+
+.dialogo-acciones .boton { margin-top: 0; }
+
+@media (max-width: 420px) {
+  .dialogo-acciones { grid-template-columns: 1fr; }
+}
