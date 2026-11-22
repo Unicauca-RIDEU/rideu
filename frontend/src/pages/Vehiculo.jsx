@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useOutletContext } from "react-router-dom";
-import { IconoAuto, IconoCheck } from "../components/Iconos.jsx";
+import { IconoCheck } from "../components/Iconos.jsx";
 import { obtenerVehiculo, registrarVehiculo } from "../services/vehiculo.js";
 import Pie from "../components/Pie.jsx";
-import EnlacesNavegacion from "../components/EnlacesNavegacion.jsx";
+import EncabezadoSesion from "../components/EncabezadoSesion.jsx";
 import BotonCancelar, { hayCambios } from "../components/BotonCancelar.jsx";
 
 const OBLIGATORIO = "Este campo es obligatorio.";
@@ -125,27 +125,7 @@ export default function Vehiculo() {
 
   return (
     <div className="pantalla perfil">
-      <header className="barra perfil-barra">
-        <Link to="/perfil/vehiculo" className="marca">
-          <span className="marca-icono">
-            <IconoAuto />
-          </span>
-          <span>
-            <strong>RideU</strong>
-            <small>Universidad del Cauca</small>
-          </span>
-        </Link>
-        <div className="perfil-nav">
-          <EnlacesNavegacion />
-          <span className="perfil-usuario">
-            <span className="avatar" aria-hidden="true">
-              {siglas}
-            </span>
-            <strong>{nombre}</strong>
-            <Chevron />
-          </span>
-        </div>
-      </header>
+      <EncabezadoSesion usuario={usuario} />
 
       <main className="perfil-cuerpo">
         <Link className="volver" to="/panel">
@@ -336,14 +316,6 @@ function Campo({
       </span>
       {error ? <small>{error}</small> : null}
     </label>
-  );
-}
-
-function Chevron() {
-  return (
-    <svg className="chevron" viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="currentColor" d="m7 10 5 5 5-5H7Z" />
-    </svg>
   );
 }
 

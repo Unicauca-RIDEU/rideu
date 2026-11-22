@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useOutletContext, useSearchParams } from "react-router-dom";
-import { IconoAuto, IconoCheck, IconoFlecha } from "../components/Iconos.jsx";
+import { IconoCheck, IconoFlecha } from "../components/Iconos.jsx";
 import { obtenerTrayecto, reservarCupo } from "../services/reservas.js";
 import Pie from "../components/Pie.jsx";
-import EnlacesNavegacion from "../components/EnlacesNavegacion.jsx";
+import EncabezadoSesion from "../components/EncabezadoSesion.jsx";
 
 // Reserva de un cupo (E04-HU07) · /trayectos/reservar?trayecto=<id>
 // La URL conserva los filtros de la búsqueda para poder volver a ella sin perderlos.
@@ -105,30 +105,11 @@ export default function ReservarTrayecto() {
 
   return (
     <div className="pantalla perfil">
-      <header className="barra perfil-barra">
-        <Link to="/panel" className="marca">
-          <span className="marca-icono">
-            <IconoAuto />
-          </span>
-          <span>
-            <strong>RideU</strong>
-            <small>Universidad del Cauca</small>
-          </span>
-        </Link>
-        <div className="perfil-nav">
-          <EnlacesNavegacion activo="Buscar" />
-          <span className="perfil-usuario">
-            <span className="avatar" aria-hidden="true">
-              {iniciales(nombre)}
-            </span>
-            <strong>{nombre}</strong>
-          </span>
-        </div>
-      </header>
+      <EncabezadoSesion usuario={usuario} activo="Buscar" />
 
       <main className="perfil-cuerpo">
-        <Link className="volver" to="/panel">
-          ← Volver al panel
+        <Link className="volver" to={rutaBusqueda}>
+          ← Volver a la búsqueda
         </Link>
         <h1>Reservar trayecto</h1>
         <p className="perfil-intro">Revisa los detalles antes de confirmar tu lugar.</p>

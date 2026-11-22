@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useOutletContext } from "react-router-dom";
-import { IconoAuto, IconoCheck, IconoFlecha } from "../components/Iconos.jsx";
+import { IconoCheck, IconoFlecha } from "../components/Iconos.jsx";
 import { obtenerDatosPublicacion, publicarTrayecto } from "../services/trayectos.js";
 import { obtenerHistorial } from "../services/historial.js";
 import { origenesUsados } from "../services/trayectosFrecuentes.js";
 import BotonCancelar, { hayCambios } from "../components/BotonCancelar.jsx";
 import Pie from "../components/Pie.jsx";
-import EnlacesNavegacion from "../components/EnlacesNavegacion.jsx";
+import EncabezadoSesion from "../components/EncabezadoSesion.jsx";
 
 const RUTA_VEHICULO = "/perfil/vehiculo";
 const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
@@ -170,26 +170,7 @@ export default function PublicarTrayecto() {
 
   return (
     <div className="pantalla perfil">
-      <header className="barra perfil-barra">
-        <Link to="/panel" className="marca">
-          <span className="marca-icono">
-            <IconoAuto />
-          </span>
-          <span>
-            <strong>RideU</strong>
-            <small>Universidad del Cauca</small>
-          </span>
-        </Link>
-        <div className="perfil-nav">
-          <EnlacesNavegacion activo="Publicar" />
-          <span className="perfil-usuario">
-            <span className="avatar" aria-hidden="true">
-              {siglas}
-            </span>
-            <strong>{nombre}</strong>
-          </span>
-        </div>
-      </header>
+      <EncabezadoSesion usuario={usuario} activo="Publicar" />
 
       <main className="perfil-cuerpo">
         <Link className="volver" to="/panel">

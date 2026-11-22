@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useOutletContext, useSearchParams } from "react-router-dom";
-import { IconoAuto, IconoTelefono } from "../components/Iconos.jsx";
+import { IconoTelefono } from "../components/Iconos.jsx";
 import { obtenerContactoConductor } from "../services/contacto.js";
 import Pie from "../components/Pie.jsx";
-import EnlacesNavegacion from "../components/EnlacesNavegacion.jsx";
+import EncabezadoSesion from "../components/EncabezadoSesion.jsx";
 
 // Contacto del conductor por WhatsApp (E05-HU10) · /reservas/contacto-conductor?reserva=<id>
 // RideU solo abre el enlace wa.me: la conversación ocurre en WhatsApp y no se almacena.
@@ -20,8 +20,6 @@ export default function ContactoConductor() {
   const [parametros] = useSearchParams();
   const reservaId = parametros.get("reserva") ?? "";
   const [carga, setCarga] = useState({ estado: "cargando" });
-
-  const nombre = usuario?.nombre || "Tu perfil";
 
   useEffect(() => {
     if (!reservaId) {
@@ -65,26 +63,7 @@ export default function ContactoConductor() {
 
   return (
     <div className="pantalla perfil">
-      <header className="barra perfil-barra">
-        <Link to="/panel" className="marca">
-          <span className="marca-icono">
-            <IconoAuto />
-          </span>
-          <span>
-            <strong>RideU</strong>
-            <small>Universidad del Cauca</small>
-          </span>
-        </Link>
-        <div className="perfil-nav">
-          <EnlacesNavegacion activo="Historial" />
-          <span className="perfil-usuario">
-            <span className="avatar" aria-hidden="true">
-              {iniciales(nombre)}
-            </span>
-            <strong>{nombre}</strong>
-          </span>
-        </div>
-      </header>
+      <EncabezadoSesion usuario={usuario} activo="Historial" />
 
       <main className="perfil-cuerpo">
         <Link className="volver" to="/historial">
@@ -163,11 +142,4 @@ function fechaLarga(fecha) {
   const [anio, mes, dia] = fecha.split("-").map(Number);
   const diaSemana = new Date(Date.UTC(anio, mes - 1, dia)).getUTCDay();
   return `${DIAS[diaSemana]} ${dia} de ${MESES_LARGOS[mes - 1]} de ${anio}`;
-}
-
-function iniciales(nombre) {
-  const partes = (nombre || "").trim().split(/\s+/).filter(Boolean);
-  if (partes.length === 0) return "RU";
-  if (partes.length === 1) return partes[0].slice(0, 2).toUpperCase();
-  return `${partes[0][0]}${partes[1][0]}`.toUpperCase();
 }

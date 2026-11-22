@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useOutletContext, useSearchParams } from "react-router-dom";
-import { IconoAuto, IconoFlecha } from "../components/Iconos.jsx";
+import { IconoFlecha } from "../components/Iconos.jsx";
 import { buscarTrayectos, obtenerSedes } from "../services/trayectos.js";
 import {
   alternarFavorita,
@@ -10,7 +10,7 @@ import {
   registrarBusqueda,
 } from "../services/trayectosFrecuentes.js";
 import Pie from "../components/Pie.jsx";
-import EnlacesNavegacion from "../components/EnlacesNavegacion.jsx";
+import EncabezadoSesion from "../components/EncabezadoSesion.jsx";
 
 // Búsqueda de trayectos (E03-HU06) · /trayectos/buscar
 // Los filtros viven en la URL para conservarlos al recargar o al volver desde otra pantalla.
@@ -42,8 +42,6 @@ export default function BuscarTrayecto() {
   const [recientes, setRecientes] = useState(() => busquedasRecientes(usuario?.id));
   const [favoritas, setFavoritas] = useState(() => busquedasFavoritas(usuario?.id));
 
-  const nombre = usuario?.nombre || "Tu perfil";
-  const siglas = iniciales(nombre);
   const consulta = parametros.toString();
 
   useEffect(() => {
@@ -158,26 +156,7 @@ export default function BuscarTrayecto() {
 
   return (
     <div className="pantalla perfil">
-      <header className="barra perfil-barra">
-        <Link to="/panel" className="marca">
-          <span className="marca-icono">
-            <IconoAuto />
-          </span>
-          <span>
-            <strong>RideU</strong>
-            <small>Universidad del Cauca</small>
-          </span>
-        </Link>
-        <div className="perfil-nav">
-          <EnlacesNavegacion activo="Buscar" />
-          <span className="perfil-usuario">
-            <span className="avatar" aria-hidden="true">
-              {siglas}
-            </span>
-            <strong>{nombre}</strong>
-          </span>
-        </div>
-      </header>
+      <EncabezadoSesion usuario={usuario} activo="Buscar" />
 
       <main className="perfil-cuerpo">
         <Link className="volver" to="/panel">

@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useOutletContext, useSearchParams } from "react-router-dom";
-import { IconoAuto, IconoCheck } from "../components/Iconos.jsx";
+import { IconoCheck } from "../components/Iconos.jsx";
 import { cancelarReserva, obtenerMisReservas } from "../services/reservas.js";
 import Pie from "../components/Pie.jsx";
-import EnlacesNavegacion from "../components/EnlacesNavegacion.jsx";
+import EncabezadoSesion from "../components/EncabezadoSesion.jsx";
 
 // Cancelación de reservas (E04-HU08) · /reservas/cancelar[?reserva=<id>]
 // El pasajero elige una de sus reservas confirmadas, pulsa «Cancelar reserva» y confirma.
@@ -24,7 +24,6 @@ export default function CancelarReserva() {
   const [resultado, setResultado] = useState(null);
   const [enviando, setEnviando] = useState(false);
 
-  const nombre = usuario?.nombre || "Tu perfil";
   const reservas = carga.reservas;
   const seleccionada = reservas.find((reserva) => reserva.id === seleccionId) ?? null;
 
@@ -102,26 +101,7 @@ export default function CancelarReserva() {
 
   return (
     <div className="pantalla perfil">
-      <header className="barra perfil-barra">
-        <Link to="/panel" className="marca">
-          <span className="marca-icono">
-            <IconoAuto />
-          </span>
-          <span>
-            <strong>RideU</strong>
-            <small>Universidad del Cauca</small>
-          </span>
-        </Link>
-        <div className="perfil-nav">
-          <EnlacesNavegacion activo="Historial" />
-          <span className="perfil-usuario">
-            <span className="avatar" aria-hidden="true">
-              {iniciales(nombre)}
-            </span>
-            <strong>{nombre}</strong>
-          </span>
-        </div>
-      </header>
+      <EncabezadoSesion usuario={usuario} activo="Historial" />
 
       <main className="perfil-cuerpo">
         <Link className="volver" to="/panel">
@@ -273,11 +253,4 @@ function textoDisponibles(trayecto) {
   if (!trayecto) return "";
   const disponibles = trayecto.cupos_disponibles;
   return `El trayecto ahora tiene ${disponibles} ${disponibles === 1 ? "cupo disponible" : "cupos disponibles"}.`;
-}
-
-function iniciales(nombre) {
-  const partes = (nombre || "").trim().split(/\s+/).filter(Boolean);
-  if (partes.length === 0) return "RU";
-  if (partes.length === 1) return partes[0].slice(0, 2).toUpperCase();
-  return `${partes[0][0]}${partes[1][0]}`.toUpperCase();
 }

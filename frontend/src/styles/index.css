@@ -1451,3 +1451,77 @@ button.boton-contorno.reservar-enlace {
 @media (max-width: 420px) {
   .dialogo-acciones { grid-template-columns: 1fr; }
 }
+
+/* Menú de la persona conectada (EncabezadoSesion) */
+
+.menu-usuario { position: relative; }
+
+.menu-usuario-boton {
+  padding: 0.25rem 0.4rem 0.25rem 0.25rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.menu-usuario-boton:hover { background: #f4f8ff; }
+
+.menu-usuario-boton:focus-visible {
+  outline: 2px solid var(--azul);
+  outline-offset: 2px;
+}
+
+.menu-usuario-boton[aria-expanded="true"] .chevron { transform: rotate(180deg); }
+
+.menu-usuario-lista {
+  position: absolute;
+  top: calc(100% + 0.45rem);
+  right: 0;
+  z-index: 10;
+  min-width: 13rem;
+  margin: 0;
+  padding: 0.4rem;
+  list-style: none;
+  border: 1px solid #e7eef8;
+  border-radius: 0.9rem;
+  background: white;
+  box-shadow: var(--sombra);
+}
+
+.menu-usuario-lista a,
+.menu-usuario-lista button {
+  display: block;
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 0;
+  border-radius: 0.6rem;
+  background: transparent;
+  color: #1f2a44;
+  font-weight: 600;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.menu-usuario-lista a:hover,
+.menu-usuario-lista button:hover { background: var(--cielo); color: var(--azul-oscuro); }
+
+.menu-usuario-lista button { color: var(--error); }
+
+.menu-usuario-lista button:disabled { opacity: 0.7; cursor: wait; }
+
+.menu-usuario-correo {
+  padding: 0.45rem 0.75rem 0.55rem;
+  margin-bottom: 0.3rem;
+  border-bottom: 1px solid #eef1f6;
+  color: var(--texto-suave);
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 700px) {
+  .perfil-barra { flex-wrap: wrap; padding: 0.9rem 1rem; }
+  .perfil-nav { width: 100%; justify-content: space-between; gap: 0.8rem; }
+  .perfil-nav .nav-enlaces { gap: 0.9rem; }
+  .menu-usuario-boton strong { display: none; }
+}

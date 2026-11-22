@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useOutletContext, useSearchParams } from "react-router-dom";
-import { IconoAuto, IconoCheck, IconoFlecha } from "../components/Iconos.jsx";
+import { IconoCheck, IconoFlecha } from "../components/Iconos.jsx";
 import { cancelarTrayecto, editarTrayecto, obtenerMisTrayectos } from "../services/trayectos.js";
 import Pie from "../components/Pie.jsx";
-import EnlacesNavegacion from "../components/EnlacesNavegacion.jsx";
+import EncabezadoSesion from "../components/EncabezadoSesion.jsx";
 import BotonCancelar, { hayCambios } from "../components/BotonCancelar.jsx";
 import { datosParaRepetir } from "../services/trayectosFrecuentes.js";
 
@@ -27,7 +27,6 @@ export default function EditarTrayecto() {
   const [confirmacion, setConfirmacion] = useState(null);
   const [enviando, setEnviando] = useState(false);
 
-  const nombre = usuario?.nombre || "Tu perfil";
   const trayectos = carga.trayectos;
   const seleccionado = trayectos.find((trayecto) => trayecto.id === seleccionId) ?? null;
 
@@ -163,26 +162,7 @@ export default function EditarTrayecto() {
 
   return (
     <div className="pantalla perfil">
-      <header className="barra perfil-barra">
-        <Link to="/panel" className="marca">
-          <span className="marca-icono">
-            <IconoAuto />
-          </span>
-          <span>
-            <strong>RideU</strong>
-            <small>Universidad del Cauca</small>
-          </span>
-        </Link>
-        <div className="perfil-nav">
-          <EnlacesNavegacion activo="Publicar" />
-          <span className="perfil-usuario">
-            <span className="avatar" aria-hidden="true">
-              {iniciales(nombre)}
-            </span>
-            <strong>{nombre}</strong>
-          </span>
-        </div>
-      </header>
+      <EncabezadoSesion usuario={usuario} activo="Publicar" />
 
       <main className="perfil-cuerpo">
         <Link className="volver" to="/panel">
@@ -421,11 +401,4 @@ function textoLimites(trayecto) {
 
 function textoPasajeros(total) {
   return total === 1 ? "1 pasajero" : `${total} pasajeros`;
-}
-
-function iniciales(nombre) {
-  const partes = (nombre || "").trim().split(/\s+/).filter(Boolean);
-  if (partes.length === 0) return "RU";
-  if (partes.length === 1) return partes[0].slice(0, 2).toUpperCase();
-  return `${partes[0][0]}${partes[1][0]}`.toUpperCase();
 }

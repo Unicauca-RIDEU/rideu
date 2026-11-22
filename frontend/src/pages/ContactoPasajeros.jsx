@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useOutletContext, useSearchParams } from "react-router-dom";
-import { IconoAuto, IconoTelefono } from "../components/Iconos.jsx";
+import { IconoTelefono } from "../components/Iconos.jsx";
 import { obtenerContactoPasajeros } from "../services/contacto.js";
 import Pie from "../components/Pie.jsx";
-import EnlacesNavegacion from "../components/EnlacesNavegacion.jsx";
+import EncabezadoSesion from "../components/EncabezadoSesion.jsx";
 
 // Contacto de los pasajeros por WhatsApp (E05-HU11) · /trayectos/pasajeros/contacto?trayecto=<id>
 // Solo el conductor del trayecto ve la lista, y solo con los pasajeros de reserva confirmada.
@@ -21,8 +21,6 @@ export default function ContactoPasajeros() {
   const trayectoId = parametros.get("trayecto") ?? "";
   const [carga, setCarga] = useState({ estado: "cargando" });
   const [actualizando, setActualizando] = useState(false);
-
-  const nombre = usuario?.nombre || "Tu perfil";
 
   // Consulta la lista al backend; cada consulta trae solo las reservas confirmadas en ese momento.
   const consultar = useCallback(async () => {
@@ -74,26 +72,7 @@ export default function ContactoPasajeros() {
 
   return (
     <div className="pantalla perfil">
-      <header className="barra perfil-barra">
-        <Link to="/panel" className="marca">
-          <span className="marca-icono">
-            <IconoAuto />
-          </span>
-          <span>
-            <strong>RideU</strong>
-            <small>Universidad del Cauca</small>
-          </span>
-        </Link>
-        <div className="perfil-nav">
-          <EnlacesNavegacion activo="Historial" />
-          <span className="perfil-usuario">
-            <span className="avatar" aria-hidden="true">
-              {iniciales(nombre)}
-            </span>
-            <strong>{nombre}</strong>
-          </span>
-        </div>
-      </header>
+      <EncabezadoSesion usuario={usuario} activo="Historial" />
 
       <main className="perfil-cuerpo">
         <Link className="volver" to="/historial">
