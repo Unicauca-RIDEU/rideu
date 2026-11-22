@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthLayout from "../components/AuthLayout.jsx";
+import CampoCorreo, { MENSAJE_SOLO_USUARIO, correoCompleto } from "../components/CampoCorreo.jsx";
 import {
   IconoCandado,
-  IconoCorreo,
   IconoEscudo,
   IconoFlecha,
   IconoOjo,
@@ -23,14 +23,23 @@ export default function Login() {
     setMensaje("");
   }
 
+  function cambiarCorreo(usuario) {
+    setDatos((actual) => ({ ...actual, correo: usuario }));
+    setMensaje("");
+  }
+
   async function enviar(evento) {
     evento.preventDefault();
-    const correoEscrito = datos.correo.trim().toLowerCase();
-    const correo = correoEscrito.includes("@") ? correoEscrito : `${correoEscrito}@unicauca.edu.co`;
-    if (!correoEscrito || !datos.contrasena) {
+    const usuarioCorreo = datos.correo.trim().toLowerCase();
+    if (!usuarioCorreo || !datos.contrasena) {
       setMensaje("Ingresa tu correo institucional y tu contraseña.");
       return;
     }
+    if (usuarioCorreo.includes("@")) {
+      setMensaje(MENSAJE_SOLO_USUARIO);
+      return;
+    }
+    const correo = correoCompleto(usuarioCorreo);
 
     setEnviando(true);
     setMensaje("");
@@ -57,7 +66,7 @@ export default function Login() {
   }
 
   return (
-    <AuthLayout>
+    <AuthLayout compacto>
       <div className="acceso">
         <p className="kicker">Qué bueno verte de nuevo</p>
         <h2>Volvamos a la U</h2>
@@ -70,20 +79,7 @@ export default function Login() {
         ) : null}
 
         <form className="formulario" onSubmit={enviar} noValidate>
-          <label>
-            Correo institucional
-            <span className="control">
-              <IconoCorreo />
-              <input
-                name="correo"
-                autoComplete="email"
-                inputMode="email"
-                placeholder="nombre.apellido@unicauca.edu.co"
-                value={datos.correo}
-                onChange={cambiar}
-              />
-            </span>
-          </label>
+          <CampoCorreo valor={datos.correo} onCambiar={cambiarCorreo} />
 
           <label>
             Contraseña

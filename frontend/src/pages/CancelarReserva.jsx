@@ -2,13 +2,14 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useOutletContext, useSearchParams } from "react-router-dom";
 import { IconoAuto, IconoCheck } from "../components/Iconos.jsx";
 import { cancelarReserva, obtenerMisReservas } from "../services/reservas.js";
+import Pie from "../components/Pie.jsx";
+import EnlacesNavegacion from "../components/EnlacesNavegacion.jsx";
 
 // Cancelación de reservas (E04-HU08) · /reservas/cancelar[?reserva=<id>]
 // El pasajero elige una de sus reservas confirmadas, pulsa «Cancelar reserva» y confirma.
 // El backend libera el cupo y avisa al conductor por correo. Si el trayecto ya inició,
 // la cancelación no se permite y se explica el motivo.
 
-const NAV = ["Inicio", "Buscar", "Publicar", "Historial"];
 const formatoPesos = new Intl.NumberFormat("es-CO");
 const MENSAJE_INICIADO = "No puedes cancelar la reserva porque el trayecto ya inició.";
 
@@ -112,11 +113,7 @@ export default function CancelarReserva() {
           </span>
         </Link>
         <div className="perfil-nav">
-          {NAV.map((item) => (
-            <span key={item} className={item === "Historial" ? "nav-activo" : undefined}>
-              {item}
-            </span>
-          ))}
+          <EnlacesNavegacion activo="Historial" />
           <span className="perfil-usuario">
             <span className="avatar" aria-hidden="true">
               {iniciales(nombre)}
@@ -130,7 +127,6 @@ export default function CancelarReserva() {
         <Link className="volver" to="/panel">
           ← Volver al panel
         </Link>
-        <p className="perfil-ruta">/reservas/cancelar</p>
         <h1>Cancelar reserva</h1>
         <p className="perfil-intro">Si no vas a viajar, libera tu cupo para otro compañero.</p>
 
@@ -236,10 +232,7 @@ export default function CancelarReserva() {
         ) : null}
       </main>
 
-      <footer className="pie">
-        <p>RideU · Hecho para la comunidad Unicauca</p>
-        <p>¿Necesitas ayuda? · Privacidad y condiciones</p>
-      </footer>
+      <Pie />
     </div>
   );
 }

@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useOutletContext } from "react-router-dom";
-import { IconoAuto, IconoEscudo } from "../components/Iconos.jsx";
 import { obtenerHistorial } from "../services/historial.js";
+import Pie from "../components/Pie.jsx";
+import EncabezadoSesion from "../components/EncabezadoSesion.jsx";
+import { datosParaRepetir } from "../services/trayectosFrecuentes.js";
 
 const formatoPesos = new Intl.NumberFormat("es-CO");
 
@@ -44,27 +46,12 @@ export default function Historial() {
 
   return (
     <div className="pantalla">
-      <header className="barra">
-        <Link to="/panel" className="marca">
-          <span className="marca-icono">
-            <IconoAuto />
-          </span>
-          <span>
-            <strong>RideU</strong>
-            <small>Universidad del Cauca</small>
-          </span>
-        </Link>
-        <p className="exclusivo">
-          <IconoEscudo />
-          {usuario?.correo}
-        </p>
-      </header>
+      <EncabezadoSesion usuario={usuario} activo="Historial" />
 
       <main className="panel-principal">
         <Link className="volver" to="/panel">
           ← Volver al panel
         </Link>
-        <p className="kicker">/historial</p>
         <h2>Historial</h2>
         <p className="ayuda">Tus trayectos publicados y tus reservas.</p>
 
@@ -124,6 +111,13 @@ export default function Historial() {
                           Contactar pasajeros
                         </Link>
                       ) : null}
+                      <Link
+                        className="boton-contorno reservar-enlace"
+                        to="/trayectos/publicar"
+                        state={{ repetir: datosParaRepetir(trayecto) }}
+                      >
+                        Repetir trayecto
+                      </Link>
                     </article>
                   </li>
                 ))}
@@ -179,10 +173,7 @@ export default function Historial() {
         ) : null}
       </main>
 
-      <footer className="pie">
-        <p>RideU · Hecho para la comunidad Unicauca</p>
-        <p>¿Necesitas ayuda? · Privacidad y condiciones</p>
-      </footer>
+      <Pie />
     </div>
   );
 }

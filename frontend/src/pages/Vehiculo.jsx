@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import { IconoAuto, IconoCheck } from "../components/Iconos.jsx";
 import { obtenerVehiculo, registrarVehiculo } from "../services/vehiculo.js";
+import Pie from "../components/Pie.jsx";
+import EnlacesNavegacion from "../components/EnlacesNavegacion.jsx";
+import BotonCancelar, { hayCambios } from "../components/BotonCancelar.jsx";
 
-const NAV = ["Inicio", "Buscar", "Publicar", "Historial"];
 const OBLIGATORIO = "Este campo es obligatorio.";
 
 const vacio = {
@@ -26,6 +28,8 @@ export default function Vehiculo() {
   const [exito, setExito] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const [guardado, setGuardado] = useState(usuarioSesion?.estado === "Habilitado");
+  // Datos tal como están guardados: sirven para saber si hay cambios sin guardar.
+  const [inicial, setInicial] = useState(vacio);
 
   // Una cuenta «Habilitado» ve sus datos actuales para poder actualizarlos.
   useEffect(() => {
@@ -42,8 +46,7 @@ export default function Vehiculo() {
           setMensaje("No se pudieron cargar tus datos actuales. Escríbelos de nuevo para actualizarlos.");
           return;
         }
-        // Solo se precarga si la persona todavía no ha escrito nada.
-        setDatos((actual) => (actual !== vacio ? actual : {
+        const actuales = {
           placa: respuesta.vehiculo.placa ?? "",
           marca: respuesta.vehiculo.marca ?? "",
           modelo: respuesta.vehiculo.modelo ?? "",
@@ -51,7 +54,10 @@ export default function Vehiculo() {
           capacidadPasajeros: String(respuesta.vehiculo.capacidadPasajeros ?? ""),
           categoriaLicencia: respuesta.licencia?.categoria ?? "",
           fechaVencimientoLicencia: fechaLatina(respuesta.licencia?.fechaVencimiento),
-        }));
+        };
+        setInicial(actuales);
+        // Solo se precarga si la persona todavía no ha escrito nada.
+        setDatos((actual) => (actual !== vacio ? actual : actuales));
       })
       .catch(() => {
         if (activo) {
@@ -108,6 +114,7 @@ export default function Vehiculo() {
       );
       setExito(true);
       setGuardado(true);
+      setInicial(datos);
     } catch {
       setMensaje("No se pudo conectar con el servidor. Inténtalo de nuevo.");
       setExito(false);
@@ -129,9 +136,7 @@ export default function Vehiculo() {
           </span>
         </Link>
         <div className="perfil-nav">
-          {NAV.map((item) => (
-            <span key={item}>{item}</span>
-          ))}
+          <EnlacesNavegacion />
           <span className="perfil-usuario">
             <span className="avatar" aria-hidden="true">
               {siglas}
@@ -146,7 +151,6 @@ export default function Vehiculo() {
         <Link className="volver" to="/panel">
           ← Volver al panel
         </Link>
-        <p className="perfil-ruta">/perfil/vehiculo</p>
         <h1>Mi vehículo</h1>
         <p className="perfil-intro">Comparte el camino con tus datos al día.</p>
 
@@ -291,14 +295,16 @@ export default function Vehiculo() {
               <IconoCheck />
               {enviando ? "Guardando…" : "Guardar vehículo"}
             </button>
+            <BotonCancelar
+              hayCambios={hayCambios(datos, inicial)}
+              onCancelar={() => navigate("/panel")}
+              disabled={enviando}
+            />
           </form>
         </div>
       </main>
 
-      <footer className="pie">
-        <p>RideU · Hecho para la comunidad Unicauca</p>
-        <p>¿Necesitas ayuda? · Privacidad y condiciones</p>
-      </footer>
+      <Pie />
     </div>
   );
 }

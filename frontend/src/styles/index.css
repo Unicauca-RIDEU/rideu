@@ -523,12 +523,6 @@ button, input, a { font: inherit; }
   text-decoration: none;
 }
 
-.perfil-ruta {
-  margin: 0.35rem 0 0.8rem;
-  color: #98a2b3;
-  font-size: 0.92rem;
-}
-
 .perfil-cuerpo h1 {
   margin: 0;
   color: #1b2437;
@@ -1221,3 +1215,154 @@ button.boton-contorno.reservar-enlace {
   .perfil-nav { flex-wrap: wrap; }
   .perfil-grid, .campos { grid-template-columns: 1fr; }
 }
+
+/* Evaluación heurística · ayuda, salir sin guardar y atajos para usuarios frecuentes */
+
+.pie-enlace {
+  color: var(--azul);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.pie-enlace:hover { text-decoration: underline; }
+
+.relato-compacto {
+  display: grid;
+  align-content: center;
+}
+
+.boton-cancelar {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.boton-cancelar:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.volver-boton {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.perfil-cuerpo .volver + h1 { margin-top: 0.6rem; }
+
+.ayuda-secciones {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.ayuda-seccion h2 {
+  margin: 0 0 0.4rem;
+  font-size: 1.2rem;
+}
+
+.ayuda-pregunta {
+  border-top: 1px solid #e7eef8;
+  padding: 0.75rem 0;
+}
+
+.ayuda-pregunta summary {
+  color: #1b2437;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ayuda-pregunta p {
+  margin: 0.5rem 0 0;
+  color: #475467;
+}
+
+.buscar-atajos {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 1rem;
+}
+
+.atajos-grupo small {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--texto-suave);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.atajos-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.chip-atajo {
+  border: 1px solid #d5e4ff;
+  background: var(--cielo);
+  color: var(--azul-oscuro);
+  cursor: pointer;
+}
+
+.chip-atajo:hover { border-color: var(--azul); }
+
+.chip-atajo:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.boton-favorita {
+  width: auto;
+  margin-bottom: 1rem;
+  padding: 0 1.2rem;
+  min-height: 2.6rem;
+}
+
+@media (max-width: 900px) {
+  .ayuda-secciones { grid-template-columns: 1fr; }
+}
+
+/* Correo institucional: el dominio es fijo y se muestra como parte del campo */
+
+.control .correo-dominio {
+  flex: none;
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.6rem;
+  background: var(--cielo);
+  color: var(--azul-oscuro);
+  font-size: 0.92rem;
+  font-weight: 700;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.control input[name="correo"] { min-width: 0; }
+
+.formulario small.pista strong { color: #1f2a44; }
+
+/* Navegación principal del encabezado */
+
+.nav-enlaces {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.35rem;
+}
+
+.nav-enlace {
+  color: #667085;
+  text-decoration: none;
+  border-radius: 0.4rem;
+}
+
+.nav-enlace:hover { color: var(--azul); }
+
+.nav-enlace:focus-visible {
+  outline: 2px solid var(--azul);
+  outline-offset: 3px;
+}
+
+.nav-enlace.nav-activo { color: var(--azul); }

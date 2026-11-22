@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import AuthLayout from "../components/AuthLayout.jsx";
+import CampoCorreo, { MENSAJE_SOLO_USUARIO, correoCompleto } from "../components/CampoCorreo.jsx";
 import {
   IconoCandado,
-  IconoCorreo,
   IconoFlecha,
   IconoOjo,
   IconoTelefono,
@@ -32,6 +32,12 @@ export default function Registro() {
     const { name, value } = evento.target;
     setDatos((actual) => ({ ...actual, [name]: value }));
     setErrores((actual) => ({ ...actual, [name]: "" }));
+    setMensaje("");
+  }
+
+  function cambiarCorreo(usuario) {
+    setDatos((actual) => ({ ...actual, correo: usuario }));
+    setErrores((actual) => ({ ...actual, correo: "" }));
     setMensaje("");
   }
 
@@ -71,8 +77,6 @@ export default function Registro() {
     }
   }
 
-  const muestraDominio = !datos.correo.includes("@");
-
   return (
     <AuthLayout>
       <p className="kicker">Tu comunidad, más cerca</p>
@@ -103,27 +107,12 @@ export default function Registro() {
             {errores.nombre ? <small>{errores.nombre}</small> : null}
           </label>
 
-          <label>
-            Correo institucional
-            <span className={errores.correo ? "control control-error" : "control"}>
-              <IconoCorreo />
-              <input
-                name="correo"
-                autoComplete="email"
-                inputMode="email"
-                placeholder="nombre.apellido"
-                value={datos.correo}
-                onChange={cambiar}
-                aria-invalid={Boolean(errores.correo)}
-              />
-              {muestraDominio ? <em>@unicauca.edu.co</em> : null}
-            </span>
-            {errores.correo ? (
-              <small>{errores.correo}</small>
-            ) : (
-              <small className="pista">Usa tu correo de la Universidad del Cauca.</small>
-            )}
-          </label>
+          <CampoCorreo
+            valor={datos.correo}
+            onCambiar={cambiarCorreo}
+            error={errores.correo}
+            autoComplete="email"
+          />
 
           <label>
             Contraseña
@@ -192,8 +181,8 @@ export default function Registro() {
 function validar(datos) {
   const errores = {};
   const nombre = datos.nombre.trim();
-  const correoEscrito = datos.correo.trim().toLowerCase();
-  const correo = correoEscrito.includes("@") ? correoEscrito : correoEscrito ? `${correoEscrito}@unicauca.edu.co` : "";
+  const usuarioCorreo = datos.correo.trim().toLowerCase();
+  const correo = correoCompleto(usuarioCorreo);
   const celular = datos.whatsapp.replace(/\D/g, "").replace(/^57/, "");
 
   if (!nombre) errores.nombre = "El nombre completo es obligatorio.";
@@ -201,7 +190,8 @@ function validar(datos) {
     errores.nombre = "El nombre completo debe tener entre 3 y 120 caracteres.";
   }
 
-  if (!correoEscrito) errores.correo = "El correo institucional es obligatorio.";
+  if (!usuarioCorreo) errores.correo = "El correo institucional es obligatorio.";
+  else if (usuarioCorreo.includes("@")) errores.correo = MENSAJE_SOLO_USUARIO;
   else if (!/^[^\s@]+@unicauca\.edu\.co$/.test(correo)) errores.correo = MENSAJE_DOMINIO;
 
   if (!datos.contrasena) errores.contrasena = "La contraseña es obligatoria.";

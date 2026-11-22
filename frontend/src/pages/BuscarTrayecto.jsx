@@ -2,11 +2,19 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useOutletContext, useSearchParams } from "react-router-dom";
 import { IconoAuto, IconoFlecha } from "../components/Iconos.jsx";
 import { buscarTrayectos, obtenerSedes } from "../services/trayectos.js";
+import {
+  alternarFavorita,
+  busquedasFavoritas,
+  busquedasRecientes,
+  esFavorita,
+  registrarBusqueda,
+} from "../services/trayectosFrecuentes.js";
+import Pie from "../components/Pie.jsx";
+import EnlacesNavegacion from "../components/EnlacesNavegacion.jsx";
 
 // Búsqueda de trayectos (E03-HU06) · /trayectos/buscar
 // Los filtros viven en la URL para conservarlos al recargar o al volver desde otra pantalla.
 
-const NAV = ["Inicio", "Buscar", "Publicar", "Historial"];
 // Cada cuánto se repite la búsqueda en segundo plano para mostrar los cupos al día (E04-HU07).
 const INTERVALO_ACTUALIZACION_MS = 10000;
 const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
@@ -31,6 +39,8 @@ export default function BuscarTrayecto() {
   const [errores, setErrores] = useState({});
   const [busqueda, setBusqueda] = useState({ estado: "inicial" });
   const [intento, setIntento] = useState(0);
+  const [recientes, setRecientes] = useState(() => busquedasRecientes(usuario?.id));
+  const [favoritas, setFavoritas] = useState(() => busquedasFavoritas(usuario?.id));
 
   const nombre = usuario?.nombre || "Tu perfil";
   const siglas = iniciales(nombre);
@@ -110,10 +120,36 @@ export default function BuscarTrayecto() {
       setErrores(faltantes);
       return;
     }
-    setErrores({});
-    setParametros(filtros);
-    setIntento((actual) => actual + 1);
+    lanzar(filtros);
   }
+
+  // Ejecuta la búsqueda y la recuerda entre las recientes de este usuario.
+  function lanzar(valores) {
+    setErrores({});
+    setFiltros(valores);
+    setParametros(valores);
+    setIntento((actual) => actual + 1);
+    setRecientes(registrarBusqueda(usuario?.id, atajoDe(valores, sedes)));
+  }
+
+  // Un atajo conserva la sede y la hora; la fecha es la que esté elegida en el formulario.
+  function usarAtajo(atajo) {
+    lanzar({
+      sedeDestinoId: String(atajo.sedeDestinoId),
+      fecha: filtros.fecha || hoyEnColombia(),
+      horaDesde: atajo.horaDesde,
+    });
+  }
+
+  function cambiarFavorita() {
+    const actuales = Object.fromEntries(new URLSearchParams(consulta));
+    if (!actuales.sedeDestinoId || !actuales.horaDesde) return;
+    setFavoritas(alternarFavorita(usuario?.id, atajoDe(actuales, sedes)));
+  }
+
+  const busquedaActual = Object.fromEntries(new URLSearchParams(consulta));
+  const actualEsFavorita =
+    Boolean(busquedaActual.sedeDestinoId && busquedaActual.horaDesde) && esFavorita(favoritas, busquedaActual);
 
   function cambiarFiltros() {
     selectorSede.current?.focus();
@@ -133,11 +169,7 @@ export default function BuscarTrayecto() {
           </span>
         </Link>
         <div className="perfil-nav">
-          {NAV.map((item) => (
-            <span key={item} className={item === "Buscar" ? "nav-activo" : undefined}>
-              {item}
-            </span>
-          ))}
+          <EnlacesNavegacion activo="Buscar" />
           <span className="perfil-usuario">
             <span className="avatar" aria-hidden="true">
               {siglas}
@@ -151,7 +183,6 @@ export default function BuscarTrayecto() {
         <Link className="volver" to="/panel">
           ← Volver al panel
         </Link>
-        <p className="perfil-ruta">/trayectos/buscar</p>
         <h1>Buscar trayecto</h1>
         <p className="perfil-intro">Encuentra personas que comparten tu camino a la U.</p>
 
@@ -197,10 +228,27 @@ export default function BuscarTrayecto() {
               {busqueda.estado === "buscando" ? "Buscando…" : "Buscar"}
             </button>
           </div>
+          <Atajos
+            favoritas={favoritas}
+            recientes={recientes}
+            sedes={sedes}
+            onUsar={usarAtajo}
+            disabled={busqueda.estado === "buscando"}
+          />
         </form>
 
         <div className="publicar-grid buscar-grid">
           <section aria-live="polite">
+            {busqueda.estado === "listo" ? (
+              <button
+                className="boton-contorno reservar-enlace boton-favorita"
+                type="button"
+                onClick={cambiarFavorita}
+                aria-pressed={actualEsFavorita}
+              >
+                {actualEsFavorita ? "★ Búsqueda favorita" : "☆ Guardar búsqueda como favorita"}
+              </button>
+            ) : null}
             <Resultados busqueda={busqueda} onCambiarFiltros={cambiarFiltros} consulta={consulta} />
           </section>
 
@@ -221,12 +269,61 @@ export default function BuscarTrayecto() {
         </div>
       </main>
 
-      <footer className="pie">
-        <p>RideU · Hecho para la comunidad Unicauca</p>
-        <p>¿Necesitas ayuda? · Privacidad y condiciones</p>
-      </footer>
+      <Pie />
     </div>
   );
+}
+
+function Atajos({ favoritas, recientes, sedes, onUsar, disabled }) {
+  const soloRecientes = recientes.filter((item) => !esFavorita(favoritas, item));
+  if (favoritas.length === 0 && soloRecientes.length === 0) return null;
+  return (
+    <div className="buscar-atajos">
+      {favoritas.length > 0 ? (
+        <GrupoAtajos titulo="Favoritas" lista={favoritas} sedes={sedes} onUsar={onUsar} disabled={disabled} estrella />
+      ) : null}
+      {soloRecientes.length > 0 ? (
+        <GrupoAtajos titulo="Recientes" lista={soloRecientes} sedes={sedes} onUsar={onUsar} disabled={disabled} />
+      ) : null}
+    </div>
+  );
+}
+
+function GrupoAtajos({ titulo, lista, sedes, onUsar, disabled, estrella = false }) {
+  return (
+    <div className="atajos-grupo">
+      <small>{titulo}</small>
+      <div className="atajos-lista">
+        {lista.map((atajo) => (
+          <button
+            key={`${atajo.sedeDestinoId}-${atajo.horaDesde}`}
+            className="chip chip-atajo"
+            type="button"
+            onClick={() => onUsar(atajo)}
+            disabled={disabled}
+            title="Buscar con la fecha elegida"
+          >
+            {estrella ? "★ " : ""}
+            {nombreSede(atajo, sedes)} · desde {atajo.horaDesde}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function atajoDe(valores, sedes) {
+  const sede = sedes.find((item) => String(item.id) === String(valores.sedeDestinoId));
+  return {
+    sedeDestinoId: String(valores.sedeDestinoId),
+    sedeNombre: sede?.nombre ?? "",
+    horaDesde: valores.horaDesde,
+  };
+}
+
+function nombreSede(atajo, sedes) {
+  const sede = sedes.find((item) => String(item.id) === String(atajo.sedeDestinoId));
+  return sede?.nombre || atajo.sedeNombre || "Sede";
 }
 
 function Resultados({ busqueda, onCambiarFiltros, consulta }) {

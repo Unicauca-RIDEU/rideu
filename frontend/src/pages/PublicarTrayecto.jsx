@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useOutletContext } from "react-router-dom";
+import { Link, useLocation, useNavigate, useOutletContext } from "react-router-dom";
 import { IconoAuto, IconoCheck, IconoFlecha } from "../components/Iconos.jsx";
 import { obtenerDatosPublicacion, publicarTrayecto } from "../services/trayectos.js";
+import { obtenerHistorial } from "../services/historial.js";
+import { origenesUsados } from "../services/trayectosFrecuentes.js";
+import BotonCancelar, { hayCambios } from "../components/BotonCancelar.jsx";
+import Pie from "../components/Pie.jsx";
+import EnlacesNavegacion from "../components/EnlacesNavegacion.jsx";
 
-const NAV = ["Inicio", "Buscar", "Publicar", "Historial"];
 const RUTA_VEHICULO = "/perfil/vehiculo";
 const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
 const formatoPesos = new Intl.NumberFormat("es-CO");
@@ -20,7 +24,11 @@ const vacio = {
 export default function PublicarTrayecto() {
   const { usuario } = useOutletContext();
   const navigate = useNavigate();
+  // «Repetir trayecto» llega con los datos de un trayecto anterior (sin la fecha).
+  const location = useLocation();
+  const [repetir] = useState(() => location.state?.repetir ?? null);
   const [carga, setCarga] = useState({ estado: "cargando" });
+  const [origenes, setOrigenes] = useState([]);
   const [datos, setDatos] = useState(vacio);
   const [errores, setErrores] = useState({});
   const [mensaje, setMensaje] = useState("");
@@ -42,16 +50,26 @@ export default function PublicarTrayecto() {
         }
         setCarga({ estado: "listo", ...respuesta });
         if (respuesta.habilitado) {
-          setDatos((actual) => ({ ...actual, cupos: String(respuesta.cuposMaximos) }));
+          setDatos((actual) => ({
+            ...actual,
+            cupos: String(respuesta.cuposMaximos),
+            ...(repetir ? datosRepetidos(repetir, respuesta) : {}),
+          }));
         }
       })
       .catch(() => {
         if (activo) setCarga({ estado: "error" });
       });
+    // Los orígenes ya usados alimentan el autocompletado; si fallan, el campo sigue siendo libre.
+    obtenerHistorial()
+      .then((respuesta) => {
+        if (activo && respuesta.ok) setOrigenes(origenesUsados(respuesta.trayectos));
+      })
+      .catch(() => {});
     return () => {
       activo = false;
     };
-  }, [navigate]);
+  }, [navigate, repetir]);
 
   const nombre = carga.conductor?.nombre || usuario?.nombre || "Tu perfil";
   const siglas = iniciales(nombre);
@@ -163,11 +181,7 @@ export default function PublicarTrayecto() {
           </span>
         </Link>
         <div className="perfil-nav">
-          {NAV.map((item) => (
-            <span key={item} className={item === "Publicar" ? "nav-activo" : undefined}>
-              {item}
-            </span>
-          ))}
+          <EnlacesNavegacion activo="Publicar" />
           <span className="perfil-usuario">
             <span className="avatar" aria-hidden="true">
               {siglas}
@@ -181,7 +195,6 @@ export default function PublicarTrayecto() {
         <Link className="volver" to="/panel">
           ← Volver al panel
         </Link>
-        <p className="perfil-ruta">/trayectos/publicar</p>
         <h1>Publicar trayecto</h1>
         <p className="perfil-intro">Tu camino a la U puede ser el de alguien más.</p>
 
@@ -210,6 +223,11 @@ export default function PublicarTrayecto() {
                   Trayecto publicado. Ya está disponible para los pasajeros.
                 </p>
               ) : null}
+              {repetir && !bloqueado && !publicado ? (
+                <p className="aviso" role="status">
+                  Copiamos los datos de tu trayecto anterior. Elige la fecha y revisa lo demás antes de publicar.
+                </p>
+              ) : null}
               {mensaje && !publicado ? (
                 <p className="aviso aviso-error" role="alert">
                   {mensaje}
@@ -221,10 +239,17 @@ export default function PublicarTrayecto() {
                   <input
                     name="origen"
                     placeholder="Ej.: Bello Horizonte"
+                    list="origenes-usados"
+                    autoComplete="off"
                     value={datos.origen}
                     onChange={cambiar}
                     aria-invalid={Boolean(errores.origen)}
                   />
+                  <datalist id="origenes-usados">
+                    {origenes.map((origen) => (
+                      <option key={origen} value={origen} />
+                    ))}
+                  </datalist>
                 </Campo>
 
                 <Campo etiqueta="Sede de destino" error={errores.sedeDestinoId}>
@@ -329,6 +354,13 @@ export default function PublicarTrayecto() {
                   {enviando ? "Publicando…" : "Publicar trayecto"}
                 </button>
               )}
+              {!bloqueado && !publicado ? (
+                <BotonCancelar
+                  hayCambios={hayCambios(datos, { ...vacio, cupos: String(cuposMaximos) })}
+                  onCancelar={() => navigate("/panel")}
+                  disabled={enviando}
+                />
+              ) : null}
             </form>
 
             <aside className="perfil-lado">
@@ -382,10 +414,7 @@ export default function PublicarTrayecto() {
         ) : null}
       </main>
 
-      <footer className="pie">
-        <p>RideU · Hecho para la comunidad Unicauca</p>
-        <p>¿Necesitas ayuda? · Privacidad y condiciones</p>
-      </footer>
+      <Pie />
     </div>
   );
 }
@@ -458,6 +487,22 @@ function textoVistaPrevia({ bloqueado, publicado, errores, vista, cuposMaximos, 
   }
   const capacidad = carga.vehiculo?.capacidadPasajeros;
   return `Así verá la comunidad tu trayecto al publicarlo. Ofreces ${vista.cupos} cupos de ${capacidad} pasajeros.`;
+}
+
+// Convierte un trayecto anterior en valores del formulario. La sede se busca por nombre
+// y los cupos no superan la capacidad actual del vehículo.
+function datosRepetidos(repetir, publicacion) {
+  const sede = (publicacion.sedes ?? []).find((item) => item.nombre === repetir.sedeDestino);
+  const cupos = Number.parseInt(repetir.cupos, 10);
+  const maximo = publicacion.cuposMaximos;
+  const aporte = Number(repetir.aporteSugerido);
+  return {
+    origen: repetir.origen ?? "",
+    sedeDestinoId: sede ? String(sede.id) : "",
+    hora: repetir.hora ?? "",
+    cupos: String(Number.isInteger(cupos) && cupos > 0 ? Math.min(cupos, maximo) : maximo),
+    aporteSugerido: Number.isFinite(aporte) && aporte > 0 ? formatoPesos.format(aporte) : "",
+  };
 }
 
 function validar(datos, cuposMaximos) {

@@ -2,13 +2,16 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useOutletContext, useSearchParams } from "react-router-dom";
 import { IconoAuto, IconoCheck, IconoFlecha } from "../components/Iconos.jsx";
 import { cancelarTrayecto, editarTrayecto, obtenerMisTrayectos } from "../services/trayectos.js";
+import Pie from "../components/Pie.jsx";
+import EnlacesNavegacion from "../components/EnlacesNavegacion.jsx";
+import BotonCancelar, { hayCambios } from "../components/BotonCancelar.jsx";
+import { datosParaRepetir } from "../services/trayectosFrecuentes.js";
 
 // Edición y cancelación de trayectos (E02-HU05) · /trayectos/editar[?trayecto=<id>]
 // El conductor elige uno de sus trayectos vigentes y cambia su fecha, hora o cupos, o lo cancela.
 // Si el trayecto tiene reservas confirmadas, la cancelación pide confirmación con el número
 // de pasajeros afectados; el backend cancela sus reservas y les avisa por correo.
 
-const NAV = ["Inicio", "Buscar", "Publicar", "Historial"];
 const formatoPesos = new Intl.NumberFormat("es-CO");
 
 export default function EditarTrayecto() {
@@ -171,11 +174,7 @@ export default function EditarTrayecto() {
           </span>
         </Link>
         <div className="perfil-nav">
-          {NAV.map((item) => (
-            <span key={item} className={item === "Publicar" ? "nav-activo" : undefined}>
-              {item}
-            </span>
-          ))}
+          <EnlacesNavegacion activo="Publicar" />
           <span className="perfil-usuario">
             <span className="avatar" aria-hidden="true">
               {iniciales(nombre)}
@@ -189,7 +188,6 @@ export default function EditarTrayecto() {
         <Link className="volver" to="/panel">
           ← Volver al panel
         </Link>
-        <p className="perfil-ruta">/trayectos/editar</p>
         <h1>Editar o cancelar trayecto</h1>
         <p className="perfil-intro">Mantén tu oferta al día si cambian tus planes.</p>
 
@@ -283,6 +281,17 @@ export default function EditarTrayecto() {
                       <IconoFlecha />
                       {enviando ? "Guardando…" : "Guardar cambios"}
                     </button>
+                    <BotonCancelar
+                      hayCambios={hayCambios(formulario, {
+                        fecha: seleccionado.fecha,
+                        hora: seleccionado.hora,
+                        cupos: seleccionado.cupos,
+                      })}
+                      onCancelar={() => seleccionar("")}
+                      disabled={enviando}
+                    >
+                      Cancelar edición
+                    </BotonCancelar>
                   </form>
 
                   <section className="tarjeta reservar-detalle" aria-live="polite">
@@ -338,10 +347,7 @@ export default function EditarTrayecto() {
         ) : null}
       </main>
 
-      <footer className="pie">
-        <p>RideU · Hecho para la comunidad Unicauca</p>
-        <p>¿Necesitas ayuda? · Privacidad y condiciones</p>
-      </footer>
+      <Pie />
     </div>
   );
 }
@@ -376,6 +382,13 @@ function TarjetaEditable({ trayecto, activo, onSeleccionar }) {
       >
         {activo ? "Seleccionado" : "Seleccionar"}
       </button>
+      <Link
+        className="boton-contorno reservar-enlace"
+        to="/trayectos/publicar"
+        state={{ repetir: datosParaRepetir(trayecto) }}
+      >
+        Repetir trayecto
+      </Link>
     </article>
   );
 }
