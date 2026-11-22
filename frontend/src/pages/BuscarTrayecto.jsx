@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate, useOutletContext, useSearchParams } from "react-router-dom";
+import { useNavigate, useOutletContext, useSearchParams } from "react-router-dom";
+import { Aviso, Boton, Cargando, EncabezadoPagina } from "@/components/ui";
 import { IconoFlecha } from "../components/Iconos.jsx";
+import TarjetaTrayecto from "../components/TarjetaTrayecto.jsx";
+import { fechaLarga } from "../components/formatoTrayecto.js";
 import { buscarTrayectos, obtenerSedes } from "../services/trayectos.js";
 import {
   alternarFavorita,
@@ -17,13 +20,6 @@ import EncabezadoSesion from "../components/EncabezadoSesion.jsx";
 
 // Cada cuánto se repite la búsqueda en segundo plano para mostrar los cupos al día (E04-HU07).
 const INTERVALO_ACTUALIZACION_MS = 10000;
-const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
-const MESES_LARGOS = [
-  "enero", "febrero", "marzo", "abril", "mayo", "junio",
-  "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
-];
-const DIAS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-const formatoPesos = new Intl.NumberFormat("es-CO");
 
 export default function BuscarTrayecto() {
   const { usuario } = useOutletContext();
@@ -159,11 +155,11 @@ export default function BuscarTrayecto() {
       <EncabezadoSesion usuario={usuario} activo="Buscar" />
 
       <main className="perfil-cuerpo">
-        <Link className="volver" to="/panel">
-          ← Volver al panel
-        </Link>
-        <h1>Buscar trayecto</h1>
-        <p className="perfil-intro">Encuentra personas que comparten tu camino a la U.</p>
+        <EncabezadoPagina
+          titulo="Buscar trayecto"
+          intro="Encuentra personas que comparten tu camino a la U."
+          volver={{ texto: "Volver al panel", to: "/panel" }}
+        />
 
         <form className="tarjeta buscar-filtros" onSubmit={buscar} noValidate>
           <h2>¿A qué sede vas?</h2>
@@ -202,10 +198,15 @@ export default function BuscarTrayecto() {
                 aria-invalid={Boolean(errores.horaDesde)}
               />
             </Campo>
-            <button className="boton boton-buscar" type="submit" disabled={busqueda.estado === "buscando"}>
-              <IconoFlecha />
-              {busqueda.estado === "buscando" ? "Buscando…" : "Buscar"}
-            </button>
+            <Boton
+              className="boton-buscar"
+              type="submit"
+              icono={<IconoFlecha />}
+              cargando={busqueda.estado === "buscando"}
+              textoCargando="Buscando…"
+            >
+              Buscar
+            </Boton>
           </div>
           <Atajos
             favoritas={favoritas}
@@ -216,36 +217,28 @@ export default function BuscarTrayecto() {
           />
         </form>
 
-        <div className="publicar-grid buscar-grid">
-          <section aria-live="polite">
-            {busqueda.estado === "listo" ? (
+        <section className="buscar-zona" aria-live="polite">
+          <Resultados
+            busqueda={busqueda}
+            onCambiarFiltros={cambiarFiltros}
+            consulta={consulta}
+            favorita={
               <button
-                className="boton-contorno reservar-enlace boton-favorita"
+                className="boton-favorita"
                 type="button"
                 onClick={cambiarFavorita}
                 aria-pressed={actualEsFavorita}
               >
-                {actualEsFavorita ? "★ Búsqueda favorita" : "☆ Guardar búsqueda como favorita"}
+                {actualEsFavorita ? "★ Búsqueda favorita" : "☆ Guardar como favorita"}
               </button>
-            ) : null}
-            <Resultados busqueda={busqueda} onCambiarFiltros={cambiarFiltros} consulta={consulta} />
-          </section>
+            }
+          />
+        </section>
 
-          <aside className="perfil-lado">
-            <section className="consejo">
-              <strong>Comparte el camino con confianza</strong>
-              <span>
-                Todos los trayectos pertenecen a la comunidad de la Universidad del Cauca, en Popayán.
-              </span>
-            </section>
-            <section className="tarjeta antes-reservar">
-              <h2>Antes de reservar</h2>
-              <p>Revisa la hora, el punto de encuentro y los cupos disponibles.</p>
-              <p>El aporte se muestra en COP por persona. Cada reserva corresponde a 1 cupo.</p>
-              <p className="pista-lado">Capacidad máxima: 4 pasajeros por vehículo.</p>
-            </section>
-          </aside>
-        </div>
+        <p className="buscar-nota">
+          Solo ves trayectos con cupos libres de la comunidad Unicauca. Cada reserva es 1 cupo y el aporte se
+          muestra en COP por persona.
+        </p>
       </main>
 
       <Pie />
@@ -305,95 +298,56 @@ function nombreSede(atajo, sedes) {
   return sede?.nombre || atajo.sedeNombre || "Sede";
 }
 
-function Resultados({ busqueda, onCambiarFiltros, consulta }) {
+function Resultados({ busqueda, onCambiarFiltros, consulta, favorita }) {
   if (busqueda.estado === "inicial") {
-    return (
-      <p className="pista-lado">Selecciona la sede, la fecha y la hora para ver los trayectos disponibles.</p>
-    );
+    return <Cargando>Selecciona la sede, la fecha y la hora para ver los trayectos disponibles.</Cargando>;
   }
   if (busqueda.estado === "buscando") {
-    return <p className="pista-lado">Buscando trayectos…</p>;
+    return <Cargando>Buscando trayectos…</Cargando>;
   }
   if (busqueda.estado === "error") {
-    return (
-      <p className="aviso aviso-error" role="alert">
-        {busqueda.mensaje}
-      </p>
-    );
+    return <Aviso tono="error">{busqueda.mensaje}</Aviso>;
   }
 
   const { total, trayectos, filtros, mensaje } = busqueda;
   return (
     <>
-      <h2 className="buscar-total">
-        {total} {total === 1 ? "trayecto disponible" : "trayectos disponibles"}
-      </h2>
-      <p className="buscar-subtitulo">{fechaLarga(filtros.fecha)} · Ordenados por hora de salida</p>
+      <div className="buscar-cabecera">
+        <div>
+          <h2 className="buscar-total">
+            {total} {total === 1 ? "trayecto disponible" : "trayectos disponibles"}
+          </h2>
+          <p className="buscar-subtitulo">{fechaLarga(filtros.fecha)} · Ordenados por hora de salida</p>
+        </div>
+        {favorita}
+      </div>
 
       {total === 0 ? (
         <div className="tarjeta buscar-vacio">
           <IlustracionRuta />
           <h3>{mensaje}</h3>
           <p>Prueba con otra fecha u hora para encontrar un trayecto a {filtros.sedeDestino}.</p>
-          <button className="boton boton-cambiar" type="button" onClick={onCambiarFiltros}>
+          <Boton className="boton-cambiar" onClick={onCambiarFiltros}>
             Cambiar filtros
-          </button>
+          </Boton>
         </div>
       ) : (
         <ul className="buscar-resultados">
           {trayectos.map((trayecto) => (
             <li key={trayecto.id}>
-              <TarjetaTrayecto trayecto={trayecto} />
-              <div className="acciones-trayecto">
-                <Link className="boton-contorno reservar-enlace" to={rutaDeReserva(trayecto.id, consulta)}>
-                  Ver trayecto
-                </Link>
-                <Link className="boton" to={rutaDeReserva(trayecto.id, consulta)}>
-                  <IconoFlecha />
-                  Reservar
-                </Link>
-              </div>
+              <TarjetaTrayecto
+                trayecto={trayecto}
+                acciones={
+                  <Boton to={rutaDeReserva(trayecto.id, consulta)} icono={<IconoFlecha />}>
+                    Ver y reservar
+                  </Boton>
+                }
+              />
             </li>
           ))}
         </ul>
       )}
     </>
-  );
-}
-
-function TarjetaTrayecto({ trayecto }) {
-  const reservas = trayecto.cupos_reservados;
-  const disponibles = trayecto.cupos_disponibles;
-  return (
-    <article className="tarjeta tarjeta-previa">
-      <div className="previa-cabecera">
-        <strong>{fechaCorta(trayecto.fecha, trayecto.hora)}</strong>
-        <p className="chip chip-ok">
-          <i />
-          Disponible
-        </p>
-      </div>
-      <ol className="previa-ruta">
-        <li>{trayecto.origen}</li>
-        <li>{trayecto.sede_destino}</li>
-      </ol>
-      <div className="previa-pie">
-        <span className="avatar" aria-hidden="true">
-          {iniciales(trayecto.conductor_nombre)}
-        </span>
-        <span className="previa-conductor">
-          <strong>{trayecto.conductor_nombre}</strong>
-          <small>
-            {reservas} {reservas === 1 ? "reserva" : "reservas"} · {disponibles}{" "}
-            {disponibles === 1 ? "disponible" : "disponibles"}
-          </small>
-        </span>
-        <span className="previa-precio">
-          <strong>${formatoPesos.format(trayecto.aporte_sugerido)}</strong>
-          <small>COP / persona</small>
-        </span>
-      </div>
-    </article>
   );
 }
 
@@ -426,27 +380,6 @@ function rutaDeReserva(trayectoId, consulta) {
 
 function hoyEnColombia() {
   return new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString().slice(0, 10);
-}
-
-function fechaCorta(fecha, hora) {
-  const [, mes, dia] = fecha.split("-").map(Number);
-  const [h, m] = hora.split(":").map(Number);
-  const sufijo = h < 12 ? "a. m." : "p. m.";
-  const hora12 = h % 12 === 0 ? 12 : h % 12;
-  return `${dia} ${MESES[mes - 1]} · ${hora12}:${String(m).padStart(2, "0")} ${sufijo}`;
-}
-
-function fechaLarga(fecha) {
-  const [anio, mes, dia] = fecha.split("-").map(Number);
-  const diaSemana = new Date(Date.UTC(anio, mes - 1, dia)).getUTCDay();
-  return `${DIAS[diaSemana]} ${dia} de ${MESES_LARGOS[mes - 1]} de ${anio}`;
-}
-
-function iniciales(nombre) {
-  const partes = (nombre || "").trim().split(/\s+/).filter(Boolean);
-  if (partes.length === 0) return "RU";
-  if (partes.length === 1) return partes[0].slice(0, 2).toUpperCase();
-  return `${partes[0][0]}${partes[1][0]}`.toUpperCase();
 }
 
 function erroresPorCampo(errores = []) {

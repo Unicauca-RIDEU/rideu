@@ -1,22 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useOutletContext, useSearchParams } from "react-router-dom";
-import { IconoCheck, IconoFlecha } from "../components/Iconos.jsx";
+import { Aviso, Boton, Cargando, Chip, EncabezadoPagina, Tarjeta } from "@/components/ui";
+import { IconoFlecha } from "../components/Iconos.jsx";
 import { obtenerTrayecto, reservarCupo } from "../services/reservas.js";
 import Pie from "../components/Pie.jsx";
 import EncabezadoSesion from "../components/EncabezadoSesion.jsx";
+import TarjetaTrayecto from "../components/TarjetaTrayecto.jsx";
+import { fechaLarga, hora12, pesos } from "../components/formatoTrayecto.js";
 
 // Reserva de un cupo (E04-HU07) · /trayectos/reservar?trayecto=<id>
 // La URL conserva los filtros de la búsqueda para poder volver a ella sin perderlos.
 
 const FILTROS = ["sedeDestinoId", "fecha", "horaDesde"];
 const INTERVALO_ACTUALIZACION_MS = 5000;
-const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
-const MESES_LARGOS = [
-  "enero", "febrero", "marzo", "abril", "mayo", "junio",
-  "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
-];
-const DIAS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-const formatoPesos = new Intl.NumberFormat("es-CO");
 
 export default function ReservarTrayecto() {
   const { usuario } = useOutletContext();
@@ -108,70 +104,78 @@ export default function ReservarTrayecto() {
       <EncabezadoSesion usuario={usuario} activo="Buscar" />
 
       <main className="perfil-cuerpo">
-        <Link className="volver" to={rutaBusqueda}>
-          ← Volver a la búsqueda
-        </Link>
-        <h1>Reservar trayecto</h1>
-        <p className="perfil-intro">Revisa los detalles antes de confirmar tu lugar.</p>
+        <EncabezadoPagina
+          titulo="Reservar trayecto"
+          intro="Revisa los detalles antes de confirmar tu lugar."
+          volver={{ texto: "Volver a la búsqueda", to: rutaBusqueda }}
+        />
 
-        {carga.estado === "cargando" ? <p className="pista-lado">Cargando el trayecto…</p> : null}
+        {carga.estado === "cargando" ? <Cargando>Cargando el trayecto…</Cargando> : null}
 
         {carga.estado === "error" ? (
           <>
-            <p className="aviso aviso-error" role="alert">
-              {carga.mensaje}
-            </p>
-            <Link className="boton boton-cambiar" to={rutaBusqueda}>
+            <Aviso tono="error">{carga.mensaje}</Aviso>
+            <Boton className="boton-cambiar" to={rutaBusqueda}>
               Volver a la búsqueda
-            </Link>
+            </Boton>
           </>
         ) : null}
 
         {carga.estado === "listo" ? (
           <div className="publicar-grid">
-            <div className="perfil-lado">
-              <TarjetaTrayecto trayecto={trayecto} />
+            <div className="perfil-lado reservar-principal">
+              <TarjetaTrayecto trayecto={trayecto} {...etiquetaDe(trayecto)} />
 
-              <section className="tarjeta reservar-detalle">
-                <h2>Punto de encuentro</h2>
-                <p>
-                  <strong>{trayecto.origen}</strong>
-                </p>
-                <p>
-                  {fechaLarga(trayecto.fecha)} · Salida a las {hora12(trayecto.hora)}
-                </p>
-                <p>Destino: {trayecto.sede_destino}, Universidad del Cauca.</p>
+              <Tarjeta titulo="Detalles del viaje" className="reservar-detalle reservar-viaje">
+                <dl className="reservar-datos">
+                  <div>
+                    <dt>Punto de encuentro</dt>
+                    <dd>{trayecto.origen}</dd>
+                  </div>
+                  <div>
+                    <dt>Salida</dt>
+                    <dd>
+                      {fechaLarga(trayecto.fecha)} · {hora12(trayecto.hora)}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Destino</dt>
+                    <dd>{trayecto.sede_destino}, Universidad del Cauca</dd>
+                  </div>
+                  <div>
+                    <dt>Conductor</dt>
+                    <dd>
+                      {trayecto.conductor_nombre}{" "}
+                      <Chip tono="exito" punto className="chip-pequeno">
+                        Habilitado
+                      </Chip>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Vehículo</dt>
+                    <dd>
+                      {resumenVehiculo(trayecto.vehiculo)} · {trayecto.vehiculo.capacidad_pasajeros} pasajeros
+                    </dd>
+                  </div>
+                </dl>
                 <p className="pista-lado">
                   Llega unos minutos antes de la salida y confirma el punto de encuentro con el conductor.
                 </p>
-              </section>
-
-              <section className="tarjeta reservar-detalle">
-                <div className="previa-cabecera">
-                  <h2>{trayecto.conductor_nombre}</h2>
-                  <p className="chip chip-ok">
-                    <i />
-                    Habilitado
-                  </p>
-                </div>
-                <p>{resumenVehiculo(trayecto.vehiculo)}</p>
-                <p>
-                  Capacidad: {trayecto.vehiculo.capacidad_pasajeros} pasajeros · Aporte sugerido: $
-                  {formatoPesos.format(trayecto.aporte_sugerido)} COP por persona.
-                </p>
-              </section>
+              </Tarjeta>
             </div>
 
-            <aside className="perfil-lado">
-              <section className="tarjeta reservar-detalle" aria-live="polite">
-                <h2>Resumen de tu reserva</h2>
+            <aside className="perfil-lado reservar-lado">
+              <Tarjeta titulo="Resumen de tu reserva" className="reservar-detalle" aria-live="polite">
                 <p>Pasajero: {nombre}</p>
                 <p>
                   1 cupo · {trayecto.origen} → {trayecto.sede_destino}
                 </p>
                 <p className="reservar-aporte">
                   <span>Aporte por persona</span>
-                  <strong>${formatoPesos.format(trayecto.aporte_sugerido)} COP</strong>
+                  <strong>{pesos(trayecto.aporte_sugerido)} COP</strong>
+                </p>
+                <p className="pista-lado">
+                  El aporte ayuda a compartir los gastos del trayecto. Acuerda los detalles con el conductor.
                 </p>
                 <p>{textoCupos(trayecto)}</p>
 
@@ -183,14 +187,7 @@ export default function ReservarTrayecto() {
                   onConfirmar={confirmar}
                   rutaBusqueda={rutaBusqueda}
                 />
-              </section>
-
-              <section className="consejo">
-                <strong>Un aporte para el camino</strong>
-                <span>
-                  El valor ayuda a compartir los gastos del trayecto. Acuerda los detalles con el conductor.
-                </span>
-              </section>
+              </Tarjeta>
             </aside>
           </div>
         ) : null}
@@ -202,45 +199,35 @@ export default function ReservarTrayecto() {
 }
 
 // Mensajes y botones según el estado de la reserva.
+// Cada estado tiene un único botón principal. Tras confirmar, el siguiente paso natural es
+// escribirle al conductor para coordinar el encuentro (E05-HU10).
 function Acciones({ trayecto, confirmada, aviso, enviando, onConfirmar, rutaBusqueda }) {
   const volver = (
-    <Link className="boton-contorno reservar-enlace" to={rutaBusqueda}>
+    <Boton variante="secundario" to={rutaBusqueda}>
       Volver a la búsqueda
-    </Link>
+    </Boton>
   );
 
   if (confirmada || trayecto.reserva_id) {
+    const reserva = trayecto.reserva_id ? encodeURIComponent(trayecto.reserva_id) : null;
     return (
       <>
-        <p className="nota-ok nota-publicado" role="status">
-          <span className="nota-icono" aria-hidden="true">
-            <IconoCheck />
-          </span>
-          {confirmada
-            ? "Reserva confirmada. Tu cupo quedó asegurado."
-            : "Ya tienes una reserva confirmada en este trayecto."}
-        </p>
-        <Link className="boton reservar-enlace" to="/historial">
-          <IconoFlecha />
-          Ver mis reservas
-        </Link>
-        {trayecto.reserva_id ? (
-          <Link
-            className="boton-contorno reservar-enlace"
-            to={`/reservas/contacto-conductor?reserva=${encodeURIComponent(trayecto.reserva_id)}`}
-          >
+        <Aviso tono="exito" icono titulo={confirmada ? "Reserva confirmada" : "Ya tienes una reserva en este trayecto"}>
+          {confirmada ? "Tu cupo quedó asegurado. " : ""}Escríbele al conductor para coordinar el punto de encuentro.
+        </Aviso>
+        {reserva ? (
+          <Boton to={`/reservas/contacto-conductor?reserva=${reserva}`} icono={<IconoFlecha />}>
             Contactar al conductor
-          </Link>
+          </Boton>
         ) : null}
-        {trayecto.reserva_id ? (
-          <Link
-            className="boton-contorno reservar-enlace"
-            to={`/reservas/cancelar?reserva=${encodeURIComponent(trayecto.reserva_id)}`}
-          >
+        <Boton variante={reserva ? "secundario" : "primario"} to="/historial">
+          Ver mis reservas
+        </Boton>
+        {reserva ? (
+          <Link className="enlace-discreto" to={`/reservas/cancelar?reserva=${reserva}`}>
             Cancelar reserva
           </Link>
         ) : null}
-        {volver}
       </>
     );
   }
@@ -248,9 +235,7 @@ function Acciones({ trayecto, confirmada, aviso, enviando, onConfirmar, rutaBusq
   if (trayecto.es_conductor) {
     return (
       <>
-        <p className="aviso" role="status">
-          Este es tu trayecto. No puedes reservar un cupo en él.
-        </p>
+        <Aviso>Este es tu trayecto. No puedes reservar un cupo en él.</Aviso>
         {volver}
       </>
     );
@@ -259,9 +244,7 @@ function Acciones({ trayecto, confirmada, aviso, enviando, onConfirmar, rutaBusq
   if (trayecto.estado === "Cancelado") {
     return (
       <>
-        <p className="aviso aviso-error" role="alert">
-          El conductor canceló este trayecto y ya no admite reservas.
-        </p>
+        <Aviso tono="error">El conductor canceló este trayecto y ya no admite reservas.</Aviso>
         {volver}
       </>
     );
@@ -270,9 +253,7 @@ function Acciones({ trayecto, confirmada, aviso, enviando, onConfirmar, rutaBusq
   if (!trayecto.vigente) {
     return (
       <>
-        <p className="aviso aviso-error" role="alert">
-          Este trayecto ya salió y no admite reservas.
-        </p>
+        <Aviso tono="error">Este trayecto ya salió y no admite reservas.</Aviso>
         {volver}
       </>
     );
@@ -281,62 +262,32 @@ function Acciones({ trayecto, confirmada, aviso, enviando, onConfirmar, rutaBusq
   return (
     <>
       {aviso ? (
-        <div className="aviso aviso-error" role="alert">
-          <strong>{aviso.titulo}</strong>
+        <Aviso tono="error" titulo={aviso.titulo}>
           {aviso.detalle ? <p>{aviso.detalle}</p> : null}
-        </div>
+        </Aviso>
       ) : null}
-      <button
-        className="boton reservar-enlace"
-        type="button"
+      <Boton
         onClick={onConfirmar}
-        disabled={enviando || Boolean(aviso?.definitivo)}
+        disabled={Boolean(aviso?.definitivo)}
+        cargando={enviando}
+        textoCargando="Confirmando…"
+        icono={<IconoFlecha />}
       >
-        <IconoFlecha />
-        {enviando ? "Confirmando…" : "Confirmar reserva"}
-      </button>
+        Confirmar reserva
+      </Boton>
       <p className="pista-lado">Tu reserva ocupa 1 cupo.</p>
-      {volver}
+      {/* Si la reserva no se pudo crear, se ofrece volver a la búsqueda con los mismos filtros (CA-HU07-03). */}
+      {aviso ? volver : null}
     </>
   );
 }
 
-function TarjetaTrayecto({ trayecto }) {
-  const reservas = trayecto.cupos_reservados;
-  const disponibles = trayecto.cupos_disponibles;
-  const cancelado = trayecto.estado === "Cancelado";
-  const disponible = !cancelado && trayecto.vigente && disponibles > 0;
-  return (
-    <article className="tarjeta tarjeta-previa">
-      <div className="previa-cabecera">
-        <strong>{fechaCorta(trayecto.fecha, trayecto.hora)}</strong>
-        <p className={disponible ? "chip chip-ok" : "chip"}>
-          <i />
-          {cancelado ? "Cancelado" : disponible ? "Disponible" : disponibles > 0 ? "Finalizado" : "Agotado"}
-        </p>
-      </div>
-      <ol className="previa-ruta">
-        <li>{trayecto.origen}</li>
-        <li>{trayecto.sede_destino}</li>
-      </ol>
-      <div className="previa-pie">
-        <span className="avatar" aria-hidden="true">
-          {iniciales(trayecto.conductor_nombre)}
-        </span>
-        <span className="previa-conductor">
-          <strong>{trayecto.conductor_nombre}</strong>
-          <small>
-            {reservas} {reservas === 1 ? "reserva" : "reservas"} · {disponibles}{" "}
-            {disponibles === 1 ? "disponible" : "disponibles"}
-          </small>
-        </span>
-        <span className="previa-precio">
-          <strong>${formatoPesos.format(trayecto.aporte_sugerido)}</strong>
-          <small>COP / persona</small>
-        </span>
-      </div>
-    </article>
-  );
+// Etiqueta de la tarjeta según el estado del trayecto.
+function etiquetaDe(trayecto) {
+  if (trayecto.estado === "Cancelado") return { estado: "Cancelado", tono: "error" };
+  if (!trayecto.vigente) return { estado: "Finalizado", tono: "neutro" };
+  if (trayecto.cupos_disponibles === 0) return { estado: "Agotado", tono: "neutro" };
+  return { estado: "Disponible", tono: "exito" };
 }
 
 // Si la pantalla aún mostraba cupos cuando el pasajero confirmó, otra persona se llevó
@@ -393,26 +344,3 @@ function resumenVehiculo(vehiculo) {
   return [modelo, vehiculo.color, vehiculo.placa].filter(Boolean).join(" · ");
 }
 
-function hora12(hora) {
-  const [h, m] = hora.split(":").map(Number);
-  const sufijo = h < 12 ? "a. m." : "p. m.";
-  return `${h % 12 === 0 ? 12 : h % 12}:${String(m).padStart(2, "0")} ${sufijo}`;
-}
-
-function fechaCorta(fecha, hora) {
-  const [, mes, dia] = fecha.split("-").map(Number);
-  return `${dia} ${MESES[mes - 1]} · ${hora12(hora)}`;
-}
-
-function fechaLarga(fecha) {
-  const [anio, mes, dia] = fecha.split("-").map(Number);
-  const diaSemana = new Date(Date.UTC(anio, mes - 1, dia)).getUTCDay();
-  return `${DIAS[diaSemana]} ${dia} de ${MESES_LARGOS[mes - 1]} de ${anio}`;
-}
-
-function iniciales(nombre) {
-  const partes = (nombre || "").trim().split(/\s+/).filter(Boolean);
-  if (partes.length === 0) return "RU";
-  if (partes.length === 1) return partes[0].slice(0, 2).toUpperCase();
-  return `${partes[0][0]}${partes[1][0]}`.toUpperCase();
-}

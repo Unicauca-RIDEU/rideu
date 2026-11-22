@@ -1525,3 +1525,107 @@ button.boton-contorno.reservar-enlace {
   .perfil-nav .nav-enlaces { gap: 0.9rem; }
   .menu-usuario-boton strong { display: none; }
 }
+
+/* Paso 2 del rediseño · Buscar y Reservar */
+
+.buscar-zona { margin-top: 0.4rem; }
+
+.buscar-cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem 1rem;
+}
+
+.buscar-zona .buscar-resultados {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+}
+
+.tarjeta-acciones .boton { margin-top: 0; }
+
+.tarjeta-acciones .boton svg { width: 1.1rem; height: 1.1rem; }
+
+.boton-favorita {
+  width: auto;
+  min-height: 0;
+  margin: 0.2rem 0 0;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  background: white;
+  color: var(--azul-oscuro);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.boton-favorita:hover { border-color: var(--azul); }
+
+.boton-favorita[aria-pressed="true"] {
+  border-color: transparent;
+  background: var(--cielo);
+}
+
+.buscar-nota {
+  margin: 1.5rem 0 0;
+  color: var(--texto-suave);
+  font-size: 0.88rem;
+}
+
+.reservar-datos {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0.2rem 0 0;
+}
+
+.reservar-datos div {
+  display: grid;
+  grid-template-columns: 9.5rem minmax(0, 1fr);
+  gap: 1rem;
+}
+
+.reservar-datos dt { color: var(--texto-suave); }
+
+.reservar-datos dd {
+  margin: 0;
+  font-weight: 600;
+  color: #1f2a44;
+}
+
+.chip-pequeno {
+  display: inline-flex;
+  margin-left: 0.35rem;
+  padding: 0.1rem 0.55rem;
+  font-size: 0.78rem;
+  vertical-align: middle;
+}
+
+.reservar-lado {
+  position: sticky;
+  top: 1rem;
+}
+
+.reservar-detalle .boton { margin-top: 0; }
+
+.enlace-discreto {
+  justify-self: center;
+  padding: 0.3rem;
+  color: var(--error);
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.enlace-discreto:hover { text-decoration: underline; }
+
+/* En móvil la acción principal va justo después de la tarjeta, antes de los detalles. */
+@media (max-width: 900px) {
+  .reservar-lado { position: static; }
+  .reservar-principal { display: contents; }
+  .reservar-viaje { order: 1; }
+}
+
+@media (max-width: 520px) {
+  .reservar-datos div { grid-template-columns: 1fr; gap: 0.1rem; }
+}
