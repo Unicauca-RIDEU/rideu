@@ -1,19 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { Aviso, Boton, Cargando } from "@/components/ui";
 import AuthLayout from "../components/AuthLayout.jsx";
-import { IconoCheck, IconoEscudo, IconoFlecha } from "../components/Iconos.jsx";
+import { IconoCheck, IconoFlecha } from "../components/Iconos.jsx";
 import { verificarCorreo } from "../services/auth.js";
-
-const RELATO_VERIFICACION = {
-  titulo: (
-    <>
-      Tu comunidad.
-      <br />
-      Tu próximo viaje.
-    </>
-  ),
-  texto: "Comparte tus trayectos por Popayán con personas de la Universidad del Cauca.",
-};
 
 export default function Verificacion() {
   const [parametros] = useSearchParams();
@@ -45,7 +35,7 @@ export default function Verificacion() {
   }, [token]);
 
   return (
-    <AuthLayout titulo={RELATO_VERIFICACION.titulo} texto={RELATO_VERIFICACION.texto} compacto>
+    <AuthLayout>
       {estado === "exito" ? (
         <ResultadoExito correo={correo} />
       ) : (
@@ -80,15 +70,9 @@ function ResultadoExito({ correo }) {
         </div>
       ) : null}
 
-      <Link className="boton" to="/login">
+      <Boton to="/login" icono={<IconoFlecha />}>
         Ir a iniciar sesión
-        <IconoFlecha />
-      </Link>
-
-      <p className="confianza">
-        <IconoEscudo />
-        Tu cuenta, un paso más segura.
-      </p>
+      </Boton>
     </div>
   );
 }
@@ -105,20 +89,13 @@ function ResultadoPendiente({ estado, mensaje }) {
           Revisa el enlace del correo o vuelve a registrarte si el token ya expiró.
         </p>
       )}
-      {mensaje ? (
-        <p
-          className={estado === "cargando" ? "aviso" : "aviso aviso-error"}
-          role="alert"
-        >
-          {mensaje}
-        </p>
-      ) : null}
+      {mensaje ? <Aviso tono={estado === "cargando" ? "info" : "error"}>{mensaje}</Aviso> : null}
+      {estado === "cargando" ? <Cargando>Un momento…</Cargando> : null}
       {estado === "error" ? (
         <div className="verificacion-acciones">
-          <Link className="boton" to="/login">
+          <Boton to="/login" icono={<IconoFlecha />}>
             Ir a iniciar sesión
-            <IconoFlecha />
-          </Link>
+          </Boton>
           <p className="cambio">
             ¿Necesitas otra cuenta? <Link to="/registro">Regístrate</Link>
           </p>

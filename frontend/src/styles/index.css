@@ -64,7 +64,7 @@ button, input, a { font: inherit; }
   text-transform: uppercase;
 }
 
-.marca-icono, .beneficios span, .campus {
+.marca-icono {
   display: grid;
   place-items: center;
 }
@@ -93,32 +93,6 @@ button, input, a { font: inherit; }
 
 .exclusivo svg { color: var(--azul); }
 
-.contenido {
-  display: grid;
-  grid-template-columns: minmax(320px, 1fr) minmax(340px, 1fr);
-  min-height: 0;
-}
-
-.relato {
-  background: var(--cielo);
-  padding: 3.2rem 3.5rem 2rem;
-}
-
-.relato h1 {
-  margin: 0.8rem 0 0.9rem;
-  color: var(--azul-oscuro);
-  font-size: clamp(2.4rem, 4vw, 3.5rem);
-  line-height: 1.05;
-  letter-spacing: -0.04em;
-}
-
-.relato-texto {
-  max-width: 34rem;
-  margin: 0 0 1.5rem;
-  color: #3d4b67;
-  font-size: 1.05rem;
-}
-
 .kicker {
   display: flex;
   align-items: center;
@@ -127,88 +101,6 @@ button, input, a { font: inherit; }
   color: var(--azul);
   font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.kicker-claro { color: var(--azul); }
-
-.mapa {
-  position: relative;
-  max-width: 34rem;
-  margin-bottom: 1.4rem;
-  border-radius: 1.4rem;
-  background: rgb(255 255 255 / 55%);
-}
-
-.mapa svg { display: block; width: 100%; height: auto; }
-
-.bloque { fill: #d9e6fb; }
-
-.camino {
-  fill: none;
-  stroke: var(--azul);
-  stroke-width: 7;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.punto { fill: var(--azul); }
-
-.auto rect { fill: white; stroke: var(--azul); stroke-width: 2; }
-
-.auto path { fill: none; stroke: var(--azul); stroke-width: 2; }
-
-.campus circle { fill: var(--azul); }
-
-.campus path { fill: white; }
-
-.etiqueta {
-  position: absolute;
-  padding: 0.25rem 0.6rem;
-  border-radius: 999px;
-  background: white;
-  color: #31415f;
-  font-size: 0.82rem;
-  box-shadow: 0 6px 16px rgb(11 63 168 / 8%);
-}
-
-.origen { left: 4%; bottom: 18%; }
-
-.destino { left: 58%; top: 22%; }
-
-.beneficios {
-  display: flex;
-  gap: 1.5rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.beneficios li {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  max-width: 12rem;
-  color: var(--azul-oscuro);
-  font-weight: 700;
-}
-
-.beneficios span {
-  width: 2.2rem;
-  height: 2.2rem;
-  flex: none;
-  border-radius: 999px;
-  background: white;
-  color: var(--azul);
-}
-
-.beneficios svg { width: 1.2rem; height: 1.2rem; }
-
-.lugar {
-  margin: 2rem 0 0;
-  color: #8ea0c0;
-  font-size: 0.78rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -244,10 +136,10 @@ button, input, a { font: inherit; }
   display: flex;
   align-items: center;
   gap: 0.55rem;
-  min-height: 3.2rem;
-  padding: 0 0.85rem;
-  border: 1px solid var(--borde);
-  border-radius: 0.9rem;
+  min-height: 3rem;
+  padding: 0 1rem;
+  border: 1px solid #e4e7ec;
+  border-radius: 0.6rem;
   background: white;
 }
 
@@ -265,11 +157,13 @@ button, input, a { font: inherit; }
   background: transparent;
 }
 
+.control input::placeholder { color: #667085; }
+
 .control em, .control b {
   flex: none;
   color: #98a2b3;
   font-style: normal;
-  font-weight: 600;
+  font-weight: 400;
 }
 
 .ojo {
@@ -302,9 +196,51 @@ button, input, a { font: inherit; }
   font-weight: 700;
   text-decoration: none;
   cursor: pointer;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 }
 
 .boton:disabled { opacity: 0.7; cursor: wait; }
+
+/* Respuesta del botón: se oscurece y sube al pasar el mouse, se hunde al presionarlo
+   y muestra un anillo al llegar con el teclado. Las variantes (peligro, WhatsApp)
+   definen después su propio color al pasar el mouse. */
+.boton:hover { background: var(--azul-oscuro); }
+
+.boton:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgb(16 24 40 / 16%);
+}
+
+.boton:not(:disabled):active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: none;
+}
+
+.boton:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgb(0 96 249 / 30%);
+}
+
+/* Círculo que gira mientras el botón espera la respuesta del servidor */
+.boton-girando {
+  flex: none;
+  width: 1.1rem;
+  height: 1.1rem;
+  border: 2px solid rgb(255 255 255 / 45%);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: boton-girar 0.7s linear infinite;
+}
+
+@keyframes boton-girar {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boton { transition: background-color 0.15s ease; }
+  .boton:not(:disabled):hover, .boton:not(:disabled):active { transform: none; }
+  .boton-girando { animation-duration: 1.6s; }
+}
 
 .cambio { text-align: center; }
 
@@ -394,21 +330,6 @@ button, input, a { font: inherit; }
   word-break: break-word;
 }
 
-.confianza {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  margin: 1.1rem 0 0;
-  color: var(--texto-suave);
-  font-size: 0.95rem;
-}
-
-.confianza svg {
-  width: 1.1rem;
-  height: 1.1rem;
-  color: var(--azul);
-}
-
 .verificacion-acciones {
   display: grid;
   gap: 0.85rem;
@@ -435,23 +356,18 @@ button, input, a { font: inherit; }
 
 .acceso .control input { font-weight: 400; }
 
-.olvido {
-  justify-self: end;
-  margin-top: -0.35rem;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--azul);
-  font-size: 0.9rem;
-  font-weight: 700;
-  cursor: pointer;
-}
+/* Más aire entre la presentación y los campos en inicio de sesión y registro */
+.ayuda-amplia { margin-bottom: 2.4rem; }
 
-.acceso .boton { margin-top: 0.6rem; }
+/* Inicio de sesión y registro: doble separación entre campos */
+.acceso .formulario > label + label { margin-top: 0.95rem; }
 
-.acceso .cambio { margin: 1.4rem 0 0; }
+.acceso .boton { min-height: 3rem; margin-top: 0.6rem; border-radius: 0.6rem; }
 
-.acceso .confianza { margin-top: 2rem; }
+/* Separación entre el último campo y el botón principal del formulario */
+.acceso .formulario > .boton { margin-top: 2.5rem; }
+
+.acceso .cambio { margin: 0.8rem 0 0; font-size: 0.85rem; text-align: left; }
 
 .panel-principal {
   padding: 3.2rem 3.5rem;
@@ -1204,12 +1120,9 @@ button.boton-contorno.reservar-enlace {
 }
 
 @media (max-width: 900px) {
-  .barra, .pie, .relato, .panel, .panel-principal { padding-left: 1.2rem; padding-right: 1.2rem; }
+  .barra, .pie, .panel, .panel-principal { padding-left: 1.2rem; padding-right: 1.2rem; }
   .barra, .pie { align-items: flex-start; flex-direction: column; }
-  .contenido { grid-template-columns: 1fr; }
   .panel { order: -1; padding-top: 1.5rem; }
-  .relato { padding-top: 2rem; }
-  .beneficios { flex-direction: column; }
   .exito-marca { justify-items: start; }
   .perfil-cuerpo { width: min(1120px, calc(100% - 2.4rem)); }
   .perfil-nav { flex-wrap: wrap; }
@@ -1225,11 +1138,6 @@ button.boton-contorno.reservar-enlace {
 }
 
 .pie-enlace:hover { text-decoration: underline; }
-
-.relato-compacto {
-  display: grid;
-  align-content: center;
-}
 
 .boton-cancelar {
   width: 100%;
@@ -1329,12 +1237,8 @@ button.boton-contorno.reservar-enlace {
 
 .control .correo-dominio {
   flex: none;
-  padding: 0.3rem 0.6rem;
-  border-radius: 0.6rem;
-  background: var(--cielo);
-  color: var(--azul-oscuro);
+  color: #475467;
   font-size: 0.92rem;
-  font-weight: 700;
   white-space: nowrap;
   user-select: none;
 }
@@ -1366,3 +1270,759 @@ button.boton-contorno.reservar-enlace {
 }
 
 .nav-enlace.nav-activo { color: var(--azul); }
+
+/* Componentes base (src/components/ui). Solo agregan estilos; no cambian las clases existentes. */
+
+:root {
+  --radio: 1.15rem;
+  --sombra: 0 12px 32px rgb(16 24 40 / 14%);
+  --foco: 0 0 0 3px rgb(0 96 249 / 12%);
+}
+
+.boton-peligro { background: var(--error); }
+
+.boton-peligro:hover { background: #912018; }
+
+.tarjeta-activa {
+  border-color: var(--azul);
+  box-shadow: var(--foco);
+}
+
+.tarjeta-acciones {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.chip-error {
+  color: var(--error);
+  background: var(--error-fondo);
+}
+
+.chip-error i { background: var(--error); }
+
+.aviso-con-icono {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+}
+
+.aviso-con-icono .nota-icono {
+  border-color: currentColor;
+  color: inherit;
+}
+
+.aviso-titulo { display: block; }
+
+.estado-vacio {
+  display: grid;
+  gap: 0.6rem;
+  justify-items: start;
+}
+
+.dialogo {
+  width: min(26rem, calc(100vw - 2rem));
+  padding: 1.4rem 1.4rem 1.2rem;
+  border: 0;
+  border-radius: var(--radio);
+  color: inherit;
+  box-shadow: var(--sombra);
+}
+
+.dialogo::backdrop { background: rgb(16 24 40 / 45%); }
+
+.dialogo h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.dialogo-texto {
+  margin-top: 0.5rem;
+  color: var(--texto-suave);
+}
+
+.dialogo-texto p { margin: 0; }
+
+.dialogo-acciones {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+  margin-top: 1.2rem;
+}
+
+.dialogo-acciones .boton { margin-top: 0; }
+
+@media (max-width: 420px) {
+  .dialogo-acciones { grid-template-columns: 1fr; }
+}
+
+/* Menú de la persona conectada (EncabezadoSesion) */
+
+.menu-usuario { position: relative; }
+
+.menu-usuario-boton {
+  padding: 0.25rem 0.4rem 0.25rem 0.25rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.menu-usuario-boton:hover { background: #f4f8ff; }
+
+.menu-usuario-boton:focus-visible {
+  outline: 2px solid var(--azul);
+  outline-offset: 2px;
+}
+
+.menu-usuario-boton[aria-expanded="true"] .chevron { transform: rotate(180deg); }
+
+.menu-usuario-lista {
+  position: absolute;
+  top: calc(100% + 0.45rem);
+  right: 0;
+  z-index: 10;
+  min-width: 13rem;
+  margin: 0;
+  padding: 0.4rem;
+  list-style: none;
+  border: 1px solid #e7eef8;
+  border-radius: 0.9rem;
+  background: white;
+  box-shadow: var(--sombra);
+}
+
+.menu-usuario-lista a,
+.menu-usuario-lista button {
+  display: block;
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 0;
+  border-radius: 0.6rem;
+  background: transparent;
+  color: #1f2a44;
+  font-weight: 600;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.menu-usuario-lista a:hover,
+.menu-usuario-lista button:hover { background: var(--cielo); color: var(--azul-oscuro); }
+
+.menu-usuario-lista button { color: var(--error); }
+
+.menu-usuario-lista button:disabled { opacity: 0.7; cursor: wait; }
+
+.menu-usuario-correo {
+  padding: 0.45rem 0.75rem 0.55rem;
+  margin-bottom: 0.3rem;
+  border-bottom: 1px solid #eef1f6;
+  color: var(--texto-suave);
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 700px) {
+  .perfil-barra { flex-wrap: wrap; padding: 0.9rem 1rem; }
+  .perfil-nav { width: 100%; justify-content: space-between; gap: 0.8rem; }
+  .perfil-nav .nav-enlaces { gap: 0.9rem; }
+  .menu-usuario-boton strong { display: none; }
+}
+
+/* Paso 2 del rediseño · Buscar y Reservar */
+
+.buscar-zona { margin-top: 0.4rem; }
+
+.buscar-cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem 1rem;
+}
+
+.buscar-zona .buscar-resultados {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+}
+
+.tarjeta-acciones .boton { margin-top: 0; }
+
+.tarjeta-acciones .boton svg { width: 1.1rem; height: 1.1rem; }
+
+.boton-favorita {
+  width: auto;
+  min-height: 0;
+  margin: 0.2rem 0 0;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  background: white;
+  color: var(--azul-oscuro);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.boton-favorita:hover { border-color: var(--azul); }
+
+.boton-favorita[aria-pressed="true"] {
+  border-color: transparent;
+  background: var(--cielo);
+}
+
+.buscar-nota {
+  margin: 1.5rem 0 0;
+  color: var(--texto-suave);
+  font-size: 0.88rem;
+}
+
+.reservar-datos {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0.2rem 0 0;
+}
+
+.reservar-datos div {
+  display: grid;
+  grid-template-columns: 9.5rem minmax(0, 1fr);
+  gap: 1rem;
+}
+
+.reservar-datos dt { color: var(--texto-suave); }
+
+.reservar-datos dd {
+  margin: 0;
+  font-weight: 600;
+  color: #1f2a44;
+}
+
+.chip-pequeno {
+  display: inline-flex;
+  margin-left: 0.35rem;
+  padding: 0.1rem 0.55rem;
+  font-size: 0.78rem;
+  vertical-align: middle;
+}
+
+.reservar-lado {
+  position: sticky;
+  top: 1rem;
+}
+
+.reservar-detalle .boton { margin-top: 0; }
+
+.enlace-discreto {
+  justify-self: center;
+  padding: 0.3rem;
+  color: var(--error);
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.enlace-discreto:hover { text-decoration: underline; }
+
+/* En móvil la acción principal va justo después de la tarjeta, antes de los detalles. */
+@media (max-width: 900px) {
+  .reservar-lado { position: static; }
+  .reservar-principal { display: contents; }
+  .reservar-viaje { order: 1; }
+}
+
+@media (max-width: 520px) {
+  .reservar-datos div { grid-template-columns: 1fr; gap: 0.1rem; }
+}
+
+/* Paso 3 del rediseño · Historial, Cancelar reserva y Editar trayecto */
+
+.pestanas {
+  display: inline-flex;
+  gap: 0.3rem;
+  margin: 0.2rem 0 1.4rem;
+  padding: 0.3rem;
+  border-radius: 999px;
+  background: #e9eef7;
+}
+
+.pestana {
+  padding: 0.55rem 1.1rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #475467;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pestana:hover { color: var(--azul-oscuro); }
+
+.pestana:focus-visible { outline: 2px solid var(--azul); outline-offset: 2px; }
+
+.pestana[aria-selected="true"] {
+  background: white;
+  color: var(--azul-oscuro);
+  box-shadow: 0 1px 3px rgb(16 24 40 / 12%);
+}
+
+.pestana-cantidad {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.5rem;
+  margin-left: 0.25rem;
+  padding: 0 0.4rem;
+  border-radius: 999px;
+  background: var(--cielo);
+  color: var(--azul-oscuro);
+  font-size: 0.8rem;
+}
+
+.historial-grupo + .historial-grupo { margin-top: 2rem; }
+
+.historial-titulo {
+  margin: 0 0 0.9rem;
+  font-size: 1.15rem;
+}
+
+.historial-titulo span {
+  color: var(--texto-suave);
+  font-weight: 600;
+}
+
+.buscar-resultados.historial-lista {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+}
+
+.viaje-detalle {
+  margin: 0;
+  color: var(--texto-suave);
+  font-size: 0.92rem;
+}
+
+.tarjeta-viaje .tarjeta-acciones { margin-top: 0.2rem; }
+
+.enlaces-tarjeta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.2rem 1.2rem;
+}
+
+.enlace-secundario {
+  justify-self: center;
+  padding: 0.3rem;
+  color: var(--azul);
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.enlace-secundario:hover { text-decoration: underline; }
+
+.lista-seleccion { grid-template-columns: 1fr; }
+
+.lado-fijo {
+  position: sticky;
+  top: 1rem;
+}
+
+.boton-contorno-peligro {
+  border-color: #f5c2bd;
+}
+
+.boton-contorno.reservar-enlace.boton-contorno-peligro { color: var(--error); }
+
+.boton-contorno-peligro:hover:not(:disabled) { background: var(--error-fondo); }
+
+@media (max-width: 900px) {
+  .lado-fijo { position: static; scroll-margin-top: 1rem; }
+}
+
+@media (max-width: 520px) {
+  .pestanas { display: flex; }
+  .pestana { flex: 1; padding: 0.55rem 0.4rem; font-size: 0.92rem; white-space: nowrap; }
+}
+
+/* Paso 4 del rediseño · Panel principal */
+
+.panel-cuerpo .kicker { margin-top: 0.4rem; }
+
+.panel-cuerpo h1 { margin-top: 0.3rem; }
+
+.panel-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.panel-proximo {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.panel-sin-viajes p { margin: 0; }
+
+.panel-sin-viajes p + p { margin-top: 0.3rem; }
+
+.panel-mas { justify-self: start; }
+
+.panel-acciones {
+  display: grid;
+  gap: 0.9rem;
+  padding-top: 2.35rem;
+}
+
+.panel-accion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.3rem 1.4rem;
+  border: 1px solid #d5e4ff;
+  border-radius: var(--radio);
+  background: white;
+  color: #1f2a44;
+  text-decoration: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.panel-accion span { display: grid; gap: 0.25rem; }
+
+.panel-accion strong { font-size: 1.15rem; }
+
+.panel-accion small { color: var(--texto-suave); font-size: 0.92rem; }
+
+.panel-accion svg {
+  flex: none;
+  width: 1.3rem;
+  height: 1.3rem;
+  color: var(--azul);
+}
+
+.panel-accion:hover { border-color: var(--azul); box-shadow: var(--foco); }
+
+.panel-accion:focus-visible { outline: 2px solid var(--azul); outline-offset: 2px; }
+
+.panel-accion-principal {
+  border-color: transparent;
+  background: var(--azul);
+  color: white;
+}
+
+.panel-accion-principal small { color: rgb(255 255 255 / 85%); }
+
+.panel-accion-principal svg { color: white; }
+
+.panel-accion-principal:hover { border-color: transparent; background: var(--azul-oscuro); }
+
+.panel-gestion {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.4rem;
+  padding: 0.4rem 0.2rem 0;
+}
+
+.panel-gestion a {
+  color: var(--azul);
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+}
+
+.panel-gestion a:hover { text-decoration: underline; }
+
+.panel-salir { margin: 2.5rem 0 0; }
+
+.boton-texto {
+  padding: 0.3rem 0;
+  border: 0;
+  background: transparent;
+  color: var(--texto-suave);
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.boton-texto:hover { color: var(--error); }
+
+.boton-texto:disabled { cursor: wait; }
+
+@media (max-width: 900px) {
+  .panel-grid { grid-template-columns: 1fr; }
+  .panel-acciones { order: -1; padding-top: 0; }
+}
+
+/* Buscar: listado completo con panel de filtros aparte */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.buscar-layout {
+  display: grid;
+  grid-template-columns: minmax(250px, 290px) minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.buscar-lateral {
+  position: sticky;
+  top: 1rem;
+}
+
+.boton-filtros { display: none; }
+
+.panel-filtros {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.panel-filtros h2 { font-size: 1.1rem; }
+
+.panel-filtros .campo small.pista {
+  color: var(--texto-suave);
+  font-weight: 500;
+  font-size: 0.82rem;
+}
+
+.panel-filtros select {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+.panel-filtros .boton-buscar {
+  width: 100%;
+  min-width: 0;
+  margin-top: 0.2rem;
+}
+
+.boton-limpiar {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.panel-filtros .buscar-atajos {
+  margin-top: 0.3rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid #e7eef8;
+}
+
+.buscar-layout .buscar-zona { margin-top: 0; }
+
+.buscar-zona:focus { outline: none; }
+
+.filtros-activos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.chip-filtro {
+  border: 0;
+  background: var(--cielo);
+  color: var(--azul-oscuro);
+  cursor: pointer;
+}
+
+.chip-filtro:hover { background: #d6e6ff; }
+
+.chip-filtro span[aria-hidden] { font-size: 1.05rem; line-height: 1; }
+
+.buscar-dia + .buscar-dia { margin-top: 1.8rem; }
+
+.buscar-dia-titulo {
+  margin: 0 0 0.8rem;
+  font-size: 1.05rem;
+}
+
+.buscar-dia-titulo span { color: var(--texto-suave); font-weight: 600; }
+
+.buscar-layout .buscar-resultados {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+}
+
+@media (max-width: 900px) {
+  .buscar-layout { grid-template-columns: 1fr; gap: 1rem; }
+  .buscar-lateral { position: static; }
+  .boton-filtros {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0.8rem 1.1rem;
+    border: 1px solid var(--borde);
+    border-radius: 999px;
+    background: white;
+    color: var(--azul-oscuro);
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .panel-filtros { display: none; margin-top: 0.7rem; }
+  .panel-filtros-abierto { display: grid; }
+  .panel-filtros h2 { display: none; }
+}
+
+/* Paso 5 del rediseño · Publicar y Vehículo */
+
+.campo small.pista {
+  color: var(--texto-suave);
+  font-weight: 500;
+}
+
+.paso-titulo {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0.9rem 0 0.1rem;
+  font-size: 1rem;
+  color: #1f2a44;
+}
+
+.publicar-campos .paso-titulo:first-child { margin-top: 0.2rem; }
+
+.paso-titulo span {
+  display: inline-grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  flex: none;
+  border-radius: 999px;
+  background: var(--cielo);
+  color: var(--azul-oscuro);
+  font-size: 0.85rem;
+}
+
+.paso-titulo-grande { margin: 0; font-size: 1.25rem; }
+
+.aviso-bloqueo {
+  display: grid;
+  gap: 0.7rem;
+  justify-items: start;
+  margin-bottom: 1.4rem;
+  padding: 1.1rem 1.2rem;
+  border: 1px solid #d5e4ff;
+  border-radius: var(--radio);
+  background: white;
+}
+
+.aviso-bloqueo .aviso { margin: 0; background: var(--cielo); color: var(--azul-oscuro); }
+
+.aviso-bloqueo .aviso p { margin: 0.3rem 0 0; }
+
+.aviso-bloqueo .boton { width: auto; padding: 0 1.5rem; margin-top: 0; }
+
+.pasos-habilitacion {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 1rem 1.2rem 1rem 2.4rem;
+  border-radius: var(--radio);
+  background: white;
+  color: #475467;
+}
+
+.pasos-habilitacion li::marker { color: var(--azul); font-weight: 700; }
+
+.perfil-lado .boton { margin-top: 0; }
+
+/* En móvil la columna única puede encogerse por debajo del ancho mínimo de su contenido. */
+@media (max-width: 900px) {
+  .publicar-grid, .perfil-grid { grid-template-columns: minmax(0, 1fr); }
+  .persona-fila { flex-wrap: wrap; }
+}
+
+/* La fila con nombre y estado salta de línea si el nombre es largo, sin salirse de su columna. */
+.persona-fila { flex-wrap: wrap; row-gap: 0.5rem; }
+.persona-fila .chip { white-space: nowrap; }
+.perfil-lado { min-width: 0; }
+
+/* Paso 6 del rediseño · Contacto por WhatsApp */
+
+.contacto-tarjeta { display: grid; gap: 1rem; }
+
+.contacto-tarjeta .boton { margin-top: 0; }
+
+.contacto-persona {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.contacto-persona span { display: grid; gap: 0.35rem; }
+
+.contacto-persona h2 { margin: 0; }
+
+.avatar-grande { width: 3.2rem; height: 3.2rem; font-size: 1rem; }
+
+.contacto-cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.6rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid #e7eef8;
+}
+
+.contacto-cabecera h2 { margin: 0; font-size: 1.1rem; }
+
+.contacto-cabecera .boton-favorita { margin: 0; }
+
+.contacto-cabecera .boton-favorita:disabled { cursor: wait; opacity: 0.7; }
+
+.boton.boton-whatsapp-fila {
+  width: auto;
+  min-height: 2.6rem;
+  padding: 0 1.1rem;
+}
+
+.boton-whatsapp-fila svg, .contacto-tarjeta .boton-whatsapp svg { width: 1.1rem; height: 1.1rem; }
+
+/* Paso 7 del rediseño · Acceso */
+
+.registro-listo { display: grid; gap: 0.9rem; }
+
+.registro-listo .aviso { margin: 0; }
+
+.registro-listo .pasos-habilitacion { background: var(--cielo); }
+
+.formulario .aviso a { color: inherit; font-weight: 700; }
+
+/* Pantallas de acceso (inicio de sesión, registro y verificación): un solo panel centrado */
+
+.pantalla-solo-panel { grid-template-rows: auto 1fr; }
+
+.contenido-solo-panel {
+  display: grid;
+  place-items: center;
+  padding: 2rem 1rem 3rem;
+}
+
+.contenido-solo-panel .panel {
+  width: 100%;
+  max-width: 34rem;
+  padding: 2.5rem 2.2rem;
+  border: 1px solid #e3e9f4;
+  border-radius: 1.2rem;
+  background: white;
+  box-shadow: 0 12px 32px rgb(15 40 90 / 8%);
+}
+
+@media (max-width: 900px) {
+  .contenido-solo-panel { padding: 1rem 16px 2rem; }
+  .contenido-solo-panel .panel { padding: 1.8rem 1.2rem; }
+}

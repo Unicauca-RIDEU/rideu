@@ -4,6 +4,7 @@ import {
   cancelarTrayectoPublicado,
   datosPublicacion,
   editarTrayecto,
+  listarTrayectosDisponibles,
   misTrayectos,
   publicarTrayecto,
 } from "../controllers/trayectoController.js";
@@ -15,6 +16,8 @@ export const trayectoRouter = Router();
 
 trayectoRouter.get("/publicacion", requiereSesion, datosPublicacion);
 trayectoRouter.get("/", requiereSesion, buscarTrayectos);
+// Listado de trayectos próximos con filtros opcionales. Va antes de /:id para que :id no lo capture.
+trayectoRouter.get("/disponibles", requiereSesion, listarTrayectosDisponibles);
 trayectoRouter.post("/", requiereSesion, publicarTrayecto);
 // Edición y cancelación de trayectos (E02-HU05). /mios va antes de /:id para que :id no lo capture.
 trayectoRouter.get("/mios", requiereSesion, misTrayectos);

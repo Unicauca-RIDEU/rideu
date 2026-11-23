@@ -1,7 +1,9 @@
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { IconoAuto, IconoEscudo } from "../components/Iconos.jsx";
 import Pie from "../components/Pie.jsx";
-import { tokenSesion } from "../services/auth.js";
+import EncabezadoSesion from "../components/EncabezadoSesion.jsx";
+import { obtenerSesion, tokenSesion } from "../services/auth.js";
 
 // Ayuda y preguntas frecuentes. Es pública: se llega desde el pie de cualquier pantalla.
 // Las respuestas describen las reglas que aplica la aplicación.
@@ -27,7 +29,13 @@ const SECCIONES = [
       },
       {
         pregunta: "¿Cuánto tiempo dura mi sesión?",
-        respuesta: "La sesión se mantiene abierta 7 días o hasta que la cierres desde el panel.",
+        respuesta:
+          "La sesión se mantiene abierta 7 días o hasta que la cierres desde el menú con tu nombre, en la parte superior de la pantalla.",
+      },
+      {
+        pregunta: "Olvidé mi contraseña, ¿cómo la recupero?",
+        respuesta:
+          "La recuperación de contraseña todavía no está disponible en RideU. Mientras tanto, procura guardarla en un lugar seguro.",
       },
     ],
   },
@@ -37,7 +45,7 @@ const SECCIONES = [
       {
         pregunta: "¿Qué necesito para publicar un trayecto?",
         respuesta:
-          "Registrar tu vehículo y tu licencia en «Mi vehículo». Al hacerlo tu cuenta queda en estado «Habilitado» y ya puedes publicar.",
+          "Registrar tu vehículo y tu licencia vigente en «Mi vehículo» (en el menú con tu nombre). Al hacerlo tu cuenta queda en estado «Habilitado» y ya puedes publicar.",
       },
       {
         pregunta: "¿Cuántos cupos puedo ofrecer?",
@@ -52,7 +60,7 @@ const SECCIONES = [
       {
         pregunta: "¿Puedo publicar el mismo trayecto otra vez?",
         respuesta:
-          "Sí. En «Mis trayectos» usa «Repetir trayecto»: el formulario de publicación se llena con el origen, la sede, la hora, los cupos y el aporte; solo eliges la nueva fecha.",
+          "Sí. En el «Historial» (pestaña «Como conductor») o en «Mis trayectos» usa «Repetir trayecto»: el formulario de publicación se llena con el origen, la sede, la hora, los cupos y el aporte; solo eliges la nueva fecha.",
       },
       {
         pregunta: "¿Puedo editar o cancelar un trayecto?",
@@ -67,7 +75,7 @@ const SECCIONES = [
       {
         pregunta: "¿Cómo busco un trayecto?",
         respuesta:
-          "En «Buscar trayecto» elige la sede de destino, la fecha y la hora desde la que puedes salir. Tus búsquedas recientes quedan guardadas para repetirlas con un clic y puedes marcar una como favorita.",
+          "En «Buscar trayecto» ves todos los trayectos próximos con cupos, agrupados por día. Si quieres, filtra por sede de destino, fecha u hora desde el panel de filtros. Las búsquedas con sede y hora quedan guardadas para repetirlas con un clic y puedes marcar una como favorita.",
       },
       {
         pregunta: "¿Por qué no puedo reservar un trayecto?",
@@ -77,7 +85,7 @@ const SECCIONES = [
       {
         pregunta: "¿Puedo cancelar una reserva?",
         respuesta:
-          "Sí, desde «Mis reservas», antes de que el trayecto inicie. Al cancelar se libera tu cupo y avisamos al conductor. La cancelación no se puede deshacer.",
+          "Sí, desde el «Historial» o «Mis reservas», antes de que el trayecto inicie. Te pediremos confirmar; al cancelar se libera tu cupo y avisamos al conductor. La cancelación no se puede deshacer.",
       },
       {
         pregunta: "¿Cómo me comunico con el conductor?",
@@ -108,23 +116,43 @@ export default function Ayuda() {
     else navigate(inicio);
   }
 
+  // Con sesión se muestra el mismo encabezado que en el resto de la aplicación (navegación y menú).
+  // Ayuda es pública: si la sesión no es válida, se mantiene el encabezado público.
+  const [usuario, setUsuario] = useState(null);
+  useEffect(() => {
+    if (!conSesion) return undefined;
+    let activo = true;
+    obtenerSesion()
+      .then((respuesta) => {
+        if (activo && respuesta.ok && respuesta.usuario) setUsuario(respuesta.usuario);
+      })
+      .catch(() => {});
+    return () => {
+      activo = false;
+    };
+  }, [conSesion]);
+
   return (
     <div className="pantalla perfil">
-      <header className="barra perfil-barra">
-        <Link to={inicio} className="marca">
-          <span className="marca-icono">
-            <IconoAuto />
-          </span>
-          <span>
-            <strong>RideU</strong>
-            <small>Universidad del Cauca</small>
-          </span>
-        </Link>
-        <p className="exclusivo">
-          <IconoEscudo />
-          Exclusivo para la comunidad Unicauca
-        </p>
-      </header>
+      {usuario ? (
+        <EncabezadoSesion usuario={usuario} />
+      ) : (
+        <header className="barra perfil-barra">
+          <Link to={inicio} className="marca">
+            <span className="marca-icono">
+              <IconoAuto />
+            </span>
+            <span>
+              <strong>RideU</strong>
+              <small>Universidad del Cauca</small>
+            </span>
+          </Link>
+          <p className="exclusivo">
+            <IconoEscudo />
+            Exclusivo para la comunidad Unicauca
+          </p>
+        </header>
+      )}
 
       <main className="perfil-cuerpo">
         <button className="volver volver-boton" type="button" onClick={volver}>

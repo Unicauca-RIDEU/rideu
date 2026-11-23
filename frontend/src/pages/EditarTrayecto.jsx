@@ -1,10 +1,14 @@
-import { useCallback, useEffect, useState } from "react";
-import { Link, useNavigate, useOutletContext, useSearchParams } from "react-router-dom";
-import { IconoAuto, IconoCheck, IconoFlecha } from "../components/Iconos.jsx";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Link, useLocation, useNavigate, useOutletContext, useSearchParams } from "react-router-dom";
+import { Aviso, Boton, Cargando, DialogoConfirmar, EncabezadoPagina, EstadoVacio, Tarjeta } from "@/components/ui";
+import { IconoFlecha } from "../components/Iconos.jsx";
 import { cancelarTrayecto, editarTrayecto, obtenerMisTrayectos } from "../services/trayectos.js";
 import Pie from "../components/Pie.jsx";
-import EnlacesNavegacion from "../components/EnlacesNavegacion.jsx";
+import EncabezadoSesion from "../components/EncabezadoSesion.jsx";
 import BotonCancelar, { hayCambios } from "../components/BotonCancelar.jsx";
+import TarjetaViaje from "../components/TarjetaViaje.jsx";
+import { pesos } from "../components/formatoTrayecto.js";
+import { usarEnfoqueEnMovil, volverDesde } from "../components/navegacionViajes.js";
 import { datosParaRepetir } from "../services/trayectosFrecuentes.js";
 
 // Edición y cancelación de trayectos (E02-HU05) · /trayectos/editar[?trayecto=<id>]
@@ -12,11 +16,12 @@ import { datosParaRepetir } from "../services/trayectosFrecuentes.js";
 // Si el trayecto tiene reservas confirmadas, la cancelación pide confirmación con el número
 // de pasajeros afectados; el backend cancela sus reservas y les avisa por correo.
 
-const formatoPesos = new Intl.NumberFormat("es-CO");
-
 export default function EditarTrayecto() {
   const { usuario } = useOutletContext();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [volver] = useState(() => volverDesde(location.state, "conductor"));
+  const detalle = useRef(null);
   const [parametros, setParametros] = useSearchParams();
   const seleccionId = parametros.get("trayecto") ?? "";
   const [carga, setCarga] = useState({ estado: "cargando", trayectos: [] });
@@ -27,9 +32,9 @@ export default function EditarTrayecto() {
   const [confirmacion, setConfirmacion] = useState(null);
   const [enviando, setEnviando] = useState(false);
 
-  const nombre = usuario?.nombre || "Tu perfil";
   const trayectos = carga.trayectos;
   const seleccionado = trayectos.find((trayecto) => trayecto.id === seleccionId) ?? null;
+  usarEnfoqueEnMovil(detalle, seleccionado?.id);
 
   const cargar = useCallback(async () => {
     try {
@@ -163,60 +168,32 @@ export default function EditarTrayecto() {
 
   return (
     <div className="pantalla perfil">
-      <header className="barra perfil-barra">
-        <Link to="/panel" className="marca">
-          <span className="marca-icono">
-            <IconoAuto />
-          </span>
-          <span>
-            <strong>RideU</strong>
-            <small>Universidad del Cauca</small>
-          </span>
-        </Link>
-        <div className="perfil-nav">
-          <EnlacesNavegacion activo="Publicar" />
-          <span className="perfil-usuario">
-            <span className="avatar" aria-hidden="true">
-              {iniciales(nombre)}
-            </span>
-            <strong>{nombre}</strong>
-          </span>
-        </div>
-      </header>
+      <EncabezadoSesion usuario={usuario} activo="Historial" />
 
       <main className="perfil-cuerpo">
-        <Link className="volver" to="/panel">
-          ← Volver al panel
-        </Link>
-        <h1>Editar o cancelar trayecto</h1>
-        <p className="perfil-intro">Mantén tu oferta al día si cambian tus planes.</p>
+        <EncabezadoPagina
+          titulo="Editar o cancelar trayecto"
+          intro="Mantén tu oferta al día si cambian tus planes."
+          volver={volver}
+        />
 
         {resultado ? (
-          <p className="nota-ok nota-publicado" role="status">
-            <span className="nota-icono" aria-hidden="true">
-              <IconoCheck />
-            </span>
+          <Aviso tono="exito" icono>
             {resultado.mensaje}
-          </p>
+          </Aviso>
         ) : null}
 
-        {carga.estado === "cargando" ? <p className="pista-lado">Cargando tus trayectos…</p> : null}
+        {carga.estado === "cargando" ? <Cargando>Cargando tus trayectos…</Cargando> : null}
 
         {carga.estado === "error" ? (
-          <p className="aviso aviso-error" role="alert">
-            {carga.mensaje || "No se pudieron cargar tus trayectos."}
-          </p>
+          <Aviso tono="error">{carga.mensaje || "No se pudieron cargar tus trayectos."}</Aviso>
         ) : null}
 
         {carga.estado === "listo" && trayectos.length === 0 ? (
-          <>
-            <p className="aviso" role="status">
-              {carga.mensaje || "No tienes trayectos vigentes para editar o cancelar."}
-            </p>
-            <Link className="boton boton-cambiar" to="/trayectos/publicar">
-              Publicar trayecto
-            </Link>
-          </>
+          <EstadoVacio
+            mensaje={carga.mensaje || "No tienes trayectos vigentes para editar o cancelar."}
+            accion={{ texto: "Publicar trayecto", to: "/trayectos/publicar" }}
+          />
         ) : null}
 
         {carga.estado === "listo" && trayectos.length > 0 ? (
@@ -225,20 +202,44 @@ export default function EditarTrayecto() {
               <h2 id="mis-trayectos" className="titulo-lado">
                 Tus trayectos vigentes ({trayectos.length})
               </h2>
-              <ul className="buscar-resultados">
-                {trayectos.map((trayecto) => (
-                  <li key={trayecto.id}>
-                    <TarjetaEditable
-                      trayecto={trayecto}
-                      activo={trayecto.id === seleccionId}
-                      onSeleccionar={() => seleccionar(trayecto.id)}
-                    />
-                  </li>
-                ))}
+              <ul className="buscar-resultados lista-seleccion">
+                {trayectos.map((trayecto) => {
+                  const activo = trayecto.id === seleccionId;
+                  const reservas = trayecto.cupos_reservados;
+                  return (
+                    <li key={trayecto.id}>
+                      <TarjetaViaje
+                        viaje={trayecto}
+                        estado={trayecto.estado}
+                        tono="exito"
+                        detalle={`${reservas} de ${trayecto.cupos} ${trayecto.cupos === 1 ? "cupo reservado" : "cupos reservados"} · ${pesos(trayecto.aporte_sugerido)} COP`}
+                        activa={activo}
+                        acciones={
+                          <>
+                            <Boton
+                              variante={activo ? "primario" : "secundario"}
+                              onClick={() => seleccionar(trayecto.id)}
+                              aria-pressed={activo}
+                            >
+                              {activo ? "Seleccionado" : "Seleccionar"}
+                            </Boton>
+                            <Link
+                              className="enlace-secundario"
+                              to="/trayectos/publicar"
+                              state={{ repetir: datosParaRepetir(trayecto) }}
+                            >
+                              Repetir trayecto
+                            </Link>
+                          </>
+                        }
+                      />
+                    </li>
+                  );
+                })}
               </ul>
             </section>
 
-            <aside className="perfil-lado">
+            <aside className="perfil-lado lado-fijo" ref={detalle}>
               {!seleccionado ? (
                 <p className="pista-lado">Selecciona un trayecto para editarlo o cancelarlo.</p>
               ) : (
@@ -272,15 +273,16 @@ export default function EditarTrayecto() {
                         />
                       </Campo>
                     </fieldset>
-                    {aviso && !confirmacion ? (
-                      <p className="aviso aviso-error" role="alert">
-                        {aviso}
-                      </p>
-                    ) : null}
-                    <button className="boton boton-guardar" type="submit" disabled={enviando}>
-                      <IconoFlecha />
-                      {enviando ? "Guardando…" : "Guardar cambios"}
-                    </button>
+                    {aviso && !confirmacion ? <Aviso tono="error">{aviso}</Aviso> : null}
+                    <Boton
+                      className="boton-guardar"
+                      type="submit"
+                      icono={<IconoFlecha />}
+                      cargando={enviando}
+                      textoCargando="Guardando…"
+                    >
+                      Guardar cambios
+                    </Boton>
                     <BotonCancelar
                       hayCambios={hayCambios(formulario, {
                         fecha: seleccionado.fecha,
@@ -294,102 +296,54 @@ export default function EditarTrayecto() {
                     </BotonCancelar>
                   </form>
 
-                  <section className="tarjeta reservar-detalle" aria-live="polite">
-                    <h2>Cancelar trayecto</h2>
-                    {confirmacion ? (
-                      <div className="aviso aviso-error" role="alertdialog" aria-labelledby="confirmar-cancelacion">
-                        <strong id="confirmar-cancelacion">
-                          Este trayecto tiene {textoPasajeros(confirmacion.pasajeros)} con reserva confirmada.
-                        </strong>
-                        <p>
-                          Si lo cancelas, {confirmacion.pasajeros === 1 ? "su reserva se cancelará" : "sus reservas se cancelarán"}{" "}
-                          y les avisaremos por correo.
-                        </p>
-                        <button
-                          className="boton reservar-enlace"
-                          type="button"
-                          onClick={() => cancelar(true)}
-                          disabled={enviando}
-                        >
-                          {enviando ? "Cancelando…" : "Sí, cancelar trayecto"}
-                        </button>
-                        <button
-                          className="boton-contorno reservar-enlace"
-                          type="button"
-                          onClick={() => setConfirmacion(null)}
-                          disabled={enviando}
-                        >
-                          No, mantenerlo
-                        </button>
-                      </div>
-                    ) : (
-                      <>
-                        <p className="pista-lado">
-                          {seleccionado.cupos_reservados > 0
-                            ? "Se cancelarán las reservas confirmadas y se avisará a los pasajeros."
-                            : "El trayecto dejará de aparecer en los resultados de búsqueda."}
-                        </p>
-                        <button
-                          className="boton-contorno reservar-enlace"
-                          type="button"
-                          onClick={pedirCancelacion}
-                          disabled={enviando}
-                        >
-                          Cancelar trayecto
-                        </button>
-                      </>
-                    )}
-                  </section>
+                  <Tarjeta titulo="Cancelar trayecto" className="reservar-detalle zona-peligro" aria-live="polite">
+                    <p className="pista-lado">
+                      {seleccionado.cupos_reservados > 0
+                        ? "Se cancelarán las reservas confirmadas y se avisará a los pasajeros."
+                        : "El trayecto dejará de aparecer en los resultados de búsqueda."}
+                    </p>
+                    <Boton
+                      variante="secundario"
+                      className="boton-contorno-peligro"
+                      onClick={pedirCancelacion}
+                      disabled={enviando}
+                    >
+                      Cancelar trayecto
+                    </Boton>
+                  </Tarjeta>
                 </>
               )}
             </aside>
           </div>
         ) : null}
+
+        {/* Criterio 2: con reservas confirmadas se indica cuántos pasajeros se verán afectados. */}
+        <DialogoConfirmar
+          abierto={Boolean(confirmacion)}
+          titulo={
+            confirmacion
+              ? `Este trayecto tiene ${textoPasajeros(confirmacion.pasajeros)} con reserva confirmada.`
+              : ""
+          }
+          textoConfirmar="Sí, cancelar trayecto"
+          textoEnviando="Cancelando…"
+          textoCancelar="No, mantenerlo"
+          peligro
+          enviando={enviando}
+          onConfirmar={() => cancelar(true)}
+          onCancelar={() => setConfirmacion(null)}
+        >
+          {confirmacion ? (
+            <p>
+              Si lo cancelas, {confirmacion.pasajeros === 1 ? "su reserva se cancelará" : "sus reservas se cancelarán"} y
+              les avisaremos por correo.
+            </p>
+          ) : null}
+        </DialogoConfirmar>
       </main>
 
       <Pie />
     </div>
-  );
-}
-
-function TarjetaEditable({ trayecto, activo, onSeleccionar }) {
-  const reservas = trayecto.cupos_reservados;
-  return (
-    <article className="tarjeta tarjeta-previa">
-      <div className="previa-cabecera">
-        <strong>
-          {trayecto.fecha} · {trayecto.hora}
-        </strong>
-        <p className="chip chip-ok">
-          <i />
-          {trayecto.estado}
-        </p>
-      </div>
-      <ol className="previa-ruta">
-        <li>{trayecto.origen}</li>
-        <li>{trayecto.sede_destino}</li>
-      </ol>
-      <p className="ayuda">
-        {trayecto.cupos} {trayecto.cupos === 1 ? "cupo" : "cupos"} · {reservas}{" "}
-        {reservas === 1 ? "reserva confirmada" : "reservas confirmadas"} · $
-        {formatoPesos.format(trayecto.aporte_sugerido)} COP por persona
-      </p>
-      <button
-        className={activo ? "boton reservar-enlace" : "boton-contorno reservar-enlace"}
-        type="button"
-        onClick={onSeleccionar}
-        aria-pressed={activo}
-      >
-        {activo ? "Seleccionado" : "Seleccionar"}
-      </button>
-      <Link
-        className="boton-contorno reservar-enlace"
-        to="/trayectos/publicar"
-        state={{ repetir: datosParaRepetir(trayecto) }}
-      >
-        Repetir trayecto
-      </Link>
-    </article>
   );
 }
 
@@ -421,11 +375,4 @@ function textoLimites(trayecto) {
 
 function textoPasajeros(total) {
   return total === 1 ? "1 pasajero" : `${total} pasajeros`;
-}
-
-function iniciales(nombre) {
-  const partes = (nombre || "").trim().split(/\s+/).filter(Boolean);
-  if (partes.length === 0) return "RU";
-  if (partes.length === 1) return partes[0].slice(0, 2).toUpperCase();
-  return `${partes[0][0]}${partes[1][0]}`.toUpperCase();
 }

@@ -22,6 +22,17 @@ import { fechaEnColombia } from "../validation/trayecto.js";
 //   prueba.pasajero@unicauca.edu.co     Verificada, con reservas confirmadas
 //   prueba.sinverificar@unicauca.edu.co Sin verificar, enlace de verificación vigente
 //   prueba.expirado@unicauca.edu.co     Sin verificar, enlace de verificación expirado
+//   prueba.nueva@unicauca.edu.co        Verificada, sin ninguna actividad (historial vacío)
+//
+// Comunidad adicional, para ver las pantallas con volumen realista:
+//   prueba.mariana, prueba.julian, prueba.isabella, prueba.daniel    Conductores habilitados
+//     (mariana y julian también viajan como pasajeros: historial con las dos pestañas)
+//   prueba.sofia, prueba.mateo, prueba.camila, prueba.nicolas,
+//   prueba.juliana, prueba.sebastian                                 Pasajeros verificados
+//
+// Escenarios: trayectos próximos en todas las sedes de Popayán, uno agotado, uno cancelado
+// con sus reservas canceladas, uno de hoy a las 06:00 ya iniciado (su reserva no se puede
+// cancelar) y tres semanas de viajes completados para el historial.
 
 export const CONTRASENA_PRUEBA = "RideU.prueba1";
 const RONDAS_BCRYPT = 10;
@@ -35,6 +46,17 @@ const USUARIOS = [
   { clave: "pasajero", nombre: "Santiago Guzmán Velasco", whatsapp: "+573001110005", estado: "Verificada" },
   { clave: "sinverificar", nombre: "Daniela Erazo Muñoz", whatsapp: "+573001110006", estado: "Sin verificar", tokenHoras: 24 },
   { clave: "expirado", nombre: "Felipe Bolaños Castro", whatsapp: "+573001110007", estado: "Sin verificar", tokenHoras: -24 },
+  { clave: "nueva", nombre: "Paula Andrea Ruiz Quintero", whatsapp: "+573001110008", estado: "Verificada" },
+  { clave: "mariana", nombre: "Mariana Velasco Rengifo", whatsapp: "+573001110009", estado: "Habilitado" },
+  { clave: "julian", nombre: "Julián Mosquera Daza", whatsapp: "+573001110010", estado: "Habilitado" },
+  { clave: "isabella", nombre: "Isabella Paz Collazos", whatsapp: "+573001110011", estado: "Habilitado" },
+  { clave: "daniel", nombre: "Daniel Ospina Caicedo", whatsapp: "+573001110012", estado: "Habilitado" },
+  { clave: "sofia", nombre: "Sofía Rivera Campo", whatsapp: "+573001110013", estado: "Verificada" },
+  { clave: "mateo", nombre: "Mateo Cerón Imbachí", whatsapp: "+573001110014", estado: "Verificada" },
+  { clave: "camila", nombre: "Camila Gaviria Solarte", whatsapp: "+573001110015", estado: "Verificada" },
+  { clave: "nicolas", nombre: "Nicolás Hurtado Mera", whatsapp: "+573001110016", estado: "Verificada" },
+  { clave: "juliana", nombre: "Juliana Valencia Ortiz", whatsapp: "+573001110017", estado: "Verificada" },
+  { clave: "sebastian", nombre: "Sebastián Muñoz Anacona", whatsapp: "+573001110018", estado: "Verificada" },
 ];
 
 // Vehículo y licencia de cada conductor. diasLicencia es relativo al día de ejecución.
@@ -42,6 +64,10 @@ const VEHICULOS = [
   { usuario: "conductora", placa: "PRU 101", marca: "Chevrolet", modelo: "Onix 2022", color: "Blanco", capacidad: 4, categoria: "B1", diasLicencia: 730 },
   { usuario: "conductor", placa: "PRU 202", marca: "Renault", modelo: "Kwid 2021", color: "Azul", capacidad: 2, categoria: "B1", diasLicencia: 365 },
   { usuario: "licencia", placa: "PRU 303", marca: "Mazda", modelo: "2 Sedán 2019", color: "Gris", capacidad: 4, categoria: "B1", diasLicencia: -30 },
+  { usuario: "mariana", placa: "PRU 404", marca: "Toyota", modelo: "Yaris 2020", color: "Rojo", capacidad: 4, categoria: "B1", diasLicencia: 900 },
+  { usuario: "julian", placa: "PRU 505", marca: "Kia", modelo: "Picanto 2023", color: "Gris", capacidad: 3, categoria: "B1", diasLicencia: 540 },
+  { usuario: "isabella", placa: "PRU 606", marca: "Suzuki", modelo: "Swift 2019", color: "Negro", capacidad: 4, categoria: "B1", diasLicencia: 400 },
+  { usuario: "daniel", placa: "PRU 707", marca: "Volkswagen", modelo: "Gol 2018", color: "Plata", capacidad: 4, categoria: "B2", diasLicencia: 1200 },
 ];
 
 // Sedes (004_sedes.sql): 1 FIET, 2 Ingeniería Civil, 3 Salud, 4 Humanas, 6 Artes, 7 Agropecuarias.
@@ -58,6 +84,35 @@ const TRAYECTOS = [
   { clave: "t9", conductor: "conductor", dias: 0, hora: "23:30", origen: "Terminal de Transporte", sede: 6, cupos: 2, aporte: 4000 },
   { clave: "t10", conductor: "conductor", dias: 4, hora: "14:00", origen: "Pomona", sede: 7, cupos: 2, aporte: 5000 },
   { clave: "t11", conductor: "conductor", dias: -1, hora: "07:00", origen: "Pomona", sede: 2, cupos: 2, aporte: 2500 },
+
+  // Próximos
+  { clave: "x1", conductor: "mariana", dias: 1, hora: "06:00", origen: "Barrio La Paz", sede: 1, cupos: 4, aporte: 2500 },
+  { clave: "x2", conductor: "mariana", dias: 1, hora: "13:00", origen: "Centro Comercial Campanario", sede: 4, cupos: 4, aporte: 3000 },
+  { clave: "x3", conductor: "julian", dias: 1, hora: "07:15", origen: "Barrio Valencia", sede: 2, cupos: 3, aporte: 2000 },
+  { clave: "x4", conductor: "julian", dias: 2, hora: "06:20", origen: "Barrio Pandiguando", sede: 1, cupos: 3, aporte: 2000 },
+  { clave: "x5", conductor: "isabella", dias: 2, hora: "08:00", origen: "Barrio Yanaconas", sede: 3, cupos: 4, aporte: 3500 },
+  { clave: "x6", conductor: "isabella", dias: 3, hora: "06:40", origen: "Barrio El Recuerdo", sede: 1, cupos: 4, aporte: 2500 },
+  { clave: "x7", conductor: "daniel", dias: 3, hora: "10:00", origen: "Barrio Bolívar", sede: 6, cupos: 4, aporte: 3000 },
+  { clave: "x8", conductor: "daniel", dias: 4, hora: "07:00", origen: "Terminal de Transporte", sede: 7, cupos: 4, aporte: 6000 },
+  { clave: "x9", conductor: "conductora", dias: 5, hora: "06:30", origen: "Barrio Bello Horizonte", sede: 1, cupos: 4, aporte: 3000 },
+  { clave: "x10", conductor: "conductor", dias: 5, hora: "15:00", origen: "Pomona", sede: 2, cupos: 2, aporte: 2500 },
+  { clave: "x11", conductor: "mariana", dias: 6, hora: "06:00", origen: "Barrio La Paz", sede: 1, cupos: 4, aporte: 2500 },
+  { clave: "x12", conductor: "julian", dias: 7, hora: "12:00", origen: "Barrio Valencia", sede: 4, cupos: 3, aporte: 2000 },
+  { clave: "x13", conductor: "isabella", dias: 1, hora: "17:30", origen: "Parque Caldas", sede: 3, cupos: 4, aporte: 3000, estado: "Cancelado" },
+  // Hoy a las 06:00: ya inició
+  { clave: "x14", conductor: "daniel", dias: 0, hora: "06:00", origen: "Barrio Bolívar", sede: 1, cupos: 4, aporte: 3000 },
+  // Anteriores (historial)
+  { clave: "x15", conductor: "conductora", dias: -1, hora: "06:30", origen: "Barrio Bello Horizonte", sede: 1, cupos: 4, aporte: 3000 },
+  { clave: "x16", conductor: "mariana", dias: -3, hora: "07:00", origen: "Barrio La Paz", sede: 2, cupos: 4, aporte: 2500 },
+  { clave: "x17", conductor: "julian", dias: -4, hora: "06:15", origen: "Barrio Valencia", sede: 1, cupos: 3, aporte: 2000 },
+  { clave: "x18", conductor: "isabella", dias: -6, hora: "08:00", origen: "Barrio Yanaconas", sede: 3, cupos: 4, aporte: 3500 },
+  { clave: "x19", conductor: "daniel", dias: -7, hora: "10:00", origen: "Barrio Bolívar", sede: 6, cupos: 4, aporte: 3000 },
+  { clave: "x20", conductor: "conductor", dias: -8, hora: "07:00", origen: "Pomona", sede: 2, cupos: 2, aporte: 2500 },
+  { clave: "x21", conductor: "mariana", dias: -10, hora: "13:00", origen: "Centro Comercial Campanario", sede: 4, cupos: 4, aporte: 3000, estado: "Cancelado" },
+  { clave: "x22", conductor: "julian", dias: -12, hora: "06:20", origen: "Barrio Pandiguando", sede: 1, cupos: 3, aporte: 2000 },
+  { clave: "x23", conductor: "conductora", dias: -14, hora: "18:00", origen: "Parque Caldas", sede: 3, cupos: 2, aporte: 2000 },
+  { clave: "x24", conductor: "isabella", dias: -15, hora: "07:30", origen: "Terminal de Transporte", sede: 7, cupos: 4, aporte: 5000 },
+  { clave: "x25", conductor: "daniel", dias: -18, hora: "06:00", origen: "Barrio Bolívar", sede: 1, cupos: 4, aporte: 3000 },
 ];
 
 // t3 queda agotado (2 de 2) y t5 cancelado con su reserva cancelada.
@@ -71,6 +126,53 @@ const RESERVAS = [
   { trayecto: "t8", pasajero: "pasajero" },
   { trayecto: "t11", pasajero: "pasajera", estado: "Cancelada" },
   { trayecto: "t11", pasajero: "pasajero" },
+
+  // x3 queda agotado (3 de 3); x13 y x21 cancelados con sus reservas canceladas;
+  // x14 ya inició hoy. mariana y julian también viajan como pasajeros.
+  { trayecto: "x1", pasajero: "sofia" },
+  { trayecto: "x1", pasajero: "mateo" },
+  { trayecto: "x1", pasajero: "camila" },
+  { trayecto: "x2", pasajero: "nicolas" },
+  { trayecto: "x3", pasajero: "sofia" },
+  { trayecto: "x3", pasajero: "juliana" },
+  { trayecto: "x3", pasajero: "sebastian" },
+  { trayecto: "x5", pasajero: "pasajera" },
+  { trayecto: "x5", pasajero: "camila" },
+  { trayecto: "x6", pasajero: "mariana" },
+  { trayecto: "x6", pasajero: "mateo" },
+  { trayecto: "x7", pasajero: "sebastian" },
+  { trayecto: "x8", pasajero: "nicolas" },
+  { trayecto: "x8", pasajero: "juliana" },
+  { trayecto: "x9", pasajero: "sofia" },
+  { trayecto: "x12", pasajero: "pasajero" },
+  { trayecto: "x13", pasajero: "mateo", estado: "Cancelada" },
+  { trayecto: "x13", pasajero: "camila", estado: "Cancelada" },
+  { trayecto: "x14", pasajero: "sofia" },
+  { trayecto: "x14", pasajero: "pasajera" },
+  { trayecto: "x14", pasajero: "sebastian" },
+  { trayecto: "x15", pasajero: "sofia" },
+  { trayecto: "x15", pasajero: "mateo" },
+  { trayecto: "x15", pasajero: "camila" },
+  { trayecto: "x16", pasajero: "pasajera" },
+  { trayecto: "x16", pasajero: "nicolas" },
+  { trayecto: "x16", pasajero: "juliana", estado: "Cancelada" },
+  { trayecto: "x17", pasajero: "pasajero" },
+  { trayecto: "x17", pasajero: "sebastian" },
+  { trayecto: "x18", pasajero: "sofia" },
+  { trayecto: "x18", pasajero: "julian" },
+  { trayecto: "x19", pasajero: "camila" },
+  { trayecto: "x19", pasajero: "nicolas" },
+  { trayecto: "x20", pasajero: "juliana" },
+  { trayecto: "x20", pasajero: "sebastian" },
+  { trayecto: "x21", pasajero: "mateo", estado: "Cancelada" },
+  { trayecto: "x21", pasajero: "sofia", estado: "Cancelada" },
+  { trayecto: "x22", pasajero: "pasajera" },
+  { trayecto: "x22", pasajero: "pasajero" },
+  { trayecto: "x22", pasajero: "nicolas" },
+  { trayecto: "x23", pasajero: "juliana" },
+  { trayecto: "x24", pasajero: "sebastian" },
+  { trayecto: "x24", pasajero: "mateo" },
+  { trayecto: "x25", pasajero: "sofia" },
 ];
 
 // UUID con formato v4 derivado de una clave: el mismo texto produce siempre el mismo id.

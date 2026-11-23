@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate, useOutletContext } from "react-router-dom";
-import { IconoAuto, IconoCheck, IconoFlecha } from "../components/Iconos.jsx";
+import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
+import { Aviso, Boton, Cargando, EncabezadoPagina } from "@/components/ui";
+import { IconoFlecha } from "../components/Iconos.jsx";
 import { obtenerDatosPublicacion, publicarTrayecto } from "../services/trayectos.js";
 import { obtenerHistorial } from "../services/historial.js";
 import { origenesUsados } from "../services/trayectosFrecuentes.js";
 import BotonCancelar, { hayCambios } from "../components/BotonCancelar.jsx";
 import Pie from "../components/Pie.jsx";
-import EnlacesNavegacion from "../components/EnlacesNavegacion.jsx";
+import EncabezadoSesion from "../components/EncabezadoSesion.jsx";
 
 const RUTA_VEHICULO = "/perfil/vehiculo";
 const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
@@ -170,39 +171,32 @@ export default function PublicarTrayecto() {
 
   return (
     <div className="pantalla perfil">
-      <header className="barra perfil-barra">
-        <Link to="/panel" className="marca">
-          <span className="marca-icono">
-            <IconoAuto />
-          </span>
-          <span>
-            <strong>RideU</strong>
-            <small>Universidad del Cauca</small>
-          </span>
-        </Link>
-        <div className="perfil-nav">
-          <EnlacesNavegacion activo="Publicar" />
-          <span className="perfil-usuario">
-            <span className="avatar" aria-hidden="true">
-              {siglas}
-            </span>
-            <strong>{nombre}</strong>
-          </span>
-        </div>
-      </header>
+      <EncabezadoSesion usuario={usuario} activo="Publicar" />
 
       <main className="perfil-cuerpo">
-        <Link className="volver" to="/panel">
-          ← Volver al panel
-        </Link>
-        <h1>Publicar trayecto</h1>
-        <p className="perfil-intro">Tu camino a la U puede ser el de alguien más.</p>
+        <EncabezadoPagina
+          titulo="Publicar trayecto"
+          intro="Tu camino a la U puede ser el de alguien más."
+          volver={{ texto: "Volver al panel", to: "/panel" }}
+        />
 
-        {carga.estado === "cargando" ? <p className="pista-lado">Cargando tus datos…</p> : null}
+        {carga.estado === "cargando" ? <Cargando>Cargando tus datos…</Cargando> : null}
         {carga.estado === "error" ? (
-          <p className="aviso aviso-error" role="alert">
+          <Aviso tono="error">
             {carga.mensaje || "No se pudieron cargar los datos para publicar. Inténtalo de nuevo."}
-          </p>
+          </Aviso>
+        ) : null}
+
+        {/* Criterio 5: sin vehículo ni licencia se explica de entrada y se dirige a /perfil/vehiculo. */}
+        {bloqueado ? (
+          <div className="aviso-bloqueo">
+            <Aviso titulo="Conductor no habilitado. No puedes publicar trayectos.">
+              <p>{carga.mensaje}</p>
+            </Aviso>
+            <Boton to={carga.redireccion || RUTA_VEHICULO} icono={<IconoFlecha />} state={{ desde: "publicar" }}>
+              Ir a registrar vehículo
+            </Boton>
+          </div>
         ) : null}
 
         {carga.estado === "listo" ? (
@@ -216,26 +210,22 @@ export default function PublicarTrayecto() {
               </p>
 
               {publicado ? (
-                <p className="nota-ok nota-publicado" role="status">
-                  <span className="nota-icono" aria-hidden="true">
-                    <IconoCheck />
-                  </span>
-                  Trayecto publicado. Ya está disponible para los pasajeros.
-                </p>
+                <Aviso tono="exito" icono titulo="Trayecto publicado. Ya está disponible para los pasajeros.">
+                  <p>Lo verás en tu historial, en la pestaña «Como conductor».</p>
+                </Aviso>
               ) : null}
               {repetir && !bloqueado && !publicado ? (
-                <p className="aviso" role="status">
-                  Copiamos los datos de tu trayecto anterior. Elige la fecha y revisa lo demás antes de publicar.
-                </p>
+                <Aviso>Copiamos los datos de tu trayecto anterior. Elige la fecha y revisa lo demás antes de publicar.</Aviso>
               ) : null}
-              {mensaje && !publicado ? (
-                <p className="aviso aviso-error" role="alert">
-                  {mensaje}
-                </p>
-              ) : null}
+              {mensaje && !publicado ? <Aviso tono="error">{mensaje}</Aviso> : null}
 
               <fieldset className="publicar-campos" disabled={bloqueado || Boolean(publicado) || enviando}>
-                <Campo etiqueta="Origen" error={errores.origen}>
+                <h3 className="paso-titulo">
+                  <span aria-hidden="true">1</span> Ruta
+                </h3>
+                <Campo etiqueta="Origen" error={errores.origen} pista="Usa una referencia conocida de Popayán: un barrio, un parque.">
+
+
                   <input
                     name="origen"
                     placeholder="Ej.: Bello Horizonte"
@@ -268,6 +258,9 @@ export default function PublicarTrayecto() {
                   </select>
                 </Campo>
 
+                <h3 className="paso-titulo">
+                  <span aria-hidden="true">2</span> Salida
+                </h3>
                 <div className="campos-fila">
                   <Campo etiqueta="Fecha" error={errores.fecha}>
                     <input
@@ -289,6 +282,9 @@ export default function PublicarTrayecto() {
                   </Campo>
                 </div>
 
+                <h3 className="paso-titulo">
+                  <span aria-hidden="true">3</span> Cupos y aporte
+                </h3>
                 <Campo
                   etiqueta="Cupos"
                   extra={cuposMaximos > 0 ? `Máx. ${cuposMaximos}` : null}
@@ -338,21 +334,26 @@ export default function PublicarTrayecto() {
                   : "Un aporte para compartir los gastos del camino. Valores de referencia: $2.000 a $5.000 COP."}
               </p>
 
-              {bloqueado ? (
-                <Link className="boton boton-guardar" to={carga.redireccion || RUTA_VEHICULO}>
-                  <IconoFlecha />
-                  Ir a registrar vehículo
-                </Link>
-              ) : publicado ? (
-                <button className="boton boton-guardar" type="button" onClick={publicarOtro}>
-                  <IconoFlecha />
-                  Publicar otro trayecto
-                </button>
+              {/* Sin habilitación, el botón para registrar el vehículo está en el aviso de arriba. */}
+              {bloqueado ? null : publicado ? (
+                <>
+                  <Boton className="boton-guardar" onClick={publicarOtro} icono={<IconoFlecha />}>
+                    Publicar otro trayecto
+                  </Boton>
+                  <Boton variante="secundario" to="/historial?vista=conductor">
+                    Ver mis trayectos
+                  </Boton>
+                </>
               ) : (
-                <button className="boton boton-guardar" type="submit" disabled={enviando}>
-                  <IconoFlecha />
-                  {enviando ? "Publicando…" : "Publicar trayecto"}
-                </button>
+                <Boton
+                  className="boton-guardar"
+                  type="submit"
+                  icono={<IconoFlecha />}
+                  cargando={enviando}
+                  textoCargando="Publicando…"
+                >
+                  Publicar trayecto
+                </Boton>
               )}
               {!bloqueado && !publicado ? (
                 <BotonCancelar
@@ -363,7 +364,7 @@ export default function PublicarTrayecto() {
               ) : null}
             </form>
 
-            <aside className="perfil-lado">
+            <aside className="perfil-lado lado-fijo">
               <section className="tarjeta tarjeta-persona">
                 <div className="persona-fila">
                   <div className="persona">
@@ -402,13 +403,6 @@ export default function PublicarTrayecto() {
               <p className="pista-lado">
                 {textoVistaPrevia({ bloqueado, publicado, errores, vista: vistaPrevia, cuposMaximos, carga })}
               </p>
-
-              <section className="consejo">
-                <strong>Comparte un punto de encuentro claro</strong>
-                <span>
-                  Indica una referencia conocida de Popayán y llega unos minutos antes de la salida.
-                </span>
-              </section>
             </aside>
           </div>
         ) : null}
@@ -419,7 +413,7 @@ export default function PublicarTrayecto() {
   );
 }
 
-function Campo({ etiqueta, extra, error, sufijo, claseCaja = "", children }) {
+function Campo({ etiqueta, extra, error, pista, sufijo, claseCaja = "", children }) {
   return (
     <label className="campo">
       <span className="campo-etiqueta">
@@ -430,7 +424,7 @@ function Campo({ etiqueta, extra, error, sufijo, claseCaja = "", children }) {
         {children}
         {sufijo ? <em aria-hidden="true">{sufijo}</em> : null}
       </span>
-      {error ? <small>{error}</small> : null}
+      {error ? <small>{error}</small> : pista ? <small className="pista">{pista}</small> : null}
     </label>
   );
 }

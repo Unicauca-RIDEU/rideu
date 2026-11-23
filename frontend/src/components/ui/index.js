@@ -1,0 +1,10 @@
+// Componentes base de la interfaz de RideU: import { Boton, Aviso } from "@/components/ui";
+export { default as Aviso } from "./Aviso.jsx";
+export { default as Boton } from "./Boton.jsx";
+export { default as Campo } from "./Campo.jsx";
+export { default as Cargando } from "./Cargando.jsx";
+export { default as Chip, tonoDeEstado } from "./Chip.jsx";
+export { default as DialogoConfirmar } from "./DialogoConfirmar.jsx";
+export { default as EncabezadoPagina } from "./EncabezadoPagina.jsx";
+export { default as EstadoVacio } from "./EstadoVacio.jsx";
+export { default as Tarjeta } from "./Tarjeta.jsx";

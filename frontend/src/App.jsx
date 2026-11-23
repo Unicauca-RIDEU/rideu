@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import RutaProtegida from "./components/RutaProtegida.jsx";
+import { tokenSesion } from "./services/auth.js";
 import Ayuda from "./pages/Ayuda.jsx";
 import BuscarTrayecto from "./pages/BuscarTrayecto.jsx";
 import CancelarReserva from "./pages/CancelarReserva.jsx";
@@ -19,7 +20,8 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/registro" replace />} />
+        {/* Con sesión guardada se entra directo al panel; si ya venció, RutaProtegida lleva al login. */}
+        <Route path="/" element={<Navigate to={tokenSesion() ? "/panel" : "/registro"} replace />} />
         <Route path="/registro" element={<Registro />} />
         <Route path="/registro/verificacion" element={<Verificacion />} />
         <Route path="/login" element={<Login />} />

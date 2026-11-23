@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useOutletContext } from "react-router-dom";
-import { IconoAuto, IconoCheck } from "../components/Iconos.jsx";
+import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
+import { Aviso, Boton, EncabezadoPagina } from "@/components/ui";
+import { IconoCheck } from "../components/Iconos.jsx";
 import { obtenerVehiculo, registrarVehiculo } from "../services/vehiculo.js";
 import Pie from "../components/Pie.jsx";
-import EnlacesNavegacion from "../components/EnlacesNavegacion.jsx";
+import EncabezadoSesion from "../components/EncabezadoSesion.jsx";
 import BotonCancelar, { hayCambios } from "../components/BotonCancelar.jsx";
 
 const OBLIGATORIO = "Este campo es obligatorio.";
@@ -20,6 +21,12 @@ const vacio = {
 
 export default function Vehiculo() {
   const navigate = useNavigate();
+  const location = useLocation();
+  // Quien llega desde Publicar (por no estar habilitado) vuelve allí al terminar.
+  const [desdePublicar] = useState(() => location.state?.desde === "publicar");
+  const volver = desdePublicar
+    ? { texto: "Volver a publicar trayecto", to: "/trayectos/publicar" }
+    : { texto: "Volver al panel", to: "/panel" };
   const { usuario: usuarioSesion } = useOutletContext();
   const [usuario, setUsuario] = useState(usuarioSesion);
   const [datos, setDatos] = useState(vacio);
@@ -125,34 +132,18 @@ export default function Vehiculo() {
 
   return (
     <div className="pantalla perfil">
-      <header className="barra perfil-barra">
-        <Link to="/perfil/vehiculo" className="marca">
-          <span className="marca-icono">
-            <IconoAuto />
-          </span>
-          <span>
-            <strong>RideU</strong>
-            <small>Universidad del Cauca</small>
-          </span>
-        </Link>
-        <div className="perfil-nav">
-          <EnlacesNavegacion />
-          <span className="perfil-usuario">
-            <span className="avatar" aria-hidden="true">
-              {siglas}
-            </span>
-            <strong>{nombre}</strong>
-            <Chevron />
-          </span>
-        </div>
-      </header>
+      <EncabezadoSesion usuario={usuario} />
 
       <main className="perfil-cuerpo">
-        <Link className="volver" to="/panel">
-          ← Volver al panel
-        </Link>
-        <h1>Mi vehículo</h1>
-        <p className="perfil-intro">Comparte el camino con tus datos al día.</p>
+        <EncabezadoPagina
+          titulo="Mi vehículo"
+          intro={
+            guardado
+              ? "Comparte el camino con tus datos al día."
+              : "Registra tu vehículo y tu licencia vigente para habilitarte como conductor y publicar trayectos."
+          }
+          volver={volver}
+        />
 
         <div className="perfil-grid">
           <aside className="perfil-lado">
@@ -180,21 +171,21 @@ export default function Vehiculo() {
 
             {guardado ? (
               <>
-                <p className="nota-ok" role="status">
-                  <span className="nota-icono" aria-hidden="true">
-                    <IconoCheck />
-                  </span>
+                <Aviso tono="exito" icono>
                   Vehículo guardado. Ya puedes publicar trayectos.
-                </p>
-                <button
-                  className="boton-contorno"
-                  type="button"
-                  onClick={() => navigate("/trayectos/publicar")}
-                >
-                  Ir a publicar trayecto
-                </button>
+                </Aviso>
+                {/* Si llegó desde Publicar, continuar es la acción principal. */}
+                <Boton variante={desdePublicar ? "primario" : "secundario"} to="/trayectos/publicar">
+                  {desdePublicar ? "Continuar a publicar trayecto" : "Ir a publicar trayecto"}
+                </Boton>
               </>
-            ) : null}
+            ) : (
+              <ol className="pasos-habilitacion">
+                <li>Registra tu vehículo.</li>
+                <li>Agrega tu licencia vigente.</li>
+                <li>Publica tus trayectos.</li>
+              </ol>
+            )}
 
             <p className="pista-lado">
               Tu información ayuda a la comunidad a reconocer el vehículo antes de viajar.
@@ -202,19 +193,13 @@ export default function Vehiculo() {
           </aside>
 
           <form className="perfil-form" onSubmit={enviar} noValidate>
-            {mensaje && !exito ? (
-              <p className="aviso aviso-error" role="alert">
-                {mensaje}
-              </p>
-            ) : null}
-            {mensaje && exito ? (
-              <p className="aviso aviso-exito" role="status">
-                {mensaje}
-              </p>
-            ) : null}
+            {mensaje && !exito ? <Aviso tono="error">{mensaje}</Aviso> : null}
+            {mensaje && exito ? <Aviso tono="exito">{mensaje}</Aviso> : null}
 
             <section className="tarjeta">
-              <h2>Tu vehículo</h2>
+              <h2 className="paso-titulo paso-titulo-grande">
+                <span aria-hidden="true">1</span> Tu vehículo
+              </h2>
               <p className="pista">Todos los campos son obligatorios.</p>
               <div className="campos">
                 <Campo
@@ -267,7 +252,9 @@ export default function Vehiculo() {
             </section>
 
             <section className="tarjeta">
-              <h2>Licencia de conducción</h2>
+              <h2 className="paso-titulo paso-titulo-grande">
+                <span aria-hidden="true">2</span> Licencia de conducción
+              </h2>
               <div className="campos">
                 <Campo
                   nombre="categoriaLicencia"
@@ -291,10 +278,15 @@ export default function Vehiculo() {
               </p>
             </section>
 
-            <button className="boton boton-guardar" type="submit" disabled={enviando}>
-              <IconoCheck />
-              {enviando ? "Guardando…" : "Guardar vehículo"}
-            </button>
+            <Boton
+              className="boton-guardar"
+              type="submit"
+              icono={<IconoCheck />}
+              cargando={enviando}
+              textoCargando="Guardando…"
+            >
+              Guardar vehículo
+            </Boton>
             <BotonCancelar
               hayCambios={hayCambios(datos, inicial)}
               onCancelar={() => navigate("/panel")}
@@ -336,14 +328,6 @@ function Campo({
       </span>
       {error ? <small>{error}</small> : null}
     </label>
-  );
-}
-
-function Chevron() {
-  return (
-    <svg className="chevron" viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="currentColor" d="m7 10 5 5 5-5H7Z" />
-    </svg>
   );
 }
 

@@ -7,6 +7,7 @@ const buscarPerfilConductor = jest.fn();
 const crearTrayecto = jest.fn();
 const existeTrayectoEnHorario = jest.fn();
 const buscarTrayectosDisponibles = jest.fn();
+const listarTrayectosProximos = jest.fn();
 const buscarSedePorId = jest.fn();
 const listarSedes = jest.fn();
 
@@ -29,6 +30,7 @@ jest.unstable_mockModule("../../src/models/trayecto.js", () => ({
   crearTrayecto,
   existeTrayectoEnHorario,
   buscarTrayectosDisponibles,
+  listarTrayectosProximos,
   listarTrayectosEditables: jest.fn(),
   buscarTrayectoParaEdicion: jest.fn(),
   actualizarTrayecto: jest.fn(),
@@ -92,6 +94,7 @@ describe("rutas /api/trayectos (Supertest)", () => {
     existeTrayectoEnHorario.mockReset();
     existeTrayectoEnHorario.mockResolvedValue(false);
     buscarTrayectosDisponibles.mockReset();
+    listarTrayectosProximos.mockReset();
     buscarSedePorId.mockReset();
     listarSedes.mockReset();
 
@@ -502,6 +505,98 @@ describe("rutas /api/trayectos (Supertest)", () => {
 
       expect(res.status).toBe(500);
       expect(res.body.mensaje).toBe("No se pudieron buscar los trayectos.");
+    });
+  });
+
+  describe("GET /api/trayectos/disponibles (HU06 · listado con filtros opcionales)", () => {
+    const proximos = [
+      { id: "t1", fecha: manana, hora: "06:00", origen: "Barrio La Paz", cupos_disponibles: 1 },
+      { id: "t2", fecha: manana, hora: "07:15", origen: "Barrio Valencia", cupos_disponibles: 3 },
+    ];
+
+    test("debería exigir sesión iniciada", async () => {
+      const res = await request(app).get("/api/trayectos/disponibles");
+
+      expect(res.status).toBe(401);
+      expect(listarTrayectosProximos).not.toHaveBeenCalled();
+    });
+
+    test("sin filtros: debería listar todos los trayectos próximos con cupos", async () => {
+      // Arrange
+      listarTrayectosProximos.mockResolvedValue(proximos);
+
+      // Act
+      const res = await request(app).get("/api/trayectos/disponibles").set(SESION);
+
+      // Assert
+      expect(res.status).toBe(200);
+      expect(res.body).toMatchObject({ mensaje: null, total: 2 });
+      expect(res.body.trayectos.map((t) => t.id)).toEqual(["t1", "t2"]);
+      expect(res.body.filtros).toEqual({ sedeDestinoId: null, fecha: null, horaDesde: null, sedeDestino: null });
+      expect(listarTrayectosProximos).toHaveBeenCalledWith({
+        sedeDestinoId: null,
+        fecha: null,
+        horaDesde: null,
+        ahoraColombia: expect.stringMatching(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/),
+      });
+      expect(buscarSedePorId).not.toHaveBeenCalled();
+    });
+
+    test("debería aplicar solo los filtros recibidos e informar el nombre de la sede", async () => {
+      listarTrayectosProximos.mockResolvedValue([]);
+
+      const res = await request(app)
+        .get("/api/trayectos/disponibles")
+        .set(SESION)
+        .query({ sedeDestinoId: "1", horaDesde: "12:00" });
+
+      expect(res.status).toBe(200);
+      expect(res.body.filtros).toEqual({
+        sedeDestinoId: 1,
+        fecha: null,
+        horaDesde: "12:00",
+        sedeDestino: "Facultad de Ingeniería Civil",
+      });
+      expect(listarTrayectosProximos).toHaveBeenCalledWith(
+        expect.objectContaining({ sedeDestinoId: 1, fecha: null, horaDesde: "12:00" }),
+      );
+    });
+
+    test("criterio 2: debería responder «No hay resultados disponibles» si no hay coincidencias", async () => {
+      listarTrayectosProximos.mockResolvedValue([]);
+
+      const res = await request(app).get("/api/trayectos/disponibles").set(SESION).query({ fecha: manana });
+
+      expect(res.status).toBe(200);
+      expect(res.body).toMatchObject({ mensaje: "No hay resultados disponibles", total: 0, trayectos: [] });
+    });
+
+    test("debería rechazar un filtro con formato inválido", async () => {
+      const res = await request(app).get("/api/trayectos/disponibles").set(SESION).query({ horaDesde: "6:30" });
+
+      expect(res.status).toBe(400);
+      expect(res.body.errores[0].campo).toBe("horaDesde");
+      expect(listarTrayectosProximos).not.toHaveBeenCalled();
+    });
+
+    test("debería rechazar una sede que no existe", async () => {
+      buscarSedePorId.mockResolvedValue(null);
+
+      const res = await request(app).get("/api/trayectos/disponibles").set(SESION).query({ sedeDestinoId: "99" });
+
+      expect(res.status).toBe(400);
+      expect(res.body.mensaje).toBe("La sede de destino no existe.");
+      expect(listarTrayectosProximos).not.toHaveBeenCalled();
+    });
+
+    test("debería responder 500 si falla la base de datos", async () => {
+      jest.spyOn(console, "error").mockImplementation(() => {});
+      listarTrayectosProximos.mockRejectedValue(new Error("caída"));
+
+      const res = await request(app).get("/api/trayectos/disponibles").set(SESION);
+
+      expect(res.status).toBe(500);
+      expect(res.body.mensaje).toBe("No se pudieron cargar los trayectos.");
     });
   });
 

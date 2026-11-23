@@ -22,6 +22,7 @@ jest.unstable_mockModule("../../src/models/trayecto.js", () => ({
   ESTADO_CANCELADO: "Cancelado",
   buscarPerfilConductor: jest.fn(),
   buscarTrayectosDisponibles: jest.fn(),
+  listarTrayectosProximos: jest.fn(),
   crearTrayecto: jest.fn(),
   existeTrayectoEnHorario: jest.fn(),
   listarTrayectosDeConductor,

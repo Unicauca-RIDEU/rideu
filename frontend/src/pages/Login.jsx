@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Aviso, Boton } from "@/components/ui";
 import AuthLayout from "../components/AuthLayout.jsx";
-import CampoCorreo, { MENSAJE_SOLO_USUARIO, correoCompleto } from "../components/CampoCorreo.jsx";
-import {
-  IconoCandado,
-  IconoEscudo,
-  IconoFlecha,
-  IconoOjo,
-} from "../components/Iconos.jsx";
+import CampoCorreo, {
+  MENSAJE_DOMINIO,
+  correoCompleto,
+  esCorreoInstitucional,
+} from "../components/CampoCorreo.jsx";
+import { IconoOjo } from "../components/Iconos.jsx";
 import { iniciarSesion } from "../services/auth.js";
 
 export default function Login() {
@@ -30,16 +30,15 @@ export default function Login() {
 
   async function enviar(evento) {
     evento.preventDefault();
-    const usuarioCorreo = datos.correo.trim().toLowerCase();
-    if (!usuarioCorreo || !datos.contrasena) {
+    const correo = correoCompleto(datos.correo);
+    if (!correo || !datos.contrasena) {
       setMensaje("Ingresa tu correo institucional y tu contraseña.");
       return;
     }
-    if (usuarioCorreo.includes("@")) {
-      setMensaje(MENSAJE_SOLO_USUARIO);
+    if (!esCorreoInstitucional(correo)) {
+      setMensaje(MENSAJE_DOMINIO);
       return;
     }
-    const correo = correoCompleto(usuarioCorreo);
 
     setEnviando(true);
     setMensaje("");
@@ -66,30 +65,24 @@ export default function Login() {
   }
 
   return (
-    <AuthLayout compacto>
+    <AuthLayout>
       <div className="acceso">
-        <p className="kicker">Qué bueno verte de nuevo</p>
-        <h2>Volvamos a la U</h2>
-        <p className="ayuda">Inicia sesión y comparte tu próximo trayecto.</p>
+        <h2>Inicia sesión</h2>
+        <p className="ayuda ayuda-amplia">Viajemos a la U y comparte tu próximo trayecto.</p>
 
-        {mensaje ? (
-          <p className="aviso aviso-error" role="alert">
-            {mensaje}
-          </p>
-        ) : null}
+        {mensaje ? <Aviso tono="error">{mensaje}</Aviso> : null}
 
         <form className="formulario" onSubmit={enviar} noValidate>
           <CampoCorreo valor={datos.correo} onCambiar={cambiarCorreo} />
 
           <label>
-            Contraseña
             <span className="control">
-              <IconoCandado />
               <input
                 name="contrasena"
                 type={verContrasena ? "text" : "password"}
                 autoComplete="current-password"
-                placeholder="Ingresa tu contraseña"
+                placeholder="Contraseña"
+                aria-label="Contraseña"
                 value={datos.contrasena}
                 onChange={cambiar}
               />
@@ -104,22 +97,13 @@ export default function Login() {
             </span>
           </label>
 
-          <button type="button" className="olvido">
-            ¿Olvidaste tu contraseña?
-          </button>
-
-          <button className="boton" type="submit" disabled={enviando}>
-            <IconoFlecha />
-            {enviando ? "Iniciando sesión…" : "Iniciar sesión"}
-          </button>
+          <Boton type="submit" cargando={enviando} textoCargando="Iniciando sesión…">
+            Iniciar sesión
+          </Boton>
         </form>
 
         <p className="cambio">
           ¿Aún no tienes cuenta? <Link to="/registro">Regístrate</Link>
-        </p>
-        <p className="confianza">
-          <IconoEscudo />
-          Tu correo institucional nos conecta con confianza.
         </p>
       </div>
     </AuthLayout>

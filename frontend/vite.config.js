@@ -7,6 +7,12 @@ const frontendDir = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   plugins: [react()],
+  // «@» apunta a src: import { Boton } from "@/components/ui";
+  resolve: {
+    alias: {
+      "@": path.resolve(frontendDir, "src"),
+    },
+  },
   envDir: path.resolve(frontendDir, ".."),
   server: {
     port: 5173,
