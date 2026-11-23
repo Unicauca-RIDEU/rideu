@@ -2045,3 +2045,45 @@ button.boton-contorno.reservar-enlace {
 .persona-fila { flex-wrap: wrap; row-gap: 0.5rem; }
 .persona-fila .chip { white-space: nowrap; }
 .perfil-lado { min-width: 0; }
+
+/* Paso 6 del rediseño · Contacto por WhatsApp */
+
+.contacto-tarjeta { display: grid; gap: 1rem; }
+
+.contacto-tarjeta .boton { margin-top: 0; }
+
+.contacto-persona {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.contacto-persona span { display: grid; gap: 0.35rem; }
+
+.contacto-persona h2 { margin: 0; }
+
+.avatar-grande { width: 3.2rem; height: 3.2rem; font-size: 1rem; }
+
+.contacto-cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.6rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid #e7eef8;
+}
+
+.contacto-cabecera h2 { margin: 0; font-size: 1.1rem; }
+
+.contacto-cabecera .boton-favorita { margin: 0; }
+
+.contacto-cabecera .boton-favorita:disabled { cursor: wait; opacity: 0.7; }
+
+.boton.boton-whatsapp-fila {
+  width: auto;
+  min-height: 2.6rem;
+  padding: 0 1.1rem;
+}
+
+.boton-whatsapp-fila svg, .contacto-tarjeta .boton-whatsapp svg { width: 1.1rem; height: 1.1rem; }

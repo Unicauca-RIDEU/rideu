@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import { Boton, Cargando, Tarjeta, tonoDeEstado } from "@/components/ui";
-import { cerrarSesion, obtenerSesion } from "../services/auth.js";
+import { obtenerSesion } from "../services/auth.js";
 import { obtenerHistorial } from "../services/historial.js";
 import Pie from "../components/Pie.jsx";
 import EncabezadoSesion from "../components/EncabezadoSesion.jsx";
@@ -15,7 +15,6 @@ export default function Panel() {
   const { usuario } = useOutletContext();
   const navigate = useNavigate();
   const [proximos, setProximos] = useState({ estado: "cargando", lista: [] });
-  const [saliendo, setSaliendo] = useState(false);
   const [estado, setEstado] = useState(usuario?.estado);
   const primerNombre = usuario?.nombre?.split(" ")[0] ?? "";
   const habilitado = estado === "Habilitado";
@@ -56,13 +55,6 @@ export default function Panel() {
       activo = false;
     };
   }, [navigate]);
-
-  // Criterio CA-HU02-07: el cierre de sesión también está disponible en el panel.
-  async function salir() {
-    setSaliendo(true);
-    await cerrarSesion();
-    navigate("/login", { replace: true });
-  }
 
   const [siguiente, ...restantes] = proximos.lista;
 
@@ -144,11 +136,6 @@ export default function Panel() {
           </section>
         </div>
 
-        <p className="panel-salir">
-          <button className="boton-texto" type="button" onClick={salir} disabled={saliendo}>
-            {saliendo ? "Cerrando sesión…" : "Cerrar sesión"}
-          </button>
-        </p>
       </main>
 
       <Pie />
