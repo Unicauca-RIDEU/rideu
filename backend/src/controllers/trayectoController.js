@@ -8,6 +8,7 @@ import {
   crearTrayecto,
   existeTrayectoEnHorario,
   listarTrayectosEditables,
+  listarTrayectosProximos,
 } from "../models/trayecto.js";
 import { enviarCorreoTrayectoCancelado } from "../services/correo.js";
 import { validarIdTrayecto } from "../validation/reserva.js";
@@ -18,6 +19,7 @@ import {
   motivoParaNoModificar,
   validarBusqueda,
   validarEdicionTrayecto,
+  validarFiltrosListado,
   validarTrayecto,
   verificarConductorHabilitado,
 } from "../validation/trayecto.js";
@@ -152,6 +154,42 @@ export async function buscarTrayectos(req, res) {
   } catch (error) {
     console.error("Error al buscar trayectos:", error);
     return res.status(500).json({ mensaje: "No se pudieron buscar los trayectos." });
+  }
+}
+
+// Listado de trayectos próximos (E03-HU06, rediseño de Buscar) · GET /api/trayectos/disponibles
+// Sin filtros devuelve todos los trayectos próximos con cupos; sede, fecha y hora son opcionales.
+export async function listarTrayectosDisponibles(req, res) {
+  const validacion = validarFiltrosListado(req.query);
+  if (!validacion.ok) {
+    return res.status(400).json({ mensaje: validacion.mensaje, errores: validacion.errores });
+  }
+
+  try {
+    let sedeDestino = null;
+    if (validacion.datos.sedeDestinoId) {
+      const sede = await buscarSedePorId(validacion.datos.sedeDestinoId);
+      if (!sede) {
+        const mensaje = "La sede de destino no existe.";
+        return res.status(400).json({ mensaje, errores: [{ campo: "sedeDestinoId", mensaje }] });
+      }
+      sedeDestino = sede.nombre;
+    }
+
+    const trayectos = await listarTrayectosProximos({
+      ...validacion.datos,
+      ahoraColombia: momentoEnColombia(),
+    });
+
+    return res.status(200).json({
+      mensaje: trayectos.length === 0 ? MENSAJE_SIN_RESULTADOS : null,
+      total: trayectos.length,
+      filtros: { ...validacion.datos, sedeDestino },
+      trayectos,
+    });
+  } catch (error) {
+    console.error("Error al listar los trayectos:", error);
+    return res.status(500).json({ mensaje: "No se pudieron cargar los trayectos." });
   }
 }
 

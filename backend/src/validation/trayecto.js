@@ -85,6 +85,43 @@ export function validarBusqueda(filtros) {
   return { ok: true, datos: { sedeDestinoId: Number(sede), fecha, horaDesde } };
 }
 
+// Filtros del listado de trayectos próximos (E03-HU06, rediseño de Buscar).
+// A diferencia de validarBusqueda, los tres son opcionales: sin filtros se listan
+// todos los trayectos próximos con cupos. Los que llegan deben tener un formato válido.
+export function validarFiltrosListado(filtros) {
+  const datos = filtros && typeof filtros === "object" ? filtros : {};
+  const errores = [];
+  const sede = texto(datos.sedeDestinoId);
+  const fecha = texto(datos.fecha);
+  const horaDesde = texto(datos.horaDesde);
+  // Un filtro repetido en la URL llega como lista: no se ignora, se rechaza.
+  const noEsTexto = (valor) => valor !== undefined && valor !== null && typeof valor !== "string";
+
+  if ((sede && !/^[1-9]\d*$/.test(sede)) || noEsTexto(datos.sedeDestinoId)) {
+    errores.push({ campo: "sedeDestinoId", mensaje: "La sede de destino no es válida." });
+  }
+  if (fecha) {
+    validarFecha(fecha, errores);
+  } else if (noEsTexto(datos.fecha)) {
+    errores.push({ campo: "fecha", mensaje: "La fecha debe tener el formato AAAA-MM-DD." });
+  }
+  if ((horaDesde && !HORA.test(horaDesde)) || noEsTexto(datos.horaDesde)) {
+    errores.push({ campo: "horaDesde", mensaje: "La hora debe tener el formato HH:MM (24 horas)." });
+  }
+
+  if (errores.length > 0) {
+    return rechazar(errores.length === 1 ? errores[0].mensaje : "Revisa los filtros de la búsqueda.", errores);
+  }
+  return {
+    ok: true,
+    datos: {
+      sedeDestinoId: sede ? Number(sede) : null,
+      fecha: fecha || null,
+      horaDesde: horaDesde || null,
+    },
+  };
+}
+
 export function validarTrayecto(body, { cuposMaximos = CUPOS_MAXIMOS, ahora = new Date() } = {}) {
   if (body === null || typeof body !== "object" || Array.isArray(body)) {
     const mensaje = "El cuerpo de la solicitud debe incluir los datos del trayecto.";

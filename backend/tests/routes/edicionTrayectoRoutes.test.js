@@ -29,6 +29,7 @@ jest.unstable_mockModule("../../src/models/trayecto.js", () => ({
   crearTrayecto: jest.fn(),
   existeTrayectoEnHorario,
   buscarTrayectosDisponibles: jest.fn(),
+  listarTrayectosProximos: jest.fn(),
   listarTrayectosEditables,
   buscarTrayectoParaEdicion,
   actualizarTrayecto,

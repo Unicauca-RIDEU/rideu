@@ -14,6 +14,7 @@ const {
   buscarTrayectosDisponibles,
   existeTrayectoEnHorario,
   listarTrayectosDeConductor,
+  listarTrayectosProximos,
   ESTADO_DISPONIBLE,
 } = await import(
   "../../src/models/trayecto.js"
@@ -251,6 +252,70 @@ describe("modelo trayecto", () => {
       query.mockResolvedValueOnce({ rows: [] });
 
       expect(await buscarTrayectosDisponibles(filtros)).toEqual([]);
+    });
+  });
+
+  describe("listarTrayectosProximos (HU06 · listado con filtros opcionales)", () => {
+    const sinFiltros = { sedeDestinoId: null, fecha: null, horaDesde: null, ahoraColombia: "2026-11-04 07:00" };
+
+    test("sin filtros: debería listar todos los próximos con cupos, solo con estado y momento actual", async () => {
+      // Arrange
+      const fila = { id: "t1", fecha: "2026-11-05", hora: "06:45", cupos_disponibles: 2 };
+      query.mockResolvedValueOnce({ rows: [fila] });
+
+      // Act
+      const filas = await listarTrayectosProximos(sinFiltros);
+
+      // Assert
+      const [sql, parametros] = query.mock.calls[0];
+      expect(filas).toEqual([fila]);
+      expect(parametros).toEqual({ estado: "Disponible", ahora_colombia: "2026-11-04 07:00" });
+      expect(sql).not.toContain(":sede_destino_id");
+      expect(sql).not.toContain(":fecha");
+      expect(sql).not.toContain(":hora_desde");
+    });
+
+    test("debería agregar solo la condición de cada filtro recibido", async () => {
+      query.mockResolvedValueOnce({ rows: [] });
+
+      await listarTrayectosProximos({ ...sinFiltros, sedeDestinoId: 3, horaDesde: "12:00" });
+
+      const [sql, parametros] = query.mock.calls[0];
+      expect(parametros).toEqual({
+        estado: "Disponible",
+        ahora_colombia: "2026-11-04 07:00",
+        sede_destino_id: 3,
+        hora_desde: "12:00",
+      });
+      expect(sql).toContain("t.sede_destino_id = :sede_destino_id");
+      expect(sql).toContain("t.hora >= :hora_desde");
+      expect(sql).not.toContain(":fecha");
+    });
+
+    test("con los tres filtros: debería usar sede, fecha y hora desde", async () => {
+      query.mockResolvedValueOnce({ rows: [] });
+
+      await listarTrayectosProximos({ ...sinFiltros, sedeDestinoId: 1, fecha: "2026-11-05", horaDesde: "06:30" });
+
+      expect(query.mock.calls[0][1]).toMatchObject({ sede_destino_id: 1, fecha: "2026-11-05", hora_desde: "06:30" });
+    });
+
+    test("criterio 3: debería excluir los agotados y los que ya salieron", async () => {
+      query.mockResolvedValueOnce({ rows: [] });
+
+      await listarTrayectosProximos(sinFiltros);
+
+      const sql = query.mock.calls[0][0];
+      expect(sql).toContain("t.cupos_disponibles > 0");
+      expect(sql).toContain("> TO_DATE(:ahora_colombia, 'YYYY-MM-DD HH24:MI')");
+    });
+
+    test("debería ordenar por fecha y hora de salida", async () => {
+      query.mockResolvedValueOnce({ rows: [] });
+
+      await listarTrayectosProximos(sinFiltros);
+
+      expect(query.mock.calls[0][0]).toMatch(/ORDER BY t\.fecha, t\.hora/);
     });
   });
 });

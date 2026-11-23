@@ -6,6 +6,7 @@ import {
   fechaEnColombia,
   momentoEnColombia,
   validarBusqueda,
+  validarFiltrosListado,
   validarTrayecto,
   verificarConductorHabilitado,
 } from "../../src/validation/trayecto.js";
@@ -324,6 +325,55 @@ describe("validarBusqueda (HU06)", () => {
 
   test("debería tolerar que no lleguen filtros", () => {
     expect(validarBusqueda(undefined).ok).toBe(false);
+  });
+});
+
+describe("validarFiltrosListado (HU06 · listado de trayectos próximos)", () => {
+  test("debería aceptar que no llegue ningún filtro", () => {
+    expect(validarFiltrosListado({})).toEqual({
+      ok: true,
+      datos: { sedeDestinoId: null, fecha: null, horaDesde: null },
+    });
+    expect(validarFiltrosListado(undefined).ok).toBe(true);
+  });
+
+  test("debería aceptar los tres filtros y convertir la sede a número", () => {
+    expect(validarFiltrosListado({ sedeDestinoId: "1", fecha: "2026-11-05", horaDesde: "06:30" })).toEqual({
+      ok: true,
+      datos: { sedeDestinoId: 1, fecha: "2026-11-05", horaDesde: "06:30" },
+    });
+  });
+
+  test.each([
+    [{ sedeDestinoId: "4" }, { sedeDestinoId: 4, fecha: null, horaDesde: null }],
+    [{ fecha: "2026-11-05" }, { sedeDestinoId: null, fecha: "2026-11-05", horaDesde: null }],
+    [{ horaDesde: "12:00" }, { sedeDestinoId: null, fecha: null, horaDesde: "12:00" }],
+    [{ sedeDestinoId: "", fecha: "  ", horaDesde: "" }, { sedeDestinoId: null, fecha: null, horaDesde: null }],
+  ])("debería aceptar filtros sueltos o vacíos (%p)", (filtros, datos) => {
+    expect(validarFiltrosListado(filtros)).toEqual({ ok: true, datos });
+  });
+
+  test.each(["0", "-1", "abc", "1.5"])("debería rechazar una sede inválida (%p)", (sedeDestinoId) => {
+    expect(validarFiltrosListado({ sedeDestinoId }).errores).toEqual([
+      { campo: "sedeDestinoId", mensaje: "La sede de destino no es válida." },
+    ]);
+  });
+
+  test.each(["05/11/2026", "2026-02-30"])("debería rechazar una fecha inválida (%p)", (fecha) => {
+    expect(validarFiltrosListado({ fecha }).errores[0].campo).toBe("fecha");
+  });
+
+  test.each(["6:30", "25:00"])("debería rechazar una hora inválida (%p)", (horaDesde) => {
+    expect(validarFiltrosListado({ horaDesde }).errores).toEqual([
+      { campo: "horaDesde", mensaje: "La hora debe tener el formato HH:MM (24 horas)." },
+    ]);
+  });
+
+  test("debería rechazar filtros repetidos en la URL (llegan como lista)", () => {
+    const resultado = validarFiltrosListado({ sedeDestinoId: ["1", "2"], fecha: ["a"], horaDesde: ["06:00"] });
+    expect(resultado.ok).toBe(false);
+    expect(resultado.mensaje).toBe("Revisa los filtros de la búsqueda.");
+    expect(resultado.errores.map((error) => error.campo)).toEqual(["sedeDestinoId", "fecha", "horaDesde"]);
   });
 });
 

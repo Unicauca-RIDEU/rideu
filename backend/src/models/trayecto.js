@@ -161,6 +161,50 @@ export async function buscarTrayectosDisponibles({ sedeDestinoId, fecha, horaDes
   return resultado.rows;
 }
 
+// Listado de trayectos próximos con cupos (E03-HU06, rediseño de Buscar).
+// Los filtros son opcionales: solo se agrega al WHERE la condición de los que llegan.
+// Se ordena por fecha y hora de salida; los agotados, cancelados o que ya salieron no se listan.
+export async function listarTrayectosProximos({ sedeDestinoId, fecha, horaDesde, ahoraColombia }) {
+  const condiciones = [];
+  const binds = { estado: ESTADO_DISPONIBLE, ahora_colombia: ahoraColombia };
+  if (sedeDestinoId) {
+    condiciones.push("AND t.sede_destino_id = :sede_destino_id");
+    binds.sede_destino_id = sedeDestinoId;
+  }
+  if (fecha) {
+    condiciones.push("AND t.fecha = TO_DATE(:fecha, 'YYYY-MM-DD')");
+    binds.fecha = fecha;
+  }
+  if (horaDesde) {
+    condiciones.push("AND t.hora >= :hora_desde");
+    binds.hora_desde = horaDesde;
+  }
+  const resultado = await pool.query(
+    `SELECT t.id,
+            TO_CHAR(t.fecha, 'YYYY-MM-DD') AS fecha,
+            t.hora,
+            t.origen,
+            t.sede_destino_id,
+            s.nombre AS sede_destino,
+            t.cupos,
+            t.cupos_disponibles,
+            t.cupos - t.cupos_disponibles AS cupos_reservados,
+            t.aporte_sugerido,
+            t.estado,
+            u.nombre AS conductor_nombre
+     FROM trayectos t
+     JOIN sedes s ON s.id = t.sede_destino_id
+     JOIN usuarios u ON u.id = t.conductor_id
+     WHERE t.estado = :estado
+       AND t.cupos_disponibles > 0
+       AND ${SALIDA_DEL_TRAYECTO} > TO_DATE(:ahora_colombia, 'YYYY-MM-DD HH24:MI')
+       ${condiciones.join("\n       ")}
+     ORDER BY t.fecha, t.hora, t.creado_en`,
+    binds,
+  );
+  return resultado.rows;
+}
+
 // Historial (E04-HU09): trayectos publicados por el usuario, del más reciente al más antiguo.
 // Un trayecto cancelado (E02-HU05) se muestra como «Cancelado», aunque su salida ya haya pasado.
 // Si no, un trayecto cuya fecha y hora de salida ya pasaron se muestra como «Completado».

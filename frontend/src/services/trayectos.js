@@ -43,6 +43,16 @@ export async function obtenerSedes() {
   return llamar("/api/sedes");
 }
 
+// Todos los trayectos próximos con cupos; sede, fecha y hora son filtros opcionales.
+export async function listarTrayectosDisponibles(filtros = {}) {
+  const parametros = new URLSearchParams();
+  for (const campo of ["sedeDestinoId", "fecha", "horaDesde"]) {
+    if (filtros[campo]) parametros.set(campo, filtros[campo]);
+  }
+  const consulta = parametros.toString();
+  return llamar(`/api/trayectos/disponibles${consulta ? `?${consulta}` : ""}`);
+}
+
 export async function buscarTrayectos({ sedeDestinoId, fecha, horaDesde }) {
   const parametros = new URLSearchParams({ sedeDestinoId, fecha, horaDesde });
   return llamar(`/api/trayectos?${parametros}`);
