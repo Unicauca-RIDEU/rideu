@@ -64,7 +64,7 @@ button, input, a { font: inherit; }
   text-transform: uppercase;
 }
 
-.marca-icono, .beneficios span, .campus {
+.marca-icono {
   display: grid;
   place-items: center;
 }
@@ -93,32 +93,6 @@ button, input, a { font: inherit; }
 
 .exclusivo svg { color: var(--azul); }
 
-.contenido {
-  display: grid;
-  grid-template-columns: minmax(320px, 1fr) minmax(340px, 1fr);
-  min-height: 0;
-}
-
-.relato {
-  background: var(--cielo);
-  padding: 3.2rem 3.5rem 2rem;
-}
-
-.relato h1 {
-  margin: 0.8rem 0 0.9rem;
-  color: var(--azul-oscuro);
-  font-size: clamp(2.4rem, 4vw, 3.5rem);
-  line-height: 1.05;
-  letter-spacing: -0.04em;
-}
-
-.relato-texto {
-  max-width: 34rem;
-  margin: 0 0 1.5rem;
-  color: #3d4b67;
-  font-size: 1.05rem;
-}
-
 .kicker {
   display: flex;
   align-items: center;
@@ -127,88 +101,6 @@ button, input, a { font: inherit; }
   color: var(--azul);
   font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.kicker-claro { color: var(--azul); }
-
-.mapa {
-  position: relative;
-  max-width: 34rem;
-  margin-bottom: 1.4rem;
-  border-radius: 1.4rem;
-  background: rgb(255 255 255 / 55%);
-}
-
-.mapa svg { display: block; width: 100%; height: auto; }
-
-.bloque { fill: #d9e6fb; }
-
-.camino {
-  fill: none;
-  stroke: var(--azul);
-  stroke-width: 7;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.punto { fill: var(--azul); }
-
-.auto rect { fill: white; stroke: var(--azul); stroke-width: 2; }
-
-.auto path { fill: none; stroke: var(--azul); stroke-width: 2; }
-
-.campus circle { fill: var(--azul); }
-
-.campus path { fill: white; }
-
-.etiqueta {
-  position: absolute;
-  padding: 0.25rem 0.6rem;
-  border-radius: 999px;
-  background: white;
-  color: #31415f;
-  font-size: 0.82rem;
-  box-shadow: 0 6px 16px rgb(11 63 168 / 8%);
-}
-
-.origen { left: 4%; bottom: 18%; }
-
-.destino { left: 58%; top: 22%; }
-
-.beneficios {
-  display: flex;
-  gap: 1.5rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.beneficios li {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  max-width: 12rem;
-  color: var(--azul-oscuro);
-  font-weight: 700;
-}
-
-.beneficios span {
-  width: 2.2rem;
-  height: 2.2rem;
-  flex: none;
-  border-radius: 999px;
-  background: white;
-  color: var(--azul);
-}
-
-.beneficios svg { width: 1.2rem; height: 1.2rem; }
-
-.lugar {
-  margin: 2rem 0 0;
-  color: #8ea0c0;
-  font-size: 0.78rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -244,10 +136,10 @@ button, input, a { font: inherit; }
   display: flex;
   align-items: center;
   gap: 0.55rem;
-  min-height: 3.2rem;
-  padding: 0 0.85rem;
-  border: 1px solid var(--borde);
-  border-radius: 0.9rem;
+  min-height: 3rem;
+  padding: 0 1rem;
+  border: 1px solid #e4e7ec;
+  border-radius: 0.6rem;
   background: white;
 }
 
@@ -265,11 +157,13 @@ button, input, a { font: inherit; }
   background: transparent;
 }
 
+.control input::placeholder { color: #667085; }
+
 .control em, .control b {
   flex: none;
   color: #98a2b3;
   font-style: normal;
-  font-weight: 600;
+  font-weight: 400;
 }
 
 .ojo {
@@ -302,9 +196,51 @@ button, input, a { font: inherit; }
   font-weight: 700;
   text-decoration: none;
   cursor: pointer;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 }
 
 .boton:disabled { opacity: 0.7; cursor: wait; }
+
+/* Respuesta del botón: se oscurece y sube al pasar el mouse, se hunde al presionarlo
+   y muestra un anillo al llegar con el teclado. Las variantes (peligro, WhatsApp)
+   definen después su propio color al pasar el mouse. */
+.boton:hover { background: var(--azul-oscuro); }
+
+.boton:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgb(16 24 40 / 16%);
+}
+
+.boton:not(:disabled):active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: none;
+}
+
+.boton:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgb(0 96 249 / 30%);
+}
+
+/* Círculo que gira mientras el botón espera la respuesta del servidor */
+.boton-girando {
+  flex: none;
+  width: 1.1rem;
+  height: 1.1rem;
+  border: 2px solid rgb(255 255 255 / 45%);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: boton-girar 0.7s linear infinite;
+}
+
+@keyframes boton-girar {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boton { transition: background-color 0.15s ease; }
+  .boton:not(:disabled):hover, .boton:not(:disabled):active { transform: none; }
+  .boton-girando { animation-duration: 1.6s; }
+}
 
 .cambio { text-align: center; }
 
@@ -394,21 +330,6 @@ button, input, a { font: inherit; }
   word-break: break-word;
 }
 
-.confianza {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  margin: 1.1rem 0 0;
-  color: var(--texto-suave);
-  font-size: 0.95rem;
-}
-
-.confianza svg {
-  width: 1.1rem;
-  height: 1.1rem;
-  color: var(--azul);
-}
-
 .verificacion-acciones {
   display: grid;
   gap: 0.85rem;
@@ -435,23 +356,18 @@ button, input, a { font: inherit; }
 
 .acceso .control input { font-weight: 400; }
 
-.olvido {
-  justify-self: end;
-  margin-top: -0.35rem;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--azul);
-  font-size: 0.9rem;
-  font-weight: 700;
-  cursor: pointer;
-}
+/* Más aire entre la presentación y los campos en inicio de sesión y registro */
+.ayuda-amplia { margin-bottom: 2.4rem; }
 
-.acceso .boton { margin-top: 0.6rem; }
+/* Inicio de sesión y registro: doble separación entre campos */
+.acceso .formulario > label + label { margin-top: 0.95rem; }
 
-.acceso .cambio { margin: 1.4rem 0 0; }
+.acceso .boton { min-height: 3rem; margin-top: 0.6rem; border-radius: 0.6rem; }
 
-.acceso .confianza { margin-top: 2rem; }
+/* Separación entre el último campo y el botón principal del formulario */
+.acceso .formulario > .boton { margin-top: 2.5rem; }
+
+.acceso .cambio { margin: 0.8rem 0 0; font-size: 0.85rem; text-align: left; }
 
 .panel-principal {
   padding: 3.2rem 3.5rem;
@@ -1204,12 +1120,9 @@ button.boton-contorno.reservar-enlace {
 }
 
 @media (max-width: 900px) {
-  .barra, .pie, .relato, .panel, .panel-principal { padding-left: 1.2rem; padding-right: 1.2rem; }
+  .barra, .pie, .panel, .panel-principal { padding-left: 1.2rem; padding-right: 1.2rem; }
   .barra, .pie { align-items: flex-start; flex-direction: column; }
-  .contenido { grid-template-columns: 1fr; }
   .panel { order: -1; padding-top: 1.5rem; }
-  .relato { padding-top: 2rem; }
-  .beneficios { flex-direction: column; }
   .exito-marca { justify-items: start; }
   .perfil-cuerpo { width: min(1120px, calc(100% - 2.4rem)); }
   .perfil-nav { flex-wrap: wrap; }
@@ -1225,11 +1138,6 @@ button.boton-contorno.reservar-enlace {
 }
 
 .pie-enlace:hover { text-decoration: underline; }
-
-.relato-compacto {
-  display: grid;
-  align-content: center;
-}
 
 .boton-cancelar {
   width: 100%;
@@ -1329,12 +1237,8 @@ button.boton-contorno.reservar-enlace {
 
 .control .correo-dominio {
   flex: none;
-  padding: 0.3rem 0.6rem;
-  border-radius: 0.6rem;
-  background: var(--cielo);
-  color: var(--azul-oscuro);
+  color: #475467;
   font-size: 0.92rem;
-  font-weight: 700;
   white-space: nowrap;
   user-select: none;
 }
@@ -2098,4 +2002,27 @@ button.boton-contorno.reservar-enlace {
 
 .formulario .aviso a { color: inherit; font-weight: 700; }
 
-.olvido[aria-expanded="true"] { text-decoration: underline; }
+/* Pantallas de acceso (inicio de sesión, registro y verificación): un solo panel centrado */
+
+.pantalla-solo-panel { grid-template-rows: auto 1fr; }
+
+.contenido-solo-panel {
+  display: grid;
+  place-items: center;
+  padding: 2rem 1rem 3rem;
+}
+
+.contenido-solo-panel .panel {
+  width: 100%;
+  max-width: 34rem;
+  padding: 2.5rem 2.2rem;
+  border: 1px solid #e3e9f4;
+  border-radius: 1.2rem;
+  background: white;
+  box-shadow: 0 12px 32px rgb(15 40 90 / 8%);
+}
+
+@media (max-width: 900px) {
+  .contenido-solo-panel { padding: 1rem 16px 2rem; }
+  .contenido-solo-panel .panel { padding: 1.8rem 1.2rem; }
+}

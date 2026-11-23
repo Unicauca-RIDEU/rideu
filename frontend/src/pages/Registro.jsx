@@ -2,17 +2,13 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Aviso, Boton } from "@/components/ui";
 import AuthLayout from "../components/AuthLayout.jsx";
-import CampoCorreo, { MENSAJE_SOLO_USUARIO, correoCompleto } from "../components/CampoCorreo.jsx";
-import {
-  IconoCandado,
-  IconoFlecha,
-  IconoOjo,
-  IconoTelefono,
-  IconoUsuario,
-} from "../components/Iconos.jsx";
+import CampoCorreo, {
+  MENSAJE_DOMINIO,
+  correoCompleto,
+  esCorreoInstitucional,
+} from "../components/CampoCorreo.jsx";
+import { IconoFlecha, IconoOjo } from "../components/Iconos.jsx";
 import { registrarUsuario } from "../services/auth.js";
-
-const MENSAJE_DOMINIO = "Solo se permite el correo institucional @unicauca.edu.co.";
 
 const vacio = {
   nombre: "",
@@ -80,110 +76,108 @@ export default function Registro() {
 
   return (
     <AuthLayout>
-      <p className="kicker">Tu comunidad, más cerca</p>
-      <h2>Crea tu cuenta</h2>
-      <p className="ayuda">El primer paso para compartir el camino a la U.</p>
+      <div className="acceso">
+        <h2>Crea tu cuenta</h2>
+        <p className="ayuda ayuda-amplia">El primer paso para compartir el camino a la U.</p>
 
-      {mensaje && !exito ? <Aviso tono="error">{mensaje}</Aviso> : null}
+        {mensaje && !exito ? <Aviso tono="error">{mensaje}</Aviso> : null}
 
-      {exito ? (
-        <div className="registro-listo">
-          <Aviso tono="exito" icono>
-            {mensaje}
-          </Aviso>
-          <ol className="pasos-habilitacion">
-            <li>Abre el correo que te enviamos a {validar(datos).correo}.</li>
-            <li>Pulsa el enlace de verificación (vence en 24 horas).</li>
-            <li>Vuelve aquí e inicia sesión.</li>
-          </ol>
-          <Boton to="/login" icono={<IconoFlecha />}>
-            Ir a iniciar sesión
-          </Boton>
-        </div>
-      ) : (
-        <form className="formulario" onSubmit={enviar} noValidate>
-          <label>
-            Nombre completo
-            <span className={errores.nombre ? "control control-error" : "control"}>
-              <IconoUsuario />
-              <input
-                name="nombre"
-                autoComplete="name"
-                placeholder="Tu nombre y apellido"
-                value={datos.nombre}
-                onChange={cambiar}
-                aria-invalid={Boolean(errores.nombre)}
-              />
-            </span>
-            {errores.nombre ? <small>{errores.nombre}</small> : null}
-          </label>
+        {exito ? (
+          <div className="registro-listo">
+            <Aviso tono="exito" icono>
+              {mensaje}
+            </Aviso>
+            <ol className="pasos-habilitacion">
+              <li>Abre el correo que te enviamos a {validar(datos).correo}.</li>
+              <li>Pulsa el enlace de verificación (vence en 24 horas).</li>
+              <li>Vuelve aquí e inicia sesión.</li>
+            </ol>
+            <Boton to="/login" icono={<IconoFlecha />}>
+              Ir a iniciar sesión
+            </Boton>
+          </div>
+        ) : (
+          <form className="formulario" onSubmit={enviar} noValidate>
+            <label>
+              <span className={errores.nombre ? "control control-error" : "control"}>
+                <input
+                  name="nombre"
+                  autoComplete="name"
+                  placeholder="Nombre completo"
+                  aria-label="Nombre completo"
+                  value={datos.nombre}
+                  onChange={cambiar}
+                  aria-invalid={Boolean(errores.nombre)}
+                />
+              </span>
+              {errores.nombre ? <small>{errores.nombre}</small> : null}
+            </label>
 
-          <CampoCorreo
-            valor={datos.correo}
-            onCambiar={cambiarCorreo}
-            error={errores.correo}
-            autoComplete="email"
-          />
+            <CampoCorreo
+              valor={datos.correo}
+              onCambiar={cambiarCorreo}
+              error={errores.correo}
+              autoComplete="email"
+            />
 
-          <label>
-            Contraseña
-            <span className={errores.contrasena ? "control control-error" : "control"}>
-              <IconoCandado />
-              <input
-                name="contrasena"
-                type={verContrasena ? "text" : "password"}
-                autoComplete="new-password"
-                placeholder="Crea una contraseña"
-                value={datos.contrasena}
-                onChange={cambiar}
-                aria-invalid={Boolean(errores.contrasena)}
-              />
-              <button
-                type="button"
-                className="ojo"
-                onClick={() => setVerContrasena((actual) => !actual)}
-                aria-label={verContrasena ? "Ocultar contraseña" : "Mostrar contraseña"}
-              >
-                <IconoOjo oculto={!verContrasena} />
-              </button>
-            </span>
-            {errores.contrasena ? (
-              <small>{errores.contrasena}</small>
-            ) : (
-              <small className="pista">Mínimo 8 caracteres.</small>
-            )}
-          </label>
+            <label>
+              <span className={errores.contrasena ? "control control-error" : "control"}>
+                <input
+                  name="contrasena"
+                  type={verContrasena ? "text" : "password"}
+                  autoComplete="new-password"
+                  placeholder="Contraseña"
+                  aria-label="Contraseña"
+                  value={datos.contrasena}
+                  onChange={cambiar}
+                  aria-invalid={Boolean(errores.contrasena)}
+                />
+                <button
+                  type="button"
+                  className="ojo"
+                  onClick={() => setVerContrasena((actual) => !actual)}
+                  aria-label={verContrasena ? "Ocultar contraseña" : "Mostrar contraseña"}
+                >
+                  <IconoOjo oculto={!verContrasena} />
+                </button>
+              </span>
+              {errores.contrasena ? (
+                <small>{errores.contrasena}</small>
+              ) : (
+                <small className="pista">Mínimo 8 caracteres.</small>
+              )}
+            </label>
 
-          <label>
-            WhatsApp
-            <span className={errores.whatsapp ? "control control-error" : "control"}>
-              <IconoTelefono />
-              <b>+57</b>
-              <input
-                name="whatsapp"
-                inputMode="tel"
-                autoComplete="tel"
-                placeholder="Tu número de celular"
-                value={datos.whatsapp}
-                onChange={cambiar}
-                aria-invalid={Boolean(errores.whatsapp)}
-              />
-            </span>
-            {errores.whatsapp ? <small>{errores.whatsapp}</small> : null}
-          </label>
+            <label>
+              <span className={errores.whatsapp ? "control control-error" : "control"}>
+                <b>+57</b>
+                <input
+                  name="whatsapp"
+                  inputMode="tel"
+                  autoComplete="tel"
+                  placeholder="WhatsApp"
+                  aria-label="WhatsApp"
+                  value={datos.whatsapp}
+                  onChange={cambiar}
+                  aria-invalid={Boolean(errores.whatsapp)}
+                />
+              </span>
+              {errores.whatsapp ? <small>{errores.whatsapp}</small> : null}
+            </label>
 
-          <p className="legal">
-            Al registrarte, aceptas nuestras condiciones de uso y la política de privacidad.
-          </p>
-          <Boton type="submit" icono={<IconoFlecha />} cargando={enviando} textoCargando="Registrando…">
-            Registrarse
-          </Boton>
-        </form>
-      )}
+            <p className="legal">
+              Al registrarte, aceptas nuestras condiciones de uso y la política de privacidad.
+            </p>
+            <Boton type="submit" cargando={enviando} textoCargando="Registrando…">
+              Registrarse
+            </Boton>
+          </form>
+        )}
 
-      <p className="cambio">
-        ¿Ya tienes cuenta? <Link to="/login">Inicia sesión</Link>
-      </p>
+        <p className="cambio">
+          ¿Ya tienes cuenta? <Link to="/login">Inicia sesión</Link>
+        </p>
+      </div>
     </AuthLayout>
   );
 }
@@ -191,8 +185,7 @@ export default function Registro() {
 function validar(datos) {
   const errores = {};
   const nombre = datos.nombre.trim();
-  const usuarioCorreo = datos.correo.trim().toLowerCase();
-  const correo = correoCompleto(usuarioCorreo);
+  const correo = correoCompleto(datos.correo);
   const celular = datos.whatsapp.replace(/\D/g, "").replace(/^57/, "");
 
   if (!nombre) errores.nombre = "El nombre completo es obligatorio.";
@@ -200,9 +193,8 @@ function validar(datos) {
     errores.nombre = "El nombre completo debe tener entre 3 y 120 caracteres.";
   }
 
-  if (!usuarioCorreo) errores.correo = "El correo institucional es obligatorio.";
-  else if (usuarioCorreo.includes("@")) errores.correo = MENSAJE_SOLO_USUARIO;
-  else if (!/^[^\s@]+@unicauca\.edu\.co$/.test(correo)) errores.correo = MENSAJE_DOMINIO;
+  if (!correo) errores.correo = "El correo institucional es obligatorio.";
+  else if (!esCorreoInstitucional(correo)) errores.correo = MENSAJE_DOMINIO;
 
   if (!datos.contrasena) errores.contrasena = "La contraseña es obligatoria.";
   else if (datos.contrasena.length < 8) {

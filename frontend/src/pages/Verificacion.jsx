@@ -2,19 +2,8 @@ import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Aviso, Boton, Cargando } from "@/components/ui";
 import AuthLayout from "../components/AuthLayout.jsx";
-import { IconoCheck, IconoEscudo, IconoFlecha } from "../components/Iconos.jsx";
+import { IconoCheck, IconoFlecha } from "../components/Iconos.jsx";
 import { verificarCorreo } from "../services/auth.js";
-
-const RELATO_VERIFICACION = {
-  titulo: (
-    <>
-      Tu comunidad.
-      <br />
-      Tu próximo viaje.
-    </>
-  ),
-  texto: "Comparte tus trayectos por Popayán con personas de la Universidad del Cauca.",
-};
 
 export default function Verificacion() {
   const [parametros] = useSearchParams();
@@ -46,7 +35,7 @@ export default function Verificacion() {
   }, [token]);
 
   return (
-    <AuthLayout titulo={RELATO_VERIFICACION.titulo} texto={RELATO_VERIFICACION.texto} compacto>
+    <AuthLayout>
       {estado === "exito" ? (
         <ResultadoExito correo={correo} />
       ) : (
@@ -84,11 +73,6 @@ function ResultadoExito({ correo }) {
       <Boton to="/login" icono={<IconoFlecha />}>
         Ir a iniciar sesión
       </Boton>
-
-      <p className="confianza">
-        <IconoEscudo />
-        Tu cuenta, un paso más segura.
-      </p>
     </div>
   );
 }

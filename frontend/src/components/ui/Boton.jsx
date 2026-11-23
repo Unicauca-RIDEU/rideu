@@ -27,7 +27,7 @@ export default function Boton({
   const clase = clases(VARIANTES[variante] ?? VARIANTES.primario, className);
   const contenido = (
     <>
-      {icono}
+      {cargando ? <span className="boton-girando" aria-hidden="true" /> : icono}
       {cargando && textoCargando ? textoCargando : children}
     </>
   );

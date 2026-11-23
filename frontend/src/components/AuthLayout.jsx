@@ -1,26 +1,11 @@
 import { Link } from "react-router-dom";
-import { IconoAuto, IconoEscudo, IconoPersona, IconoRuta } from "./Iconos.jsx";
-import Pie from "./Pie.jsx";
+import { IconoAuto } from "./Iconos.jsx";
 
-const RELATO_POR_DEFECTO = {
-  titulo: (
-    <>
-      La U nos une.
-      <br />
-      El camino también.
-    </>
-  ),
-  texto: "Comparte tus trayectos por Popayán con personas de la Universidad del Cauca.",
-};
-
-// «compacto» muestra solo el mensaje principal: el bloque completo (mapa y beneficios)
-// se reserva para el registro, donde la persona conoce RideU por primera vez.
-export default function AuthLayout({ children, titulo, texto, compacto = false }) {
-  const relatoTitulo = titulo ?? RELATO_POR_DEFECTO.titulo;
-  const relatoTexto = texto ?? RELATO_POR_DEFECTO.texto;
-
+// Diseño de las pantallas de acceso (inicio de sesión, registro y verificación):
+// solo la marca y un panel centrado con el formulario.
+export default function AuthLayout({ children }) {
   return (
-    <div className="pantalla">
+    <div className="pantalla pantalla-solo-panel">
       <header className="barra">
         <Link to="/registro" className="marca">
           <span className="marca-icono">
@@ -31,73 +16,10 @@ export default function AuthLayout({ children, titulo, texto, compacto = false }
             <small>Universidad del Cauca</small>
           </span>
         </Link>
-        <p className="exclusivo">
-          <IconoEscudo />
-          Exclusivo para la comunidad Unicauca
-        </p>
       </header>
-
-      <main className="contenido">
-        <section className={compacto ? "relato relato-compacto" : "relato"}>
-          <p className="kicker kicker-claro">
-            <IconoRuta />
-            Juntos hacemos camino
-          </p>
-          <h1>{relatoTitulo}</h1>
-          <p className="relato-texto">{relatoTexto}</p>
-          {compacto ? null : (
-            <>
-              <MapaTrayecto />
-              <ul className="beneficios">
-                <li>
-                  <span>
-                    <IconoEscudo />
-                  </span>
-                  Correos institucionales verificados
-                </li>
-                <li>
-                  <span>
-                    <IconoPersona />
-                  </span>
-                  Más compañía en cada trayecto
-                </li>
-              </ul>
-            </>
-          )}
-          <p className="lugar">Popayán, Cauca · Comunidad en movimiento</p>
-        </section>
+      <main className="contenido-solo-panel">
         <section className="panel">{children}</section>
       </main>
-
-      <Pie />
-    </div>
-  );
-}
-
-function MapaTrayecto() {
-  return (
-    <div className="mapa" aria-hidden="true">
-      <svg viewBox="0 0 460 230">
-        <rect x="28" y="28" width="78" height="58" rx="14" className="bloque" />
-        <rect x="122" y="28" width="78" height="58" rx="14" className="bloque" />
-        <rect x="216" y="28" width="78" height="58" rx="14" className="bloque" />
-        <rect x="28" y="102" width="78" height="58" rx="14" className="bloque" />
-        <rect x="122" y="102" width="78" height="58" rx="14" className="bloque" />
-        <rect x="310" y="102" width="92" height="58" rx="14" className="bloque" />
-        <rect x="216" y="156" width="78" height="46" rx="14" className="bloque" />
-        <path d="M92 154h78v-46h92" className="camino" />
-        <circle cx="78" cy="154" r="9" className="punto" />
-        <g className="auto" transform="translate(148 132)">
-          <rect width="36" height="28" rx="9" />
-          <path d="M8 14h6l3-5h8l3 5h6" />
-        </g>
-        <g className="campus" transform="translate(286 78)">
-          <circle cx="22" cy="22" r="22" />
-          <path d="M22 10 12 16v4h20v-4L22 10Zm-6 12v8h4v-5h4v5h4v-8h-12Z" />
-        </g>
-      </svg>
-      <span className="etiqueta origen">Bello Horizonte</span>
-      <span className="etiqueta destino">Campus Tulcán</span>
     </div>
   );
 }
