@@ -1738,3 +1738,113 @@ button.boton-contorno.reservar-enlace {
   .pestanas { display: flex; }
   .pestana { flex: 1; padding: 0.55rem 0.4rem; font-size: 0.92rem; white-space: nowrap; }
 }
+
+/* Paso 4 del rediseño · Panel principal */
+
+.panel-cuerpo .kicker { margin-top: 0.4rem; }
+
+.panel-cuerpo h1 { margin-top: 0.3rem; }
+
+.panel-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.panel-proximo {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.panel-sin-viajes p { margin: 0; }
+
+.panel-sin-viajes p + p { margin-top: 0.3rem; }
+
+.panel-mas { justify-self: start; }
+
+.panel-acciones {
+  display: grid;
+  gap: 0.9rem;
+  padding-top: 2.35rem;
+}
+
+.panel-accion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.3rem 1.4rem;
+  border: 1px solid #d5e4ff;
+  border-radius: var(--radio);
+  background: white;
+  color: #1f2a44;
+  text-decoration: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.panel-accion span { display: grid; gap: 0.25rem; }
+
+.panel-accion strong { font-size: 1.15rem; }
+
+.panel-accion small { color: var(--texto-suave); font-size: 0.92rem; }
+
+.panel-accion svg {
+  flex: none;
+  width: 1.3rem;
+  height: 1.3rem;
+  color: var(--azul);
+}
+
+.panel-accion:hover { border-color: var(--azul); box-shadow: var(--foco); }
+
+.panel-accion:focus-visible { outline: 2px solid var(--azul); outline-offset: 2px; }
+
+.panel-accion-principal {
+  border-color: transparent;
+  background: var(--azul);
+  color: white;
+}
+
+.panel-accion-principal small { color: rgb(255 255 255 / 85%); }
+
+.panel-accion-principal svg { color: white; }
+
+.panel-accion-principal:hover { border-color: transparent; background: var(--azul-oscuro); }
+
+.panel-gestion {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.4rem;
+  padding: 0.4rem 0.2rem 0;
+}
+
+.panel-gestion a {
+  color: var(--azul);
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+}
+
+.panel-gestion a:hover { text-decoration: underline; }
+
+.panel-salir { margin: 2.5rem 0 0; }
+
+.boton-texto {
+  padding: 0.3rem 0;
+  border: 0;
+  background: transparent;
+  color: var(--texto-suave);
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.boton-texto:hover { color: var(--error); }
+
+.boton-texto:disabled { cursor: wait; }
+
+@media (max-width: 900px) {
+  .panel-grid { grid-template-columns: 1fr; }
+  .panel-acciones { order: -1; padding-top: 0; }
+}
