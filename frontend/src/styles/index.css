@@ -1848,3 +1848,200 @@ button.boton-contorno.reservar-enlace {
   .panel-grid { grid-template-columns: 1fr; }
   .panel-acciones { order: -1; padding-top: 0; }
 }
+
+/* Buscar: listado completo con panel de filtros aparte */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.buscar-layout {
+  display: grid;
+  grid-template-columns: minmax(250px, 290px) minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.buscar-lateral {
+  position: sticky;
+  top: 1rem;
+}
+
+.boton-filtros { display: none; }
+
+.panel-filtros {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.panel-filtros h2 { font-size: 1.1rem; }
+
+.panel-filtros .campo small.pista {
+  color: var(--texto-suave);
+  font-weight: 500;
+  font-size: 0.82rem;
+}
+
+.panel-filtros select {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+.panel-filtros .boton-buscar {
+  width: 100%;
+  min-width: 0;
+  margin-top: 0.2rem;
+}
+
+.boton-limpiar {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.panel-filtros .buscar-atajos {
+  margin-top: 0.3rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid #e7eef8;
+}
+
+.buscar-layout .buscar-zona { margin-top: 0; }
+
+.buscar-zona:focus { outline: none; }
+
+.filtros-activos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.chip-filtro {
+  border: 0;
+  background: var(--cielo);
+  color: var(--azul-oscuro);
+  cursor: pointer;
+}
+
+.chip-filtro:hover { background: #d6e6ff; }
+
+.chip-filtro span[aria-hidden] { font-size: 1.05rem; line-height: 1; }
+
+.buscar-dia + .buscar-dia { margin-top: 1.8rem; }
+
+.buscar-dia-titulo {
+  margin: 0 0 0.8rem;
+  font-size: 1.05rem;
+}
+
+.buscar-dia-titulo span { color: var(--texto-suave); font-weight: 600; }
+
+.buscar-layout .buscar-resultados {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+}
+
+@media (max-width: 900px) {
+  .buscar-layout { grid-template-columns: 1fr; gap: 1rem; }
+  .buscar-lateral { position: static; }
+  .boton-filtros {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0.8rem 1.1rem;
+    border: 1px solid var(--borde);
+    border-radius: 999px;
+    background: white;
+    color: var(--azul-oscuro);
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .panel-filtros { display: none; margin-top: 0.7rem; }
+  .panel-filtros-abierto { display: grid; }
+  .panel-filtros h2 { display: none; }
+}
+
+/* Paso 5 del rediseño · Publicar y Vehículo */
+
+.campo small.pista {
+  color: var(--texto-suave);
+  font-weight: 500;
+}
+
+.paso-titulo {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0.9rem 0 0.1rem;
+  font-size: 1rem;
+  color: #1f2a44;
+}
+
+.publicar-campos .paso-titulo:first-child { margin-top: 0.2rem; }
+
+.paso-titulo span {
+  display: inline-grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  flex: none;
+  border-radius: 999px;
+  background: var(--cielo);
+  color: var(--azul-oscuro);
+  font-size: 0.85rem;
+}
+
+.paso-titulo-grande { margin: 0; font-size: 1.25rem; }
+
+.aviso-bloqueo {
+  display: grid;
+  gap: 0.7rem;
+  justify-items: start;
+  margin-bottom: 1.4rem;
+  padding: 1.1rem 1.2rem;
+  border: 1px solid #d5e4ff;
+  border-radius: var(--radio);
+  background: white;
+}
+
+.aviso-bloqueo .aviso { margin: 0; background: var(--cielo); color: var(--azul-oscuro); }
+
+.aviso-bloqueo .aviso p { margin: 0.3rem 0 0; }
+
+.aviso-bloqueo .boton { width: auto; padding: 0 1.5rem; margin-top: 0; }
+
+.pasos-habilitacion {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 1rem 1.2rem 1rem 2.4rem;
+  border-radius: var(--radio);
+  background: white;
+  color: #475467;
+}
+
+.pasos-habilitacion li::marker { color: var(--azul); font-weight: 700; }
+
+.perfil-lado .boton { margin-top: 0; }
+
+/* En móvil la columna única puede encogerse por debajo del ancho mínimo de su contenido. */
+@media (max-width: 900px) {
+  .publicar-grid, .perfil-grid { grid-template-columns: minmax(0, 1fr); }
+  .persona-fila { flex-wrap: wrap; }
+}
+
+/* La fila con nombre y estado salta de línea si el nombre es largo, sin salirse de su columna. */
+.persona-fila { flex-wrap: wrap; row-gap: 0.5rem; }
+.persona-fila .chip { white-space: nowrap; }
+.perfil-lado { min-width: 0; }
