@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Aviso, Boton } from "@/components/ui";
 import AuthLayout from "../components/AuthLayout.jsx";
 import CampoCorreo, { MENSAJE_SOLO_USUARIO, correoCompleto } from "../components/CampoCorreo.jsx";
 import {
@@ -16,6 +17,7 @@ export default function Login() {
   const [mensaje, setMensaje] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [verContrasena, setVerContrasena] = useState(false);
+  const [verOlvido, setVerOlvido] = useState(false);
 
   function cambiar(evento) {
     const { name, value } = evento.target;
@@ -72,11 +74,7 @@ export default function Login() {
         <h2>Volvamos a la U</h2>
         <p className="ayuda">Inicia sesión y comparte tu próximo trayecto.</p>
 
-        {mensaje ? (
-          <p className="aviso aviso-error" role="alert">
-            {mensaje}
-          </p>
-        ) : null}
+        {mensaje ? <Aviso tono="error">{mensaje}</Aviso> : null}
 
         <form className="formulario" onSubmit={enviar} noValidate>
           <CampoCorreo valor={datos.correo} onCambiar={cambiarCorreo} />
@@ -104,14 +102,28 @@ export default function Login() {
             </span>
           </label>
 
-          <button type="button" className="olvido">
+          {/* RideU aún no tiene recuperación de contraseña: el enlace lo explica en vez de no hacer nada. */}
+          <button
+            type="button"
+            className="olvido"
+            aria-expanded={verOlvido}
+            aria-controls="nota-olvido"
+            onClick={() => setVerOlvido((actual) => !actual)}
+          >
             ¿Olvidaste tu contraseña?
           </button>
+          {verOlvido ? (
+            <div id="nota-olvido">
+              <Aviso>
+                La recuperación de contraseña todavía no está disponible en RideU. Si no recuerdas tu
+                contraseña, consulta la <Link to="/ayuda">ayuda</Link>.
+              </Aviso>
+            </div>
+          ) : null}
 
-          <button className="boton" type="submit" disabled={enviando}>
-            <IconoFlecha />
-            {enviando ? "Iniciando sesión…" : "Iniciar sesión"}
-          </button>
+          <Boton type="submit" icono={<IconoFlecha />} cargando={enviando} textoCargando="Iniciando sesión…">
+            Iniciar sesión
+          </Boton>
         </form>
 
         <p className="cambio">

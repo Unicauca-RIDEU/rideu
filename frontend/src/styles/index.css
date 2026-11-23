@@ -2087,3 +2087,15 @@ button.boton-contorno.reservar-enlace {
 }
 
 .boton-whatsapp-fila svg, .contacto-tarjeta .boton-whatsapp svg { width: 1.1rem; height: 1.1rem; }
+
+/* Paso 7 del rediseño · Acceso */
+
+.registro-listo { display: grid; gap: 0.9rem; }
+
+.registro-listo .aviso { margin: 0; }
+
+.registro-listo .pasos-habilitacion { background: var(--cielo); }
+
+.formulario .aviso a { color: inherit; font-weight: 700; }
+
+.olvido[aria-expanded="true"] { text-decoration: underline; }

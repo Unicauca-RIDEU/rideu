@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { Aviso, Boton } from "@/components/ui";
 import AuthLayout from "../components/AuthLayout.jsx";
 import CampoCorreo, { MENSAJE_SOLO_USUARIO, correoCompleto } from "../components/CampoCorreo.jsx";
 import {
@@ -83,13 +84,23 @@ export default function Registro() {
       <h2>Crea tu cuenta</h2>
       <p className="ayuda">El primer paso para compartir el camino a la U.</p>
 
-      {mensaje ? (
-        <p className={exito ? "aviso aviso-exito" : "aviso aviso-error"} role="alert">
-          {mensaje}
-        </p>
-      ) : null}
+      {mensaje && !exito ? <Aviso tono="error">{mensaje}</Aviso> : null}
 
-      {exito ? null : (
+      {exito ? (
+        <div className="registro-listo">
+          <Aviso tono="exito" icono>
+            {mensaje}
+          </Aviso>
+          <ol className="pasos-habilitacion">
+            <li>Abre el correo que te enviamos a {validar(datos).correo}.</li>
+            <li>Pulsa el enlace de verificación (vence en 24 horas).</li>
+            <li>Vuelve aquí e inicia sesión.</li>
+          </ol>
+          <Boton to="/login" icono={<IconoFlecha />}>
+            Ir a iniciar sesión
+          </Boton>
+        </div>
+      ) : (
         <form className="formulario" onSubmit={enviar} noValidate>
           <label>
             Nombre completo
@@ -164,10 +175,9 @@ export default function Registro() {
           <p className="legal">
             Al registrarte, aceptas nuestras condiciones de uso y la política de privacidad.
           </p>
-          <button className="boton" type="submit" disabled={enviando}>
-            <IconoFlecha />
-            {enviando ? "Registrando…" : "Registrarse"}
-          </button>
+          <Boton type="submit" icono={<IconoFlecha />} cargando={enviando} textoCargando="Registrando…">
+            Registrarse
+          </Boton>
         </form>
       )}
 

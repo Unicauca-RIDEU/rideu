@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { Aviso, Boton, Cargando } from "@/components/ui";
 import AuthLayout from "../components/AuthLayout.jsx";
 import { IconoCheck, IconoEscudo, IconoFlecha } from "../components/Iconos.jsx";
 import { verificarCorreo } from "../services/auth.js";
@@ -80,10 +81,9 @@ function ResultadoExito({ correo }) {
         </div>
       ) : null}
 
-      <Link className="boton" to="/login">
+      <Boton to="/login" icono={<IconoFlecha />}>
         Ir a iniciar sesión
-        <IconoFlecha />
-      </Link>
+      </Boton>
 
       <p className="confianza">
         <IconoEscudo />
@@ -105,20 +105,13 @@ function ResultadoPendiente({ estado, mensaje }) {
           Revisa el enlace del correo o vuelve a registrarte si el token ya expiró.
         </p>
       )}
-      {mensaje ? (
-        <p
-          className={estado === "cargando" ? "aviso" : "aviso aviso-error"}
-          role="alert"
-        >
-          {mensaje}
-        </p>
-      ) : null}
+      {mensaje ? <Aviso tono={estado === "cargando" ? "info" : "error"}>{mensaje}</Aviso> : null}
+      {estado === "cargando" ? <Cargando>Un momento…</Cargando> : null}
       {estado === "error" ? (
         <div className="verificacion-acciones">
-          <Link className="boton" to="/login">
+          <Boton to="/login" icono={<IconoFlecha />}>
             Ir a iniciar sesión
-            <IconoFlecha />
-          </Link>
+          </Boton>
           <p className="cambio">
             ¿Necesitas otra cuenta? <Link to="/registro">Regístrate</Link>
           </p>
